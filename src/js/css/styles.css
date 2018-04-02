@@ -1,0 +1,29 @@
+/*Loading Screen Center*/
+.centerComponent {
+    height: 75vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rows{
+    display: flex;
+    margin-left: 12px;
+    width: min-content;
+ }
+ .row {
+    display: flex;
+    width: min-content;
+    margin-right: 16px;
+ }
+ 
+ .mainMain{
+    float: left; 
+    width: 80%;
+ }
+
+.mainLeft{
+    width: 20%;
+    float: left; 
+}
