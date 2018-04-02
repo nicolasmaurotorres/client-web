@@ -58,6 +58,7 @@
     "react": "^15.4.2",
     "react-burger-menu": "^2.3.0",
     "react-dom": "^15.4.2",
+    "react-notifications": "^1.4.3",
     "react-redux": "^5.0.7",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",

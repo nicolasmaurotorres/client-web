@@ -8,6 +8,7 @@ import NavBar from './NavBar'
 import DoctorLobby from './DoctorLobby'
 import PlademaLobby from './PlademaLobby'
 import NotImplementedYet from './NotImplementedYet'
+import FlashMessagesList from './FlashMessagesList'
 
 export default class Routes extends React.Component {
     render(){
@@ -21,6 +22,7 @@ export default class Routes extends React.Component {
                 <div>
                     <Route exact path="/" render={() => <NavBar titles={ titlesNavBarNotLogued } /> } />
                     <Route exact path="/" render={() => <Home /> } />
+                    <Route path="/" render={() => <FlashMessagesList /> } />
                     <Route exact path="/login" render={ () => <NavBar titles={ titlesNavBarNotLogued } />} />
                     <Route exact path="/login" render={() => <LoginPage  />}/>  
                     <Route exact path="/doctor" render={ () => <NavBar titles={ titlesNavBarDoctor } />} />
