@@ -22,6 +22,7 @@ class LoginForm extends React.Component {
         this._submitForm = this._submitForm.bind(this);
         this._isValid = this._isValid.bind(this);
         this._onChange = this._onChange.bind(this);
+        this._onClickCloseError = this._onClickCloseError.bind(this);
     }
 
     _isValid(){
@@ -73,26 +74,19 @@ class LoginForm extends React.Component {
                 };
             })
             .catch(error => {
-                this.setState({loading:false});
+                var e = error.response.data.message;
+                var _errors = this.state.errors;
+                _errors['submit'] = e;
+                this.setState({loading:false,errors:_errors});
             });
         }
     }
 
+    _onClickCloseError(){
+        this.setState({errors:{}});
+    }
+
     render(){
-        /*  error 
-        var notification = <div className="alert alert-dismissible alert-danger">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <strong>Oh snap!</strong> <a href="#" class="alert-link">Change a few things up</a> and try submitting again.
-        </div>;
-            success
-        <div class="alert alert-dismissible alert-success">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <strong>Well done!</strong> You successfully read <a href="#" class="alert-link">this important alert message</a>.
-        </div> 
-        var validEmail = (this.state.validemail)? "has-success" : "has-error";
-        var validFeedback = (this.state.validemail)? "text-success" : "text-danger";
-        var spanMessage = (this.state.validemail)? "Success! You've done it." : "Sorry, that username's taken or is invalid. Try another one.";
-        */
         if (this.state.loading){
             return (
                 <div className="centerComponent">
@@ -101,9 +95,14 @@ class LoginForm extends React.Component {
             );
         } else 
         return (
-            <form onSubmit={ this._submitForm }  className="container">
+            <form onSubmit={ this._submitForm }>
                 <h1 className="text-center">Login </h1>
-
+                { this.state.errors.submit && <div className="alert alert-danger"> 
+                                                    <button onClick={ this._onClickCloseError }type="button" className="close" data-dismiss="alert">
+                                                        <span>&times;</span>
+                                                    </button>
+                                                    {this.state.errors.submit}
+                                                </div>}
                 <TextFieldGroup
                    error = { this.state.errors.email }
                    label="Email"
