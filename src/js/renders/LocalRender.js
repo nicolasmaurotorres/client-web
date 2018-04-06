@@ -7,7 +7,7 @@ import vtkSTLReader from 'vtk.js/Sources/IO/Geometry/STLReader';
 
 import vtkPolyDataReader from 'vtk.js/Sources/IO/Legacy/PolyDataReader';
 
-export default class LocalRender extends React.Component {
+class LocalRender extends React.Component {
     constructor(){
         super();
         this.state = {

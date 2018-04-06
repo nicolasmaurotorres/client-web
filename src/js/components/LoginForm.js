@@ -54,31 +54,7 @@ class LoginForm extends React.Component {
             var obj = {}
             obj["email"] = this.state.email;
             obj["password"] = this.state.password;
-            this.props.userLoginRequest(obj)
-            .then(response => { 
-                this.setState({loading:false});
-                this.props.addFlashMessage({
-                    type:"success",
-                    text:"login success"
-                });
-                switch (response.data.category) {
-                    case 0: // doctor
-                        this.context.router.history.push("/doctor");
-                        break;
-                    case 1: // pladema
-                        this.context.router.history.push("/pladema");
-                        break;
-                    case 2: // admin
-                        this.context.router.history.push("/admin");
-                        break; 
-                };
-            })
-            .catch(error => {
-                var e = error.response.data.message;
-                var _errors = this.state.errors;
-                _errors['submit'] = e;
-                this.setState({loading:false,errors:_errors});
-            });
+            this.props.userLoginRequest(obj,this);
         }
     }
 
