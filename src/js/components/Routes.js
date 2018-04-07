@@ -19,19 +19,14 @@ export default class Routes extends React.Component {
         return (
             <div>
                 <Router path="/" component={Home}>
-                <div>
-                    <Route exact path="/" render={() => <NavBar titles={ titlesNavBarNotLogued } /> } />
-                    <Route exact path="/" render={() => <Home /> } />
-                    <Route path="/" render={() => <FlashMessagesList /> } />
-                    <Route exact path="/login" render={ () => <NavBar titles={ titlesNavBarNotLogued } />} />
-                    <Route exact path="/login" render={() => <LoginPage  />}/>  
-                    <Route exact path="/doctor" render={ () => <NavBar titles={ titlesNavBarDoctor } />} />
-                    <Route exact path="/doctor" render={ () => <DoctorLobby /> } />
-                    <Route exact path="/pladema" render={ () => <NavBar titles={ titlesNavBarPladema } />} />
-                    <Route exact path="/pladema" render={ () => <PlademaLobby />} />
-                    <Route path="/admin" render={ () => <NavBar titles={ titlesNavBarAdmin } />} />
-                    <Route path="/admin" render={ () => <NotImplementedYet />} />
-                </div>
+                    <div>
+                        <Route path="/" render={() => <NavBar titles={ titlesNavBarNotLogued } /> } />
+                        <Route path="/" render={() => <FlashMessagesList /> } />
+                        <Route exact path="/login" render={() => <LoginPage  />}/>  
+                        <Route exact path="/doctor" render={ () => <DoctorLobby /> } />
+                        <Route exact path="/pladema" render={ () => <PlademaLobby />} />
+                        <Route path="/admin" render={ () => <NotImplementedYet />} />
+                    </div>
                 </Router>
             </div>
         );
