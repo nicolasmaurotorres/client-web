@@ -9,7 +9,8 @@ import DoctorLobby                                                      from './
 import PlademaLobby                                                     from './PlademaLobby'
 import NotImplementedYet                                                from './NotImplementedYet'
 import FlashMessagesList                                                from './FlashMessagesList'
-import { authenticateDoctor, authenticatePladema, authenticateAdmin }   from '../utils/authentications'
+import { authenticateDoctor, authenticatePladema, 
+    authenticateAdmin, loginControl }   from '../utils/authentications'
 
 export default class Routes extends React.Component {
     render(){
@@ -19,7 +20,7 @@ export default class Routes extends React.Component {
                     <div>
                         <Route path="/" component = { NavBar } />
                         <Route path="/" component = { FlashMessagesList  } />
-                        <Route exact path="/login" component = { LoginPage }/>  
+                        <Route exact path="/login" component = { loginControl(LoginPage) }/>  
                         <Route exact path="/doctor" component = { authenticateDoctor(DoctorLobby) } />
                         <Route exact path="/pladema" component = { authenticatePladema(PlademaLobby) } />
                         <Route exact path="/admin" component = { authenticateAdmin(NotImplementedYet) } />

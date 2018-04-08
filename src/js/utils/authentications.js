@@ -120,3 +120,45 @@ export function authenticateAdmin(ComposedComponent){
 
     return connect(mapStateToProps,{ addFlashMessage })(AuthenticateAdmin);
 };
+
+export function loginControl(LoginComponent){
+    class LoginControl extends React.Component {
+        componentWillMount(){
+            if (this.props.auth.isAuthenticated){ // ya esta autenticado, entonces no puede loguear de nuevo
+                this.props.addFlashMessage({
+                    type:'warning',
+                    text:'you are already logged'
+                });
+                var lobby = "";
+                switch (this.props.auth.user.category){
+                    case 0: 
+                        lobby = "/doctor";
+                        break;
+                    case 1:
+                        lobby = "/pladema";
+                        break;
+                    case 2:
+                        lobby = "/admin";
+                        break;
+                }
+                this.context.router.history.push(lobby);
+            }
+        }
+        render(){
+            return (
+                <LoginComponent {...this.props} />
+            );
+        }
+    }
+
+    LoginControl.propTypes = {
+        auth : PropTypes.object.isRequired,
+        addFlashMessage : PropTypes.func.isRequired
+    }
+
+    LoginControl.contextTypes = {
+        router : PropTypes.object.isRequired
+    }
+
+    return connect(mapStateToProps,{ addFlashMessage })(LoginControl);
+}
