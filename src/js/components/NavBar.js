@@ -24,7 +24,7 @@ class NavBar extends React.Component {
         );
         const authenticated = (
             <ul className="navbar-nav mr-auto navbar-right"> 
-                <li className="nav-item" ><Link className="nav-link" to = "/home" onClick = { this._onClickLogout } >Logout</Link></li>
+                <li className="nav-item" ><Link className="nav-link" to = "/login" onClick = { this._onClickLogout } >Logout</Link></li>
             </ul>
         );
         return (

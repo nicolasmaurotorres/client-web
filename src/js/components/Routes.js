@@ -1,14 +1,15 @@
-import React from 'react'
-import { Route , IndexRoute } from 'react-router-dom'
-import { BrowserRouter as Router } from 'react-router-dom';
+import React                                                            from 'react'
+import { Route , IndexRoute }                                           from 'react-router-dom'
+import { BrowserRouter as Router }                                      from 'react-router-dom';
 
-import Home from './Home'
-import LoginPage from './LoginPage' 
-import NavBar from './NavBar'
-import DoctorLobby from './DoctorLobby'
-import PlademaLobby from './PlademaLobby'
-import NotImplementedYet from './NotImplementedYet'
-import FlashMessagesList from './FlashMessagesList'
+import Home                                                             from './Home'
+import LoginPage                                                        from './LoginPage' 
+import NavBar                                                           from './NavBar'
+import DoctorLobby                                                      from './DoctorLobby'
+import PlademaLobby                                                     from './PlademaLobby'
+import NotImplementedYet                                                from './NotImplementedYet'
+import FlashMessagesList                                                from './FlashMessagesList'
+import { authenticateDoctor, authenticatePladema, authenticateAdmin }   from '../utils/authentications'
 
 export default class Routes extends React.Component {
     render(){
@@ -19,9 +20,9 @@ export default class Routes extends React.Component {
                         <Route path="/" component = { NavBar } />
                         <Route path="/" component = { FlashMessagesList  } />
                         <Route exact path="/login" component = { LoginPage }/>  
-                        <Route exact path="/doctor" component = { DoctorLobby } />
-                        <Route exact path="/pladema" component = { PlademaLobby } />
-                        <Route exact path="/admin" component = { NotImplementedYet } />
+                        <Route exact path="/doctor" component = { authenticateDoctor(DoctorLobby) } />
+                        <Route exact path="/pladema" component = { authenticatePladema(PlademaLobby) } />
+                        <Route exact path="/admin" component = { authenticateAdmin(NotImplementedYet) } />
                     </div>
                 </Router>
             </div>

@@ -20,8 +20,9 @@ const store = createStore(
 if (localStorage.jwtToken){
     setAuthorizationInfo(localStorage.jwtToken);
     store.dispatch(setCurrentUser(jwt.decode(localStorage.jwtToken)));
+} else {
+    store.dispatch(setCurrentUser({}));
 }
-
 
 const app = document.getElementById('app');
 ReactDOM.render(<Provider store={ store }>
