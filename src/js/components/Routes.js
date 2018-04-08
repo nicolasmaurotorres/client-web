@@ -12,20 +12,16 @@ import FlashMessagesList from './FlashMessagesList'
 
 export default class Routes extends React.Component {
     render(){
-        var titlesNavBarNotLogued = [["Login","/login","login"]];
-        var titlesNavBarDoctor = [["Add","/doctor/add"],["Edit","/doctor/edit"],["Delete","/doctor/delete"],["View","/doctor/view"]];
-        var titlesNavBarPladema = [["Add","/pladema/add"],["Edit","/pladema/edit"],["Delete","/pladema/delete"],["Download","/pladema/download/file"]];
-        var titlesNavBarAdmin = [["Add","/admin/add"],["Edit","/admin/edit"],["Delete","/admin/delete"]];
         return (
             <div>
-                <Router path="/" component={Home}>
+                <Router path="/" component = { Home }>
                     <div>
-                        <Route path="/" render={() => <NavBar titles={ titlesNavBarNotLogued } /> } />
-                        <Route path="/" render={() => <FlashMessagesList /> } />
-                        <Route exact path="/login" render={() => <LoginPage  />}/>  
-                        <Route exact path="/doctor" render={ () => <DoctorLobby /> } />
-                        <Route exact path="/pladema" render={ () => <PlademaLobby />} />
-                        <Route path="/admin" render={ () => <NotImplementedYet />} />
+                        <Route path="/" component = { NavBar } />
+                        <Route path="/" component = { FlashMessagesList  } />
+                        <Route exact path="/login" component = { LoginPage }/>  
+                        <Route exact path="/doctor" component = { DoctorLobby } />
+                        <Route exact path="/pladema" component = { PlademaLobby } />
+                        <Route exact path="/admin" component = { NotImplementedYet } />
                     </div>
                 </Router>
             </div>

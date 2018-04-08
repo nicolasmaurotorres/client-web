@@ -1,30 +1,54 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux'
+import { userLogoutRequest } from '../actions/authActions'
 
+class NavBar extends React.Component {
+    constructor(props){
+        super(props);
 
-export default class NavBar extends React.Component {
+        this._onClickLogout = this._onClickLogout.bind(this);
+    }
+
+    _onClickLogout(e){
+        this.props.userLogoutRequest();
+    }
+
     render(){
-        var links = this.props.titles.map(function(link){
-                        return <li key={link[1]+link[0]} className="nav-item"><Link className="nav-link" name={link[2]} to={link[1]}>{link[0]}</Link></li>;
-                    });
-        
+        const { isAuthenticated } = this.props.auth;
+        const notAuthenticated = (
+            <ul className="navbar-nav mr-auto navbar-right"> 
+                <li className="nav-item"><Link className="nav-link" to = "/login">Login</Link></li>
+            </ul>
+        );
+        const authenticated = (
+            <ul className="navbar-nav mr-auto navbar-right"> 
+                <li className="nav-item" ><Link className="nav-link" to = "/home" onClick = { this._onClickLogout } >Logout</Link></li>
+            </ul>
+        );
         return (
             <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-                <Link className="navbar-brand" to="/">Home</Link>
                 <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation" >
                     <span className="navbar-toggler-icon"></span>
                 </button>
                 <div className="collapse navbar-collapse" id="navbarColor01">
-                    <ul className="navbar-nav mr-auto">
-                        {links}
-                    </ul>
+                    { isAuthenticated ? authenticated : notAuthenticated }
                 </div>
             </nav>
         );
     }
 }
 
-NavBar.propTypes = {
-    titles: PropTypes.array.isRequired,
-  };
+NavBar.PropTypes = {
+    auth : PropTypes.object.isRequired,
+    userLogoutRequest : PropTypes.func.isRequired
+}
+
+function mapStateToProps(state) {
+    return {
+        auth : state.auth
+    };
+}
+
+export default connect(mapStateToProps,{ userLogoutRequest })(NavBar);

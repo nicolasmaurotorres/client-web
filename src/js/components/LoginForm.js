@@ -17,7 +17,7 @@ class LoginForm extends React.Component {
             password:"",
             loading : false,
             errors : {}
-        };
+        };0
         // Bindings
         this._submitForm = this._submitForm.bind(this);
         this._isValid = this._isValid.bind(this);

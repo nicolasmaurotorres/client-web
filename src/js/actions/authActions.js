@@ -10,9 +10,20 @@ export function setCurrentUser(user) {
     };
 }
 
+export function userLogoutRequest(){
+    return function action(dispatch){
+        var data = {};
+        data["token"] = localStorage.jwtToken;
+        axiosInstance.post("/logout",data)
+        setAuthorizationInfo(false)
+        dispatch(setCurrentUser({}));
+    }
+}
+
 export function userLoginRequest(data,contextReact){
     return function action(dispatch){
-        return axiosInstance.post('/login',data).then(response => { 
+        return axiosInstance.post('/login',data)
+        .then(response => { 
             contextReact.setState({loading:false});
             contextReact.props.addFlashMessage({
                 type:"success",
@@ -24,16 +35,15 @@ export function userLoginRequest(data,contextReact){
             dispatch(setCurrentUser(jwt.decode(token)));
             switch (category) {
                 case 0: // doctor
-                contextReact.context.router.history.push("/doctor");
+                    contextReact.context.router.history.push("/doctor");
                     break;
                 case 1: // pladema
-                contextReact.context.router.history.push("/pladema");
+                    contextReact.context.router.history.push("/pladema");
                     break;
                 case 2: // admin
-                contextReact.context.router.history.push("/admin");
+                    contextReact.context.router.history.push("/admin");
                     break; 
             };
-
         })
         .catch(error => {
             var e = error.response.data.message;

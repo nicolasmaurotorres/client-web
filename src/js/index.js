@@ -8,7 +8,7 @@ import jwt                                          from 'jsonwebtoken';
 import Routes                                       from './components/Routes'
 import rootReducer                                  from './reducers/rootReducer'
 import setAuthorizationInfo                         from './utils/setAuthorizationInfo';
-import { setCurrentUser }                           from './actions/userLoginRequest';
+import { setCurrentUser }                           from './actions/authActions';
 
 const store = createStore(
     rootReducer,
