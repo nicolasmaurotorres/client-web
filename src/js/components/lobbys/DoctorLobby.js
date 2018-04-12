@@ -1,10 +1,10 @@
 import React    from 'react'
 import FileBrowserWidget  from 'paraviewweb/src/React/Widgets/FileBrowserWidget';
-import RemoteRender from '../renders/RemoteRender'
+import RemoteRender from '../../renders/RemoteRender'
 
 class DoctorLobby extends React.Component {
-    constructor(){
-       super();
+    constructor(props){
+       super(props);
        this.state = {
            rawResponse : {},
            actualPath : [],
@@ -168,9 +168,9 @@ class DoctorLobby extends React.Component {
                     <div onContextMenu={this._rightClick.bind(this)}>
                         <FileBrowserWidget  
                             className="FileBrowserWidget"
-                            directories = {this.state.actualDirectorys /* ['a', 'b', 'c']*/ } 
-                            files = { this.state.actualFiles /*['g', 'h', 'i', 'Super long name with not much else bla bla bla bla bla bla bla bla bla bla bla bla.txt'] */}
-                            path = { this.state.actualPath /*['Home', 'subDir1', 'subDir2', 'subDir3']*/ }
+                            directories = {this.state.actualDirectorys } 
+                            files = { this.state.actualFiles }
+                            path = { this.state.actualPath  }
                             groups = { [] }
                             onAction = { this._updateState } />
                         { this.props.contextMenu }

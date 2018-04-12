@@ -27,3 +27,20 @@
     width: 20%;
     float: left; 
 }
+/*card styles*/
+.row-card-admin {
+    display: flex;
+    max-width: 30rem;
+    margin: 0 3rem 3rem 0;
+    transition: transform .2s; /* Animation */
+}
+
+.row-card-admin:hover {
+    transform: scale(1.25); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+    cursor: pointer;
+}
+
+.rows-admin{
+    display: flex;
+    margin-left: 23px;
+ }

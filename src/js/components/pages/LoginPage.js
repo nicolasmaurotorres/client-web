@@ -1,10 +1,10 @@
 import React    from 'react'
-import LoginForm from './LoginForm'
 import PropTypes from 'prop-types'
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { userLoginRequest } from '../actions/authActions'
-import { addFlashMessage } from '../actions/flashMessages'
+
+import LoginForm from '../forms/LoginForm'
+import { userLoginRequest } from '../../actions/authActions'
+import { addFlashMessage } from '../../actions/flashMessages'
 
 class LoginPage extends React.Component {
     render(){ 

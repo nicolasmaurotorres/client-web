@@ -1,16 +1,19 @@
-import React                                                            from 'react'
-import { Route , IndexRoute }                                           from 'react-router-dom'
-import { BrowserRouter as Router }                                      from 'react-router-dom';
+import React from 'react'
+import { Route , IndexRoute } from 'react-router-dom'
+import { BrowserRouter as Router } from 'react-router-dom';
 
-import Home                                                             from './Home'
-import LoginPage                                                        from './LoginPage' 
-import NavBar                                                           from './NavBar'
-import DoctorLobby                                                      from './DoctorLobby'
-import PlademaLobby                                                     from './PlademaLobby'
-import NotImplementedYet                                                from './NotImplementedYet'
-import FlashMessagesList                                                from './FlashMessagesList'
-import { authenticateDoctor, authenticatePladema, 
-    authenticateAdmin, loginControl }   from '../utils/authentications'
+import Home from './common/Home'
+import LoginPage from './pages/LoginPage' 
+import NavBar from './common/NavBar'
+import DoctorLobby from './lobbys/DoctorLobby'
+import PlademaLobby from './lobbys/PlademaLobby'
+import AdminPage from './pages/AdminLobbyPage'
+import FlashMessagesList from './FlashMessagesList'
+import { authenticateDoctor, authenticatePladema, authenticateAdmin, loginControl }   from '../utils/authentications'
+import AdminDeleteUserPage from './pages/AdminDeleteUserPage'
+import AdminViewUsersPage from './pages/AdminViewUsersPage'
+import AdminEditUserPage from './pages/AdminEditUserPage'
+import AdminAddUserPage from './pages/AdminAddUserPage'
 
 export default class Routes extends React.Component {
     render(){
@@ -23,7 +26,12 @@ export default class Routes extends React.Component {
                         <Route exact path="/login" component = { loginControl(LoginPage) }/>  
                         <Route exact path="/doctor" component = { authenticateDoctor(DoctorLobby) } />
                         <Route exact path="/pladema" component = { authenticatePladema(PlademaLobby) } />
-                        <Route exact path="/admin" component = { authenticateAdmin(NotImplementedYet) } />
+                        <Route exact path="/admin" component = { authenticateAdmin(AdminPage) } />
+                        <Route exact path="/admin/view" component = { authenticateAdmin(AdminViewUsersPage) } />
+                        <Route exact path="/admin/add" component = { authenticateAdmin(AdminAddUserPage) } />
+                        <Route exact path="/admin/edit" component = { authenticateAdmin(AdminEditUserPage) } />
+                        <Route exact path="/admin/delete" component = { authenticateAdmin(AdminDeleteUserPage) } />
+
                     </div>
                 </Router>
             </div>

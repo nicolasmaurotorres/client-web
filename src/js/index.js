@@ -1,14 +1,14 @@
-import React                                        from 'react';
-import ReactDOM                                     from 'react-dom';
-import { Provider }                                 from 'react-redux';
-import   thunk                                      from 'redux-thunk';
-import { createStore , applyMiddleware, compose }   from 'redux';
-import jwt                                          from 'jsonwebtoken';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
+import { createStore , applyMiddleware, compose } from 'redux';
+import jwt from 'jsonwebtoken';
 
-import Routes                                       from './components/Routes'
-import rootReducer                                  from './reducers/rootReducer'
-import setAuthorizationInfo                         from './utils/setAuthorizationInfo';
-import { setCurrentUser }                           from './actions/authActions';
+import Routes from './components/Routes'
+import rootReducer from './reducers/rootReducer'
+import setAuthorizationInfo from './utils/setAuthorizationInfo';
+import { setCurrentUser } from './actions/authActions';
 
 const store = createStore(
     rootReducer,

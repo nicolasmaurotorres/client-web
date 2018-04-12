@@ -3,10 +3,10 @@ import classnames from 'classnames'
 import { BeatLoader } from 'react-spinners'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import axiosInstance from '../utils/axiosInstance'
-import TextFieldGroup from './TextFieldGroup'
 import validator from 'validator'
 import isEmpty from 'lodash/isEmpty'
+
+import TextFieldGroup from '../common/TextFieldGroup'
 
 class LoginForm extends React.Component {
     constructor(){
