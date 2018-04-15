@@ -44,3 +44,12 @@
     display: flex;
     margin-left: 23px;
  }
+
+ /* button message modals */
+ .marginButton {
+    margin: 8px
+ }
+
+ .marginButton:hover{
+     box-shadow: 0 0 6px rgba(35,173,278,1);
+ }

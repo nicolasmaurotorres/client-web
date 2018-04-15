@@ -45,6 +45,9 @@
     "worker-loader": "^1.1.1"
   },
   "dependencies": {
+    "@fortawesome/fontawesome": "^1.1.5",
+    "@fortawesome/fontawesome-free-solid": "^5.0.10",
+    "@fortawesome/react-fontawesome": "0.0.18",
     "axios": "^0.17.1",
     "browserify": "^14.5.0",
     "classnames": "^2.2.5",
@@ -58,7 +61,11 @@
     "paraviewweb": "^2.5.20",
     "react": "^15.4.2",
     "react-burger-menu": "^2.3.0",
+    "react-confirm": "^0.1.17",
+    "react-contexify": "^3.0.0",
     "react-dom": "^15.4.2",
+    "react-fontawesome": "^1.6.1",
+    "react-modal": "^3.3.2",
     "react-notifications": "^1.4.3",
     "react-redux": "^5.0.7",
     "react-router": "^4.2.0",

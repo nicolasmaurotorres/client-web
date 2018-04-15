@@ -25,4 +25,4 @@ AdminViewUsersPage.propTypes = {
     addFlashMessage : PropTypes.func.isRequired
 }
 
-export default connect(null,{ createUserRequest,addFlashMessage })(AdminViewUsersPage);
+export default connect(null,{ createUserRequest,addFlashMessage,deleteUserRequest,editUserRequest })(AdminViewUsersPage);

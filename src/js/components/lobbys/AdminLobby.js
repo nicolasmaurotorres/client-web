@@ -4,12 +4,12 @@ import PropTypes from 'prop-types'
 class AdminLobby extends React.Component {
     constructor(props){
         super(props);
+        
         /* bindings */
         this._onClick = this._onClick.bind(this);
     }
 
     _onClick(e){
-        debugger;
         var dir = e.target.id;
         this.context.router.history.push("/admin/"+dir);
     }

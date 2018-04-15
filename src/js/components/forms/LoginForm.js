@@ -77,7 +77,6 @@ class LoginForm extends React.Component {
                                                     <button onClick={ this._onClickCloseError }type="button" className="close" data-dismiss="alert">
                                                         <span>&times;</span>
                                                     </button>
-                                                    {this.state.errors.submit}
                                                 </div>}
                 <TextFieldGroup
                    error = { this.state.errors.email }

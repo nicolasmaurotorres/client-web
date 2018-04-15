@@ -5,6 +5,7 @@ import RemoteRender from '../../renders/RemoteRender'
 class DoctorLobby extends React.Component {
     constructor(props){
        super(props);
+       
        this.state = {
            rawResponse : {},
            actualPath : [],
