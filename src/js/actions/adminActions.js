@@ -17,3 +17,10 @@ export function editUserRequest(data){
         return axiosInstance.post("/admin/edit/user",data);
      }
 }
+
+export function viewUsersRequest(data){
+    debugger;
+    return function action(dispatch){
+        return axiosInstance.post("/admin/view/users",data);
+     }
+}
