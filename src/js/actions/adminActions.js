@@ -19,7 +19,6 @@ export function editUserRequest(data){
 }
 
 export function viewUsersRequest(data){
-    debugger;
     return function action(dispatch){
         return axiosInstance.post("/admin/view/users",data);
      }

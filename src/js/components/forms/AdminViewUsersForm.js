@@ -16,15 +16,19 @@ class AdminViewUsersForm extends React.Component {
             rawResponse : {},
             actualPath : [],
             actualFiles : [],
-            actualDirectorys : []
+            actualDirectorys : [],
+            errors: {}
         }
+
+        /*bindings*/
+        this._getAllUsers = this._getAllUsers.bind(this);
     }
 
-    componentWillMount(){
-        this.setState({loading:true});
+
+    _getAllUsers(){
+        this.setState({ loading : true });
         this.props.viewUsersRequest({ token : localStorage.jwtToken })
         .then((response)=>{
-            debugger;
             var subFolders = [];
             var users = response.data.users;
             for(var i = 0; i < users.length; i++){
@@ -36,6 +40,10 @@ class AdminViewUsersForm extends React.Component {
             debugger;
             this.setState({ loading : false});
         });
+    }
+
+    componentWillMount(){
+        this._getAllUsers();
     }
    
     render(){ 
@@ -50,13 +58,22 @@ class AdminViewUsersForm extends React.Component {
                     .then(
                         (result) => {
                           // `proceed` callback
-                          
-                          
+                          var obj = {}
+                          obj["token"] = localStorage.jwtToken;
+                          obj["email"] = name;
+                          this.props.deleteUserRequest(obj)
+                          .then((response)=>{
+                            // actualizo los usuarios
+                            this._getAllUsers();
+                          })
+                          .catch((response)=>{
+                            debugger;
+                            //error al borrar
+                          })
                         },
                         (result) => {
                           // `cancel` callback
-                          console.log('cancel called');
-                          console.log(result)
+                          
                         }
                       )
                     break;

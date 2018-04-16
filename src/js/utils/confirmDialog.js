@@ -1,8 +1,8 @@
 import { createConfirmation } from 'react-confirm';
-import DialogPage from '../components/forms/DialogForm';
+import DialogForm from '../components/forms/DialogForm';
  
 // create confirm function
-const confirm = createConfirmation(DialogPage);
+const confirm = createConfirmation(DialogForm);
  
 // This is optional. But I recommend to define your confirm function easy to call.
 export default function(title,message = {} ) {
