@@ -17,13 +17,12 @@ class AdminViewUsersForm extends React.Component {
             actualPath : [],
             actualFiles : [],
             actualDirectorys : [],
-            errors: {}
+            errors: null
         }
 
         /*bindings*/
         this._getAllUsers = this._getAllUsers.bind(this);
     }
-
 
     _getAllUsers(){
         this.setState({ loading : true });
@@ -31,14 +30,17 @@ class AdminViewUsersForm extends React.Component {
         .then((response)=>{
             var subFolders = [];
             var users = response.data.users;
-            for(var i = 0; i < users.length; i++){
+            for(var i = 0; i < users.length; i++) {
                 subFolders.push(users[i]);
             }
-            this.setState({ actualDirectorys : subFolders, loading : false, actualFiles : [], actualPath : ["Users"], rawResponse : response.data });
+            this.setState({ actualDirectorys : subFolders, 
+                            loading : false, 
+                            actualFiles : [], 
+                            actualPath : ["Users"], 
+                            rawResponse : response.data });
         })
         .catch((response)=>{
-            debugger;
-            this.setState({ loading : false});
+            this.setState({ loading : false });
         });
     }
 
@@ -48,10 +50,9 @@ class AdminViewUsersForm extends React.Component {
    
     render(){ 
         const { createUserRequest, addFlashMessage, deleteUserRequest, editUserRequest, viewUsersRequest } = this.props;
-         /* habilitar context menues */
         const onClickDelete = ({ event, ref, data, dataFromProvider }) => {
-            var action = event.target.dataset.action;
-            var name = event.target.dataset.name;
+            const action = event.target.dataset.action;
+            const name = event.target.dataset.name;
             switch(action){
                 case 'directory': {
                     confirm("Warning","Are you sure you want to delete this user?")
@@ -61,25 +62,27 @@ class AdminViewUsersForm extends React.Component {
                           var obj = {}
                           obj["token"] = localStorage.jwtToken;
                           obj["email"] = name;
-                          this.props.deleteUserRequest(obj)
+                          deleteUserRequest(obj)
                           .then((response)=>{
                             // actualizo los usuarios
-                            this._getAllUsers();
+                            addFlashMessage({
+                                type:"success",
+                                text:"user "+name+" deleted"
+                            });
+                            let arr = this.state.actualDirectorys;
+                            arr = arr.filter(e => e !== name); // will return ['A', 'C']
+                            this.setState({ actualDirectorys : arr });
                           })
                           .catch((response)=>{
                             debugger;
-                            //error al borrar
-                          })
+                            //TODO: fijar si si esta logueado sino mostrar el error
+                          });
                         },
                         (result) => {
                           // `cancel` callback
-                          
+                          //TODO: fijar si si esta logueado sino mostrar el error
                         }
-                      )
-                    break;
-                }
-                case 'file': {
-                    this.props.admin
+                      );
                     break;
                 }
             }
@@ -89,9 +92,6 @@ class AdminViewUsersForm extends React.Component {
             switch(action){
                 case 'directory': {
                     //TODO: edit directory
-                    break;
-                }
-                case 'file': {
                     break;
                 }
             }
@@ -107,7 +107,7 @@ class AdminViewUsersForm extends React.Component {
         if (this.state.loading){
             return (
                 <div className="centerComponent">
-                    <BeatLoader color =  {'#2FA4E7'} loading = { this.state.loading }/>
+                    <BeatLoader color =  { '#2FA4E7' } loading = { this.state.loading }/>
                 </div>
             );
         } else {
@@ -116,11 +116,10 @@ class AdminViewUsersForm extends React.Component {
                 <ContextMenuProvider id = "rightClickContextMenu" >
                     <FileBrowserWidget  
                         className="FileBrowserWidget"
-                        directories = {this.state.actualDirectorys } 
+                        directories = { this.state.actualDirectorys } 
                         files = { this.state.actualFiles }
                         path = { this.state.actualPath  }
-                        groups = { [] }
-                        />
+                        groups = { [] } />
                 </ContextMenuProvider>
                 <MenuFile/>
             </div>
