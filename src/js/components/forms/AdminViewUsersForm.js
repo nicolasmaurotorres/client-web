@@ -8,6 +8,7 @@ import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify
 import 'react-contexify/dist/ReactContexify.min.css'; // css del click derecho
 import confirm from '../../utils/confirmDialog'
 import Table from '../common/Table';
+import ConfirmForm from '../forms/ConfirmForm';
 
 class AdminViewUsersForm extends React.Component {
     constructor(props){
@@ -32,7 +33,7 @@ class AdminViewUsersForm extends React.Component {
         })
         .catch((response)=>{
             this.props.addFlashMessage({
-                type:"danger",
+                type:"error",
                 text:"cannot get the users from server"
             });
             this.setState({ loading : false });
@@ -47,19 +48,16 @@ class AdminViewUsersForm extends React.Component {
         const columns = ["Category","Email"];
         const { createUserRequest, addFlashMessage, deleteUserRequest, editUserRequest, viewUsersRequest } = this.props;
         const onClickDelete = ({ event, ref, data, dataFromProvider }) => {
-            debugger;
             const email = event.target.parentElement.id;
             if (email !== ''){
-                confirm("Warning","Are you sure you want to delete this user?")
+                confirm(ConfirmForm,"Warning","Are you sure you want to delete this user?")
                 .then((result) => {
                     // `proceed` callback
                     var obj = {}
-                    obj["token"] = localStorage.jwtToken;
                     obj["email"] = email;
                     deleteUserRequest(obj)
                     .then((response)=>{
                         // actualizo los usuarios
-                        debugger;
                         addFlashMessage({
                             type:"success",
                             text:"user "+email+" deleted"
@@ -107,9 +105,7 @@ class AdminViewUsersForm extends React.Component {
             return (
                 <div className="bs-docs-section">
                     <ContextMenuProvider id = "rightClickContextMenu" >
-                    
                         <Table columns = { columns } data = { this.state.data } />
-                    
                     </ContextMenuProvider>
                     <MenuFile/>
                 </div>
@@ -117,7 +113,6 @@ class AdminViewUsersForm extends React.Component {
         }
     }
 }
-
 
 AdminViewUsersForm.propTypes = {
     createUserRequest : PropTypes.func.isRequired,

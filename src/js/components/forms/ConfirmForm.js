@@ -17,7 +17,7 @@ const customStyles = {
 // Make sure to bind modal to your appElement (http://reactcommunity.org/react-modal/accessibility/)
 Modal.setAppElement('#app')
 
-class DialogForm extends React.Component {
+class ConfirmForm extends React.Component {
   constructor(props) {
     super(props);
 
@@ -68,10 +68,10 @@ class DialogForm extends React.Component {
   }
 }
 
-DialogForm.propTypes = {
+ConfirmForm.propTypes = {
   title : PropTypes.string.isRequired,
   message : PropTypes.string.isRequired,
 }
 
 
-export default confirmable(DialogForm);
+export default confirmable(ConfirmForm);

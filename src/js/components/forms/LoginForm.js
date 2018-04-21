@@ -48,6 +48,7 @@ class LoginForm extends React.Component {
     }
 
     _submitForm(e){
+        debugger;
         e.preventDefault(); 
         if (this._isValid()){
             this.setState({loading:true});
@@ -71,7 +72,7 @@ class LoginForm extends React.Component {
             );
         } else 
         return (
-            <form onSubmit={ this._submitForm }>
+            <div >
                 <h1 className="text-center">Login </h1>
                 { this.state.errors.submit && <div className="alert alert-danger"> 
                                                     { this.state.errors.submit }
@@ -95,9 +96,9 @@ class LoginForm extends React.Component {
                   type = "password"
                 />
                 <div className="form-group">
-                    <button className="btn btn-primary btn-lg"> Login </button>
+                    <button onClick = { this._submitForm } className="btn btn-primary btn-lg"> Login </button>
                 </div>
-            </form>
+            </div>
         );
     }
 };

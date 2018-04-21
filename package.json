@@ -64,6 +64,7 @@
     "react-confirm": "^0.1.17",
     "react-contexify": "^3.0.0",
     "react-dom": "^15.4.2",
+    "react-dropdown": "^1.4.2",
     "react-fontawesome": "^1.6.1",
     "react-modal": "^3.3.2",
     "react-notifications": "^1.4.3",

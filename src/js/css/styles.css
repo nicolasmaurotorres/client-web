@@ -42,7 +42,11 @@
 
 .rows-admin{
     display: flex;
-    margin-left: 23px;
+ }
+
+ .centered{
+     margin-left: 30%;
+     display: flex;
  }
 
  /* button message modals */
@@ -53,3 +57,17 @@
  .marginButton:hover{
      box-shadow: 0 0 6px rgba(35,173,278,1);
  }
+
+.dropdown-style{
+    position: absolute;
+    transform: translate3d(0px, 38px, 0px); 
+    top: 0px; 
+    left: 0px; 
+    will-change: transform;
+}
+
+.middle{
+    margin-right:20%;
+    margin-left: 20%;
+}
+ 
