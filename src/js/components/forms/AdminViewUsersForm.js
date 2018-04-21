@@ -55,17 +55,18 @@ class AdminViewUsersForm extends React.Component {
                     // `proceed` callback
                     var obj = {}
                     obj["token"] = localStorage.jwtToken;
-                    obj["email"] = name;
+                    obj["email"] = email;
                     deleteUserRequest(obj)
                     .then((response)=>{
                         // actualizo los usuarios
+                        debugger;
                         addFlashMessage({
                             type:"success",
-                            text:"user "+name+" deleted"
+                            text:"user "+email+" deleted"
                         });
-                        let arr = this.state.actualDirectorys;
-                        arr = arr.filter(e => e !== name); // will return ['A', 'C']
-                        this.setState({ actualDirectorys : arr });
+                        let arr = this.state.data;
+                        arr = arr.filter(e => e.email !== email); // will return ['A', 'C']
+                        this.setState({ data : arr });
                     })
                     .catch((response)=>{
                         //TODO: fijar si si esta logueado sino mostrar el error
