@@ -46,7 +46,7 @@ export function userLoginRequest(data,contextReact){
                 };
             })
             .catch(error => {
-                var e = error.response.data.message;
+                var e = error.message;
                 var _errors = contextReact.state.errors;
                 _errors['submit'] = e;
                 contextReact.setState({loading:false,errors:_errors});

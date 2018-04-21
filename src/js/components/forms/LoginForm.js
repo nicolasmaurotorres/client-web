@@ -74,6 +74,7 @@ class LoginForm extends React.Component {
             <form onSubmit={ this._submitForm }>
                 <h1 className="text-center">Login </h1>
                 { this.state.errors.submit && <div className="alert alert-danger"> 
+                                                    { this.state.errors.submit }
                                                     <button onClick={ this._onClickCloseError }type="button" className="close" data-dismiss="alert">
                                                         <span>&times;</span>
                                                     </button>

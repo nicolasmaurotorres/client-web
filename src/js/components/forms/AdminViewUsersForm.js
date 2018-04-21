@@ -7,16 +7,15 @@ import FileBrowserWidget  from 'paraviewweb/src/React/Widgets/FileBrowserWidget'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.min.css'; // css del click derecho
 import confirm from '../../utils/confirmDialog'
+import Table from '../common/Table';
 
 class AdminViewUsersForm extends React.Component {
     constructor(props){
         super(props);
         
         this.state = {
-            rawResponse : {},
-            actualPath : [],
-            actualFiles : [],
-            actualDirectorys : [],
+            data : [],
+            loading: false,
             errors: null
         }
 
@@ -28,18 +27,14 @@ class AdminViewUsersForm extends React.Component {
         this.setState({ loading : true });
         this.props.viewUsersRequest({ token : localStorage.jwtToken })
         .then((response)=>{
-            var subFolders = [];
-            var users = response.data.users;
-            for(var i = 0; i < users.length; i++) {
-                subFolders.push(users[i]);
-            }
-            this.setState({ actualDirectorys : subFolders, 
-                            loading : false, 
-                            actualFiles : [], 
-                            actualPath : ["Users"], 
-                            rawResponse : response.data });
+            var usersServer = response.data.users;
+            this.setState({data: usersServer, loading: false})
         })
         .catch((response)=>{
+            this.props.addFlashMessage({
+                type:"danger",
+                text:"cannot get the users from server"
+            });
             this.setState({ loading : false });
         });
     }
@@ -49,44 +44,41 @@ class AdminViewUsersForm extends React.Component {
     }
    
     render(){ 
+        const columns = ["Category","Email"];
         const { createUserRequest, addFlashMessage, deleteUserRequest, editUserRequest, viewUsersRequest } = this.props;
         const onClickDelete = ({ event, ref, data, dataFromProvider }) => {
-            const action = event.target.dataset.action;
-            const name = event.target.dataset.name;
-            switch(action){
-                case 'directory': {
-                    confirm("Warning","Are you sure you want to delete this user?")
-                    .then(
-                        (result) => {
-                          // `proceed` callback
-                          var obj = {}
-                          obj["token"] = localStorage.jwtToken;
-                          obj["email"] = name;
-                          deleteUserRequest(obj)
-                          .then((response)=>{
-                            // actualizo los usuarios
-                            addFlashMessage({
-                                type:"success",
-                                text:"user "+name+" deleted"
-                            });
-                            let arr = this.state.actualDirectorys;
-                            arr = arr.filter(e => e !== name); // will return ['A', 'C']
-                            this.setState({ actualDirectorys : arr });
-                          })
-                          .catch((response)=>{
-                            debugger;
-                            //TODO: fijar si si esta logueado sino mostrar el error
-                          });
-                        },
-                        (result) => {
-                          // `cancel` callback
-                          //TODO: fijar si si esta logueado sino mostrar el error
-                        }
-                      );
-                    break;
-                }
-            }
+            debugger;
+            const email = event.target.parentElement.id;
+            if (email !== ''){
+                confirm("Warning","Are you sure you want to delete this user?")
+                .then((result) => {
+                    // `proceed` callback
+                    var obj = {}
+                    obj["token"] = localStorage.jwtToken;
+                    obj["email"] = name;
+                    deleteUserRequest(obj)
+                    .then((response)=>{
+                        // actualizo los usuarios
+                        addFlashMessage({
+                            type:"success",
+                            text:"user "+name+" deleted"
+                        });
+                        let arr = this.state.actualDirectorys;
+                        arr = arr.filter(e => e !== name); // will return ['A', 'C']
+                        this.setState({ actualDirectorys : arr });
+                    })
+                    .catch((response)=>{
+                        //TODO: fijar si si esta logueado sino mostrar el error
+                    });
+                },
+                (result) => {
+                    // `cancel` callback
+                    //TODO: fijar si si esta logueado sino mostrar el error
+                    }  
+                );
+            };
         };
+
         const onClickEdit = ({event, ref,data,dataFromProvider}) => {
             var action = event.target.dataset.action;
             switch(action){
@@ -106,27 +98,25 @@ class AdminViewUsersForm extends React.Component {
 
         if (this.state.loading){
             return (
-                <div className="centerComponent">
+                <div>
                     <BeatLoader color =  { '#2FA4E7' } loading = { this.state.loading }/>
                 </div>
             );
-        } else {
-        return (
-            <div className="mainLeft"> 
-                <ContextMenuProvider id = "rightClickContextMenu" >
-                    <FileBrowserWidget  
-                        className="FileBrowserWidget"
-                        directories = { this.state.actualDirectorys } 
-                        files = { this.state.actualFiles }
-                        path = { this.state.actualPath  }
-                        groups = { [] } />
-                </ContextMenuProvider>
-                <MenuFile/>
-            </div>
-        );
+         } else {
+            return (
+                <div className="bs-docs-section">
+                    <ContextMenuProvider id = "rightClickContextMenu" >
+                    
+                        <Table columns = { columns } data = { this.state.data } />
+                    
+                    </ContextMenuProvider>
+                    <MenuFile/>
+                </div>
+            );
         }
     }
 }
+
 
 AdminViewUsersForm.propTypes = {
     createUserRequest : PropTypes.func.isRequired,
