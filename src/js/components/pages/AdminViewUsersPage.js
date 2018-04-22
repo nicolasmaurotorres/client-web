@@ -27,4 +27,4 @@ AdminViewUsersPage.propTypes = {
     viewUsersRequest : PropTypes.func.isRequired
 }
 
-export default connect(null,{ createUserRequest,addFlashMessage,deleteUserRequest,editUserRequest,viewUsersRequest })(AdminViewUsersPage);
+export default connect(null,{ createUserRequest,addFlashMessage,deleteUserRequest,editUserRequest,viewUsersRequest})(AdminViewUsersPage);

@@ -25,6 +25,8 @@ class AdminAddUserForm extends React.Component {
         this._onChange = this._onChange.bind(this);
         this._isValid = this._isValid.bind(this);
         this._onClickCloseMessage = this._onClickCloseMessage.bind(this);
+        this._cancelForm = this._cancelForm.bind(this);
+        this.callback = this.callback.bind(this);
     }
 
     _submitForm(){
@@ -37,11 +39,17 @@ class AdminAddUserForm extends React.Component {
             this.props.createUserRequest(obj)
             .then((response)=>{
                 debugger;
-                this.setState({serverMessage : response.response.data.message, serverStatus:"OK"})
+                this.setState({serverMessage : response.data.message, serverStatus:"OK"})
+                this.callback();
             })
             .catch((response)=>{
                 debugger;
-                this.setState({serverMessage : response.response.data.message, serverStatus:"BAD_STATUS"})
+                if (typeof response === 'undefined'){
+                    this.setState({serverMessage : "network error", serverStatus:"BAD_STATUS"})
+                } else {
+                    this.setState({serverMessage : response.data.message, serverStatus:"BAD_STATUS"})
+                }
+                this.callback();
             })
         }
     }
@@ -70,9 +78,17 @@ class AdminAddUserForm extends React.Component {
     }
 
     _cancelForm(){
-        
+        debugger;
+        this.callback();
     }
 
+    callback(){
+        const { callbackModalAdminAddUser } = this.props;
+        if (callbackModalAdminAddUser != null || typeof callbackModalAdminAddUser !== 'undefined'){
+            callbackModalAdminAddUser();
+        }    
+    }
+    
     _onClickCloseMessage(){
         this.setState({serverMessage:"",serverStatus:""});
     }
@@ -123,7 +139,8 @@ class AdminAddUserForm extends React.Component {
 
 AdminAddUserForm.propTypes = {
     createUserRequest : PropTypes.func.isRequired,
-    addFlashMessage : PropTypes.func.isRequired
+    addFlashMessage : PropTypes.func.isRequired,
+    callbackModalAdminAddUser : PropTypes.func
 }
 
 export default AdminAddUserForm;

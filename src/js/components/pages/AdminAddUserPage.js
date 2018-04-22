@@ -8,16 +8,19 @@ import { addFlashMessage } from '../../actions/flashMessages'
 
 class AdminAddUserPage extends React.Component {
     render(){ 
-        const { createUserRequest, addFlashMessage } = this.props;
+        const { createUserRequest, addFlashMessage, callbackCreateOrCancel } = this.props;
         return (
-            <AdminAddUserForm createUserRequest = { createUserRequest } addFlashMessage = { addFlashMessage } />
+            <AdminAddUserForm createUserRequest = { createUserRequest } 
+                              addFlashMessage = { addFlashMessage } 
+                              callbackModalAdminAddUser = { callbackCreateOrCancel } />
         );
     }
 }
 
 AdminAddUserPage.propTypes = {
     createUserRequest : PropTypes.func.isRequired,
-    addFlashMessage : PropTypes.func.isRequired
+    addFlashMessage : PropTypes.func.isRequired,
+    callbackCreateOrCancel: PropTypes.func
 }
 
 export default connect(null,{ createUserRequest,addFlashMessage })(AdminAddUserPage);

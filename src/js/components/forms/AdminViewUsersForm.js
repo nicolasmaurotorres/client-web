@@ -1,7 +1,5 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-
 import { BeatLoader } from 'react-spinners'
 import FileBrowserWidget  from 'paraviewweb/src/React/Widgets/FileBrowserWidget';
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify';
@@ -9,6 +7,7 @@ import 'react-contexify/dist/ReactContexify.min.css'; // css del click derecho
 import confirm from '../../utils/confirmDialog'
 import Table from '../common/Table';
 import ConfirmForm from '../forms/ConfirmForm';
+import ModalAddUser from '../forms/ModalAdminAddUser';
 
 class AdminViewUsersForm extends React.Component {
     constructor(props){
@@ -17,11 +16,13 @@ class AdminViewUsersForm extends React.Component {
         this.state = {
             data : [],
             loading: false,
-            errors: null
+            errors: null,
+            showingAddUserModal : false,
         }
 
         /*bindings*/
         this._getAllUsers = this._getAllUsers.bind(this);
+        this.callbackCreateUser = this.callbackCreateUser.bind(this);
     }
 
     _getAllUsers(){
@@ -42,6 +43,10 @@ class AdminViewUsersForm extends React.Component {
 
     componentWillMount(){
         this._getAllUsers();
+    }
+
+    callbackCreateUser(){
+        this.setState({showingAddUserModal : false});
     }
    
     render(){ 
@@ -78,6 +83,11 @@ class AdminViewUsersForm extends React.Component {
             };
         };
 
+        const onClickAdd = ({event, ref,data,dataFromProvider}) => {
+            debugger;
+            this.setState({ showingAddUserModal : true });
+        };
+
         const onClickEdit = ({event, ref,data,dataFromProvider}) => {
             var action = event.target.dataset.action;
             switch(action){
@@ -90,25 +100,31 @@ class AdminViewUsersForm extends React.Component {
 
         const MenuFile = () => (
             <ContextMenu  id='rightClickContextMenu'>
-                <Item onClick = { onClickDelete  }><IconFont className="fa fa-trash" /> Delete </Item>
-                <Item onClick = { onClickEdit  }><IconFont className="fa fa-edit" /> Edit </Item>
+                <Item onClick = { onClickAdd }><IconFont className = "fa fa-plus"/> Add </Item>
+                <Item onClick = { onClickEdit }><IconFont className = "fa fa-edit"/> Edit </Item>
+                <Item onClick = { onClickDelete }><IconFont className = "fa fa-trash"/> Delete </Item>
             </ContextMenu>
         );
 
-        if (this.state.loading){
+         if (this.state.loading){
             return (
-                <div>
-                    <BeatLoader color =  { '#2FA4E7' } loading = { this.state.loading }/>
-                </div>
+                <BeatLoader color =  { '#2FA4E7' } loading = { this.state.loading }/>
             );
-         } else {
+         } 
+         if (this.state.showingAddUserModal){
+             return (
+                <ModalAddUser callbackCreateUser = { this.callbackCreateUser } />
+             );
+         }
+         else {
             return (
-                <div className="bs-docs-section">
-                    <ContextMenuProvider id = "rightClickContextMenu" >
-                        <Table columns = { columns } data = { this.state.data } />
-                    </ContextMenuProvider>
-                    <MenuFile/>
-                </div>
+                    <div className="bs-docs-section">
+                        <ContextMenuProvider id = "rightClickContextMenu" >
+                            <Table columns = { columns } data = { this.state.data } />
+                        </ContextMenuProvider>
+                        <MenuFile/>
+                    </div>
+                
             );
         }
     }
@@ -120,6 +136,10 @@ AdminViewUsersForm.propTypes = {
     editUserRequest: PropTypes.func.isRequired,
     addFlashMessage : PropTypes.func.isRequired,
     viewUsersRequest : PropTypes.func.isRequired
+}
+
+AdminViewUsersForm.contextTypes = {
+    router : PropTypes.object.isRequired
 }
 
 export default AdminViewUsersForm;

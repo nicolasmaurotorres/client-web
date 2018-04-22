@@ -10,7 +10,6 @@ import PlademaLobby from './lobbys/PlademaLobby'
 import AdminPage from './pages/AdminLobbyPage'
 import FlashMessagesList from './FlashMessagesList'
 import { authenticateDoctor, authenticatePladema, authenticateAdmin, loginControl }   from '../utils/authentications'
-import AdminDeleteUserPage from './pages/AdminDeleteUserPage'
 import AdminViewUsersPage from './pages/AdminViewUsersPage'
 import AdminEditUserPage from './pages/AdminEditUserPage'
 import AdminAddUserPage from './pages/AdminAddUserPage'
@@ -30,8 +29,6 @@ export default class Routes extends React.Component {
                         <Route exact path="/admin/view" component = { authenticateAdmin(AdminViewUsersPage) } />
                         <Route exact path="/admin/add" component = { authenticateAdmin(AdminAddUserPage) } />
                         <Route exact path="/admin/edit" component = { authenticateAdmin(AdminEditUserPage) } />
-                        <Route exact path="/admin/delete" component = { authenticateAdmin(AdminDeleteUserPage) } />
-
                     </div>
                 </Router>
             </div>

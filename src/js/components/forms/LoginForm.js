@@ -48,7 +48,6 @@ class LoginForm extends React.Component {
     }
 
     _submitForm(e){
-        debugger;
         e.preventDefault(); 
         if (this._isValid()){
             this.setState({loading:true});
