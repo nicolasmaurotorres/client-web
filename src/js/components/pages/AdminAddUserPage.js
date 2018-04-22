@@ -11,8 +11,7 @@ class AdminAddUserPage extends React.Component {
         const { createUserRequest, addFlashMessage, callbackCreateOrCancel } = this.props;
         return (
             <AdminAddUserForm createUserRequest = { createUserRequest } 
-                              addFlashMessage = { addFlashMessage } 
-                              callbackModalAdminAddUser = { callbackCreateOrCancel } />
+                              addFlashMessage = { addFlashMessage } />
         );
     }
 }
@@ -20,7 +19,6 @@ class AdminAddUserPage extends React.Component {
 AdminAddUserPage.propTypes = {
     createUserRequest : PropTypes.func.isRequired,
     addFlashMessage : PropTypes.func.isRequired,
-    callbackCreateOrCancel: PropTypes.func
 }
 
 export default connect(null,{ createUserRequest,addFlashMessage })(AdminAddUserPage);

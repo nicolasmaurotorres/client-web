@@ -47,6 +47,7 @@ class AdminViewUsersForm extends React.Component {
 
     callbackCreateUser(){
         this.setState({showingAddUserModal : false});
+        this._getAllUsers();
     }
    
     render(){ 
@@ -84,7 +85,6 @@ class AdminViewUsersForm extends React.Component {
         };
 
         const onClickAdd = ({event, ref,data,dataFromProvider}) => {
-            debugger;
             this.setState({ showingAddUserModal : true });
         };
 

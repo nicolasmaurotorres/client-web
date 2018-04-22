@@ -2,7 +2,6 @@ import axiosInstance from '../utils/axiosInstance'
 
 export function createUserRequest(data){
     return function action(dispatch){
-        debugger;
         data["token"] = localStorage.jwtToken;
         return axiosInstance.post("/admin/add/user",data);
      }

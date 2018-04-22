@@ -3,7 +3,8 @@ import PropTypes from 'prop-types'
 import { confirmable } from 'react-confirm';
 import { connect } from 'react-redux';
 import Modal from 'react-modal';
-import AdminAddUserPage from '../pages/AdminAddUserPage'
+
+import AdminAddUserForm from '../forms/AdminAddUserForm'
 import { createUserRequest } from '../../actions/adminActions'
 import { addFlashMessage } from '../../actions/flashMessages'
 
@@ -29,34 +30,17 @@ class ModalAdminAddUser extends React.Component {
       modalIsOpen: true
     };
 
-    //this.openModal = this.openModal.bind(this);
-    this.afterOpenModal = this.afterOpenModal.bind(this);
-    this.closeModalOk = this.closeModalOk.bind(this);
-    this.closeModalCancel = this.closeModalCancel.bind(this);
     this.callbackCreateOrCancel = this.callbackCreateOrCancel.bind(this);
   }
 
-  afterOpenModal() {
-    this.subtitle.style.color = '#f00';// references are now sync'd and can be accessed.
-  }
-
-  closeModalOk() {
-    this.setState({modalIsOpen: false});
-    this.props.proceed();
-  }
-
-  closeModalCancel(){
-    this.setState({modalIsOpen: false});
-    this.props.cancel();
-  }
-
   callbackCreateOrCancel(){
+    debugger;
     this.props.callbackCreateUser();
     this.setState({modalIsOpen : false});
   }
 
   render() {
-    const { show, proceed, dismiss, cancel, confirmation, options, title, message } = this.props;
+    const { createUserRequest, addFlashMessage} = this.props;
     return (
       <div>
         <Modal
@@ -65,7 +49,9 @@ class ModalAdminAddUser extends React.Component {
           onRequestClose={ this.closeModal }
           style={ customStyles }
           contentLabel="Example Modal">
-            <AdminAddUserPage callbackCreateOrCancel = { this.callbackCreateOrCancel }/> 
+            <AdminAddUserForm callbackCreateOrCancel = { this.callbackCreateOrCancel } 
+                              createUserRequest = {createUserRequest} 
+                              addFlashMessage={addFlashMessage} /> 
         </Modal>
       </div>
     );
@@ -74,7 +60,9 @@ class ModalAdminAddUser extends React.Component {
 
 ModalAdminAddUser.propTypes = {
   callbackCreateUser : PropTypes.func.isRequired,
+  createUserRequest : PropTypes.func.isRequired,
+  addFlashMessage : PropTypes.func.isRequired,
 }
 
 
-export default confirmable(ModalAdminAddUser);
+export default connect(null,{createUserRequest,addFlashMessage})(confirmable(ModalAdminAddUser));

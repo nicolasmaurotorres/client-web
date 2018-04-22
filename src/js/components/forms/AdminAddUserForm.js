@@ -32,7 +32,6 @@ class AdminAddUserForm extends React.Component {
     _submitForm(){
         if (this._isValid()){
             var obj = {}
-            debugger;
             obj["email"] = this.state.email;
             obj["password"] = this.state.password;
             obj["category"] = parseInt(this.state.category);
@@ -44,7 +43,7 @@ class AdminAddUserForm extends React.Component {
             })
             .catch((response)=>{
                 debugger;
-                if (typeof response === 'undefined'){
+                if (typeof response.response === 'undefined'){
                     this.setState({serverMessage : "network error", serverStatus:"BAD_STATUS"})
                 } else {
                     this.setState({serverMessage : response.data.message, serverStatus:"BAD_STATUS"})
@@ -78,14 +77,14 @@ class AdminAddUserForm extends React.Component {
     }
 
     _cancelForm(){
-        debugger;
         this.callback();
     }
 
     callback(){
-        const { callbackModalAdminAddUser } = this.props;
-        if (callbackModalAdminAddUser != null || typeof callbackModalAdminAddUser !== 'undefined'){
-            callbackModalAdminAddUser();
+        debugger;
+        const { callbackCreateOrCancel } = this.props;
+        if (callbackCreateOrCancel != null || typeof callbackCreateOrCancel !== 'undefined'){
+            callbackCreateOrCancel();
         }    
     }
     
