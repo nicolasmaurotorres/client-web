@@ -68,6 +68,7 @@
     "react-fontawesome": "^1.6.1",
     "react-modal": "^3.3.2",
     "react-notifications": "^1.4.3",
+    "react-password-mask": "^3.3.0",
     "react-redux": "^5.0.7",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",

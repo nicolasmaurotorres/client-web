@@ -7,7 +7,9 @@ import 'react-contexify/dist/ReactContexify.min.css'; // css del click derecho
 import confirm from '../../utils/confirmDialog'
 import Table from '../common/Table';
 import ConfirmForm from '../forms/ConfirmForm';
-import ModalAddUser from '../forms/ModalAdminAddUser';
+import ModalAddUser from '../modals/ModalAdminAddUser';
+import ModalEditUser from '../modals/ModalAdminEditUser'
+import { createGzip } from 'zlib';
 
 class AdminViewUsersForm extends React.Component {
     constructor(props){
@@ -18,6 +20,8 @@ class AdminViewUsersForm extends React.Component {
             loading: false,
             errors: null,
             showingAddUserModal : false,
+            showingEditUserModal: false,
+            editedUser : []
         }
 
         /*bindings*/
@@ -50,26 +54,29 @@ class AdminViewUsersForm extends React.Component {
         this._getAllUsers();
     }
    
+    callbackEditUser(){
+        this.setState({showingEditUserModal : false, editedUser : []});
+        this._getAllUsers();
+    }
+
     render(){ 
-        const columns = ["Category","Email"];
-        const { createUserRequest, addFlashMessage, deleteUserRequest, editUserRequest, viewUsersRequest } = this.props;
+        const columns = ["Category","Email","Password"];
+        const { addFlashMessage, deleteUserRequest } = this.props;
         const onClickDelete = ({ event, ref, data, dataFromProvider }) => {
             const email = event.target.parentElement.id;
             if (email !== ''){
                 confirm(ConfirmForm,"Warning","Are you sure you want to delete this user?")
-                .then((result) => {
-                    // `proceed` callback
+                .then((result) => { // `proceed` callback
                     var obj = {}
                     obj["email"] = email;
                     deleteUserRequest(obj)
-                    .then((response)=>{
-                        // actualizo los usuarios
+                    .then((response)=>{                         // actualizo los usuarios
                         addFlashMessage({
                             type:"success",
                             text:"user "+email+" deleted"
                         });
                         let arr = this.state.data;
-                        arr = arr.filter(e => e.email !== email); // will return ['A', 'C']
+                        arr = arr.filter(e => e.email !== email);
                         this.setState({ data : arr });
                     })
                     .catch((response)=>{
@@ -89,13 +96,18 @@ class AdminViewUsersForm extends React.Component {
         };
 
         const onClickEdit = ({event, ref,data,dataFromProvider}) => {
-            var action = event.target.dataset.action;
-            switch(action){
-                case 'directory': {
-                    //TODO: edit directory
-                    break;
+            const email = event.target.parentElement.id;
+            var aux = event.target.parentElement.children[0].attributes.name
+            if (typeof aux !== 'undefined'){
+                const password = event.target.parentElement.children[2].children[0].children[0].value; //obtengo la pass
+                const category = parseInt(aux.value); // obtengo el numero de la categoria
+                if (email !== ''){ // si el email es distinto de vacio
+                    var editedUser = [];
+                    editedUser.push(email,category,password);
+                    this.setState({ showingEditUserModal : true, editedUser })
+                    debugger;
                 }
-            }
+            } 
         }
 
         const MenuFile = () => (
@@ -110,11 +122,16 @@ class AdminViewUsersForm extends React.Component {
             return (
                 <BeatLoader color =  { '#2FA4E7' } loading = { this.state.loading }/>
             );
-         } 
+         } else 
          if (this.state.showingAddUserModal){
              return (
                 <ModalAddUser callbackCreateUser = { this.callbackCreateUser } />
              );
+         } else 
+         if (this.state.showingEditUserModal){
+            return (
+                <ModalEditUser callbackEditUser = { this.callbackEditUser } user ={"pepe" }/>
+            );
          }
          else {
             return (
