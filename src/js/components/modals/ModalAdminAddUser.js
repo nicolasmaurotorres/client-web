@@ -12,7 +12,7 @@ const customStyles = {
   content : {
     top                   : '50%',
     left                  : '50%',
-    right                 : 'auto',
+    right                 : '20%',
     bottom                : 'auto',
     marginRight           : '-50%',
     transform             : 'translate(-50%, -50%)'
@@ -45,7 +45,6 @@ class ModalAdminAddUser extends React.Component {
       <div>
         <Modal
           isOpen = { this.state.modalIsOpen }
-          onAfterOpen = { this.afterOpenModal }
           onRequestClose={ this.closeModal }
           style={ customStyles }
           contentLabel="Example Modal">

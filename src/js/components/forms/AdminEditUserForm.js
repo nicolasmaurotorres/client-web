@@ -7,6 +7,8 @@ import 'react-dropdown/style.css'
 import classname from 'classnames'
 import { PropagateLoader } from 'react-spinners';
 
+import PasswordMask from '../common/PasswordMask';
+
 class AdminEditUserForm extends React.Component {
     constructor(props){
         super(props);
@@ -18,6 +20,7 @@ class AdminEditUserForm extends React.Component {
             category: 0, //default doctor
             oldEmail: "",
             oldCategory: "",
+            oldPassword: "",
             serverMessage: "",
             serverStatus: "",
         }
@@ -32,13 +35,14 @@ class AdminEditUserForm extends React.Component {
     }
 
     componentWillMount(){
-        const { oldEmail, oldCategory } = this.props;
-        this.setState({ oldEmail, oldCategory });
+        const { user } = this.props;
+        this.setState({ oldEmail: user.email, oldCategory: user.category, oldPassword : user.password, 
+                        email : user.email, password: user.password, category : user.category });
     }
 
     _submitForm(){
         if (this._isValid()){
-            var obj = {}
+            var obj = {};
             obj["email"] = this.state.email;
             obj["password"] = this.state.password;
             obj["category"] = parseInt(this.state.category);
@@ -116,18 +120,18 @@ class AdminEditUserForm extends React.Component {
                         onChange = { this._onChange }
                         value = { this.state.email }
                         field = "email" />
-                   <TextFieldGroup
-                        error = { this.state.errors.password }
-                        label = "Password"
-                        onChange = { this._onChange }
-                        value = { this.state.password }
-                        field = "password"
-                        type = "password" />
+                      
+                    <PasswordMask 
+                                              id = "passwordEdit"
+                                              name = "password"
+                                              placeholder = "Enter password"
+                                              value = { this.state.oldPassword }
+                                              onChange = { this.handleChange }/>
                     
                     <fieldset>
                         <div className="form-group">
                             <label>Category</label>
-                            <select name="category" onChange={this._onChange } className="custom-select">
+                            <select name="category" value={this.state.category} onChange = { this._onChange } className="custom-select">
                                 <option value="0">Doctor</option>
                                 <option value="1">Pladema</option>
                             </select>
@@ -147,8 +151,8 @@ AdminEditUserForm.propTypes = {
     editUserRequest : PropTypes.func.isRequired,
     addFlashMessage : PropTypes.func.isRequired,
     callbackEditUser : PropTypes.func.isRequired,
-    oldEmail : PropTypes.string.isRequired,
-    oldCategory : PropTypes.string.isRequired,
+    user : PropTypes.object.isRequired,
+    
 }
 
 export default AdminEditUserForm;

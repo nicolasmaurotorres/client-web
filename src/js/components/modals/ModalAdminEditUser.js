@@ -12,7 +12,7 @@ const customStyles = {
   content : {
     top : '50%',
     left : '50%',
-    right : 'auto',
+    right : '20%',
     bottom : 'auto',
     marginRight : '-50%',
     transform : 'translate(-50%, -50%)'
@@ -35,23 +35,23 @@ class ModalAdminEditUser extends React.Component {
 
   callbackEditOrCancel(){
     debugger;
-    this.props.callbackViewUsers();
+    this.props.callbackEditUser();
     this.setState({modalIsOpen : false});
   }
 
   render() {
-    const { editUserRequest, addFlashMessage} = this.props;
+    const { editUserRequest, addFlashMessage, callbackEditUser, user} = this.props;
     return (
       <div>
         <Modal
           isOpen = { this.state.modalIsOpen }
-          onAfterOpen = { this.afterOpenModal }
           onRequestClose={ this.closeModal }
           style={ customStyles }
-          contentLabel="Example Modal">
+          contentLabel="Edit Modal">
             <AdminEditUserForm callbackEditUser = { this.callbackEditOrCancel } 
-                              createUserRequest = {createUserRequest} 
-                              addFlashMessage={addFlashMessage} /> 
+                              editUserRequest = { editUserRequest } 
+                              addFlashMessage = { addFlashMessage }
+                              user = { user } /> 
         </Modal>
       </div>
     );
@@ -59,9 +59,10 @@ class ModalAdminEditUser extends React.Component {
 }
 
 ModalAdminEditUser.propTypes = {
-  callbackViewUsers : PropTypes.func.isRequired,
+  callbackEditUser : PropTypes.func.isRequired,
   editUserRequest : PropTypes.func.isRequired,
   addFlashMessage : PropTypes.func.isRequired,
+  user : PropTypes.object.isRequired
 }
 
 

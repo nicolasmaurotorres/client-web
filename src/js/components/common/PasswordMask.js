@@ -1,188 +1,55 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { containerStyles, inputStyles, buttonStyles } from '../../css/stylesPasswordMask';
+import '../../css/passwordField.scss';
+import zxcvbn from 'zxcvbn';
 
-class PasswordMask extends React.Component {
-    constructor(props){
-        super(props);
-
-        this.state = {
-            passwordShown: false,
-            hasBeenFocused: false,
-          };
+class ShowPassword extends React.Component{
+  constructor(props){
+    super(props);
+    this.state = {
+      type: 'password',
+      score: 'null',
+      value : ""
     }
-
-  invokeCallbacks(value, passwordShown) {
-    const { onShow, onHide, onToggle } = this.props;
-
-    if (onToggle) {
-      onToggle(value);
-    }
-
-    if (onShow && passwordShown) {
-      onShow(value);
-    }
-
-    if (onHide && !passwordShown) {
-      onHide(value);
-    }
+    this.showHide = this.showHide.bind(this);
+    this.passwordStrength = this.passwordStrength.bind(this);
   }
-
-  focusVisibleInput() {
-    const { passwordShown } = this.state;
-    const visibleInput = passwordShown ? this.textInput : this.passwordInput;
-
-    visibleInput.focus();
+  
+  showHide(e){
+    e.preventDefault();
+    e.stopPropagation();
+    this.setState({
+      type: this.state.type === 'input' ? 'password' : 'input'
+    })  
   }
-
-  componentWillUpdate(nextProps, nextState) {
-    const { passwordShown } = this.state;
-
-    if (nextState.passwordShown !== passwordShown) {
-      this.invokeCallbacks(nextProps.value, nextState.passwordShown);
+  
+  passwordStrength(e){
+    debugger;
+    if(e.target.value === ''){
+      this.setState({
+        score: 'null'
+      })
     }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const { passwordShown, hasBeenFocused } = this.state;
-
-    if (hasBeenFocused && prevState.passwordShown !== passwordShown) {
-      this.focusVisibleInput();
+    else{
+      var pw = zxcvbn(e.target.value);
+      this.setState({
+        score: pw.score
+      });      
     }
+
   }
-
-  togglePasswordMask() {
-    this.setState({ passwordShown: !this.state.passwordShown });
-  }
-
-  render() {
-    const { value, id, name, className, inputClassName, buttonClassName, placeholder, autoFocus, minLength, maxLength, onChange, onBlur, onKeyDown, showButtonContent, hideButtonContent, useVendorStyles, readOnly, disabled, required } = this.props;
-    const { passwordShown } = this.state;
-
-    const vendorContainerCss = useVendorStyles ? containerStyles : {};
-    const vendorInputCss = useVendorStyles ? inputStyles : {};
-    const vendorButtonCss = useVendorStyles ? buttonStyles : {};
-
-    return (
-      <div
-        className={className}
-        style={vendorContainerCss}
-      >
-        <input
-          type="password"
-          ref={input => this.passwordInput = input}
-          value={value}
-          id={!passwordShown ? id : `_${id}`}
-          name={!passwordShown ? name : ''}
-          className={inputClassName}
-          placeholder={placeholder}
-          autoFocus={autoFocus}
-          minLength={minLength}
-          maxLength={maxLength}
-          readOnly={readOnly}
-          disabled={disabled}
-          required={required}
-          style={{
-            vendorInputCss,
-            inputStyles,
-            display: !passwordShown ? 'block' : 'none'
-          }}
-          onChange={onChange}
-          onBlur={onBlur}
-          onKeyDown={onKeyDown}
-          onFocus={() => this.setState({ hasBeenFocused: true })}
-        />
-
-        <input
-          type="text"
-          ref={input => this.textInput = input}
-          value={value}
-          id={passwordShown ? id : `_${id}`}
-          name={passwordShown ? name : ''}
-          className={inputClassName}
-          placeholder={placeholder}
-          minLength={minLength}
-          maxLength={maxLength}
-          readOnly={readOnly}
-          disabled={disabled}
-          required={required}
-          style={{
-            vendorInputCss,
-            inputStyles,
-            display: passwordShown ? 'block' : 'none'
-          }}
-          onChange={onChange}
-          onBlur={onBlur}
-          onKeyDown={onKeyDown}
-          onFocus={() => this.setState({ hasBeenFocused: true })}
-        />
-
-        <a
-          href=""
-          className={buttonClassName}
-          style={{
-            vendorButtonCss,
-            buttonStyles
-          }}
-          onMouseDown={e => e.preventDefault()}
-          onClick={e => {
-            e.preventDefault();
-            this.togglePasswordMask();
-          }}
-          tabIndex={-1}
-        >
-          {passwordShown ?
-            hideButtonContent || 'Hide' :
-            showButtonContent || 'Show'
-          }
-        </a>
-      </div>
-    );
+  
+  render(){
+    return(
+      <label className="password">Password
+      <input type={this.state.type} className="password__input" onChange={this.passwordStrength}/>
+      <span className="password__show" onClick={this.showHide}>{this.state.type === 'input' ? 'Hide' : 'Show'}</span>
+      <span className="password__strength" data-score={this.state.score} />
+      </label>
+    )
   }
 }
 
-PasswordMask.PropTypes = {
-    value: PropTypes.any.isRequired,
-    id: PropTypes.string,
-    name: PropTypes.string,
-    className: PropTypes.string,
-    inputClassName: PropTypes.string,
-    buttonClassName: PropTypes.string,
-    placeholder: PropTypes.string,
-    autoFocus: PropTypes.bool,
-    minLength: PropTypes.number,
-    maxLength: PropTypes.number,
-    onChange: PropTypes.func,
-    onBlur: PropTypes.func,
-    onKeyDown: PropTypes.func,
-    onShow: PropTypes.func,
-    onHide: PropTypes.func,
-    onToggle: PropTypes.func,
-    useVendorStyles: PropTypes.bool,
-    readOnly: PropTypes.bool,
-    required: PropTypes.bool,
-    disabled: PropTypes.bool,
-    inputStyles: PropTypes.any,
-    buttonStyles: PropTypes.any,
-    showButtonContent: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.string
-    ]),
-    hideButtonContent: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.string
-    ])
-  }
-
-  PasswordMask.defaultProps = {
-    inputClassName: '',
-    buttonClassName: '',
-    placeholder: '',
-    useVendorStyles: true,
-    onChange() {},
-    onBlur() {},
-    onKeyDown() {}
-  }
 
 
-export default PasswordMask;
+export default ShowPassword;

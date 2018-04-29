@@ -21,12 +21,13 @@ class AdminViewUsersForm extends React.Component {
             errors: null,
             showingAddUserModal : false,
             showingEditUserModal: false,
-            editedUser : []
+            editedUser : {}
         }
 
         /*bindings*/
         this._getAllUsers = this._getAllUsers.bind(this);
         this.callbackCreateUser = this.callbackCreateUser.bind(this);
+        this.callbackEditUser = this.callbackEditUser.bind(this);
     }
 
     _getAllUsers(){
@@ -102,10 +103,11 @@ class AdminViewUsersForm extends React.Component {
                 const password = event.target.parentElement.children[2].children[0].children[0].value; //obtengo la pass
                 const category = parseInt(aux.value); // obtengo el numero de la categoria
                 if (email !== ''){ // si el email es distinto de vacio
-                    var editedUser = [];
-                    editedUser.push(email,category,password);
-                    this.setState({ showingEditUserModal : true, editedUser })
-                    debugger;
+                    var obj = {};
+                    obj["email"] = email;
+                    obj["password"] = password;
+                    obj["category"] = category;
+                    this.setState({ showingEditUserModal : true, editedUser : obj })
                 }
             } 
         }
@@ -130,7 +132,7 @@ class AdminViewUsersForm extends React.Component {
          } else 
          if (this.state.showingEditUserModal){
             return (
-                <ModalEditUser callbackEditUser = { this.callbackEditUser } user ={"pepe" }/>
+                <ModalEditUser callbackEditUser = { this.callbackEditUser } user = { this.state.editedUser }/>
             );
          }
          else {
@@ -148,9 +150,7 @@ class AdminViewUsersForm extends React.Component {
 }
 
 AdminViewUsersForm.propTypes = {
-    createUserRequest : PropTypes.func.isRequired,
     deleteUserRequest : PropTypes.func.isRequired,
-    editUserRequest: PropTypes.func.isRequired,
     addFlashMessage : PropTypes.func.isRequired,
     viewUsersRequest : PropTypes.func.isRequired
 }
