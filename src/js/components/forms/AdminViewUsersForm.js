@@ -100,7 +100,7 @@ class AdminViewUsersForm extends React.Component {
             const email = event.target.parentElement.id;
             var aux = event.target.parentElement.children[0].attributes.name
             if (typeof aux !== 'undefined'){
-                const password = event.target.parentElement.children[2].children[0].children[0].value; //obtengo la pass
+                const password = event.target.parentElement.children[2].children[0].children[0].children[0].value; //obtengo la pass
                 const category = parseInt(aux.value); // obtengo el numero de la categoria
                 if (email !== ''){ // si el email es distinto de vacio
                     var obj = {};

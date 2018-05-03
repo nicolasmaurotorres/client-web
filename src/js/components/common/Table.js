@@ -17,7 +17,6 @@ class Table extends React.Component {
     
     handleChange(e){
         console.log("me clickeaste gato");
-        debugger;
     }
 
     componentWillMount(){
@@ -42,12 +41,12 @@ class Table extends React.Component {
             var row = ( <tr className = "table-secondary" key = { item.email } id = { item.email }>
                             <td scope="row" name={item.category}>{ (item.category === 0) ? "Doctor" : "Pladema" }</td>
                             <td>{ item.email }</td>{/*disable package css*/}
-                            <td><PasswordMask useVendorStyles = {true}
-                                              id = { item.email }
+                            <td><PasswordMask id = { item.email }
                                               name = "password"
                                               placeholder = "Enter password"
                                               value = { item.password }
-                                              onChange = { this.handleChange }/></td>
+                                              onChange = { this.handleChange }
+                                              editable = { false } /></td>
                         </tr>);
             data.push(row);
         }

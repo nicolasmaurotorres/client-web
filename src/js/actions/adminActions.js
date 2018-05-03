@@ -16,6 +16,7 @@ export function deleteUserRequest(data){
 
 export function editUserRequest(data){
     return function action(dispatch){
+        data["token"] = localStorage.jwtToken;
         return axiosInstance.post("/admin/edit/user",data);
      }
 }

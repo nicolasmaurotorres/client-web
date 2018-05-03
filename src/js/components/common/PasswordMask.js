@@ -9,12 +9,35 @@ class ShowPassword extends React.Component{
     this.state = {
       type: 'password',
       score: 'null',
-      value : ""
+      value : "",
+      showStrongPassword : false,
+      showTitle : false,
+      editable : true
     }
+    /* binding */
     this.showHide = this.showHide.bind(this);
-    this.passwordStrength = this.passwordStrength.bind(this);
+    this.onChange = this.onChange.bind(this);
   }
   
+  componentWillMount(){
+    if (typeof this.props.value  !== 'undefined'){ // dado que no es requerido
+      this.setState({value : this.props.value}); 
+    }
+
+    if (typeof this.props.showStrongPassword  !== 'undefined'){ // dado que no es requerido
+      this.setState({showStrongPassword : this.props.showStrongPassword}); 
+    }
+
+    if (typeof this.props.showTitle  !== 'undefined'){ // dado que no es requerido
+      this.setState({showTitle : this.props.showTitle}); 
+    }
+
+    if (typeof this.props.editable  !== 'undefined'){ // dado que no es requerido
+      this.setState({editable : this.props.editable}); 
+    }
+  }
+
+
   showHide(e){
     e.preventDefault();
     e.stopPropagation();
@@ -23,33 +46,47 @@ class ShowPassword extends React.Component{
     })  
   }
   
-  passwordStrength(e){
-    debugger;
-    if(e.target.value === ''){
-      this.setState({
-        score: 'null'
-      })
+  onChange(e){
+    if (this.state.editable){
+      if(e.target.value === ''){
+         this.setState({
+           score: 'null', value : e.target.value
+         });
+      } else {
+         var pw = zxcvbn(e.target.value);
+         this.setState({
+           score: pw.score, value : e.target.value
+         });      
+      }
+      if (typeof this.props.onChange !== 'undefined'){
+         this.props.onChange(e);
+      }
     }
-    else{
-      var pw = zxcvbn(e.target.value);
-      this.setState({
-        score: pw.score
-      });      
-    }
-
   }
   
   render(){
+    const { name } = this.props;
     return(
-      <label className="password">Password
-      <input type={this.state.type} className="password__input" onChange={this.passwordStrength}/>
+      <div className="form-group"> 
+      { this.state.showTitle && <label className="control-label" > Password </label>}
+      <div className="password">
+      <input name={ name } type={this.state.type}  className="password__input" onChange={this.onChange} value={this.state.value}  disabled = { (this.state.editable) ? "" : "disabled" }/>
       <span className="password__show" onClick={this.showHide}>{this.state.type === 'input' ? 'Hide' : 'Show'}</span>
-      <span className="password__strength" data-score={this.state.score} />
-      </label>
+      { this.state.showStrongPassword && <span className="password__strength" data-score={this.state.score} />}
+      </div>
+      </div>
     )
   }
 }
 
+ShowPassword.PropTypes = {
+  value : PropTypes.string,
+  showStrongPassword : PropTypes.bool,
+  showTitle : PropTypes.bool,
+  editable : PropTypes.bool,
+  onChange : PropTypes.func,
+  name : PropTypes.string.isRequired
+}
 
 
 export default ShowPassword;

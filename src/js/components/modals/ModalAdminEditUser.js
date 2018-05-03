@@ -34,7 +34,6 @@ class ModalAdminEditUser extends React.Component {
   }
 
   callbackEditOrCancel(){
-    debugger;
     this.props.callbackEditUser();
     this.setState({modalIsOpen : false});
   }

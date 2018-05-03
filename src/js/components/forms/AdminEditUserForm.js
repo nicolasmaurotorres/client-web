@@ -43,21 +43,31 @@ class AdminEditUserForm extends React.Component {
     _submitForm(){
         if (this._isValid()){
             var obj = {};
-            obj["email"] = this.state.email;
-            obj["password"] = this.state.password;
-            obj["category"] = parseInt(this.state.category);
+            obj["oldemail"] = this.state.oldEmail
+            obj["newemail"] = (this.state.email !== this.state.oldEmail) ? this.state.email : ""; // NO cambio el email
+            obj["newpassword"] = (this.state.password !== this.state.oldPassword) ? this.state.password  :  ""; // NO cambio la password
+            obj["newcategory"] = (this.state.category !== this.state.oldCategory) ? parseInt(this.state.category) : -1;
             this.props.editUserRequest(obj)
             .then((response)=>{
                 debugger;
                 this.setState({serverMessage : response.data.message, serverStatus:"OK"})
+                this.props.addFlashMessage({
+                    type:"success",
+                    text:"user edited successfully"
+                });
                 this.callback();
             })
             .catch((response)=>{
                 debugger;
+                this.props.addFlashMessage({
+                    type:"error",
+                    text:"cannot edit the user"
+                });
                 if (typeof response.response === 'undefined'){
                     this.setState({serverMessage : "network error", serverStatus:"BAD_STATUS"})
                 } else {
-                    this.setState({serverMessage : response.data.message, serverStatus:"BAD_STATUS"})
+                    debugger;
+                    this.setState({serverMessage : response.response.data.message, serverStatus:"BAD_STATUS"})
                 }
                 this.callback();
             })
@@ -114,20 +124,18 @@ class AdminEditUserForm extends React.Component {
                                                             <span>&times;</span>
                                                         </button>
                                                      </div>}
-                    <TextFieldGroup
+                    <TextFieldGroup name = "email"
                         error = { this.state.errors.email }
                         label="Email"
                         onChange = { this._onChange }
                         value = { this.state.email }
                         field = "email" />
                       
-                    <PasswordMask 
-                                              id = "passwordEdit"
-                                              name = "password"
-                                              placeholder = "Enter password"
-                                              value = { this.state.oldPassword }
-                                              onChange = { this.handleChange }/>
-                    
+                    <PasswordMask name = "password"
+                                  value = { this.state.oldPassword }
+                                  showStrongPassword = { true }
+                                  showTitle = { true }
+                                  onChange = { this._onChange } />
                     <fieldset>
                         <div className="form-group">
                             <label>Category</label>
@@ -138,7 +146,7 @@ class AdminEditUserForm extends React.Component {
                         </div>
                     </fieldset>
                     <div className="form-group">
-                        <button onClick={ this._submitForm } className="btn btn-primary btn-lg"> Create </button>
+                        <button onClick={ this._submitForm } className="btn btn-primary btn-lg"> Change </button>
                         <button onClick={ this._cancelForm } className="btn btn-danger btn-lg marginButton"> Cancel </button>
                     </div>
                 </div>
