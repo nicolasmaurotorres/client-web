@@ -49,7 +49,6 @@ class AdminEditUserForm extends React.Component {
             obj["newcategory"] = (this.state.category !== this.state.oldCategory) ? parseInt(this.state.category) : -1;
             this.props.editUserRequest(obj)
             .then((response)=>{
-                debugger;
                 this.setState({serverMessage : response.data.message, serverStatus:"OK"})
                 this.props.addFlashMessage({
                     type:"success",
@@ -58,7 +57,6 @@ class AdminEditUserForm extends React.Component {
                 this.callback();
             })
             .catch((response)=>{
-                debugger;
                 this.props.addFlashMessage({
                     type:"error",
                     text:"cannot edit the user"
@@ -66,7 +64,6 @@ class AdminEditUserForm extends React.Component {
                 if (typeof response.response === 'undefined'){
                     this.setState({serverMessage : "network error", serverStatus:"BAD_STATUS"})
                 } else {
-                    debugger;
                     this.setState({serverMessage : response.response.data.message, serverStatus:"BAD_STATUS"})
                 }
                 this.callback();

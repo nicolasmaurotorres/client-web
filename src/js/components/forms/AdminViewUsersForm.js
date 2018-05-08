@@ -5,7 +5,7 @@ import FileBrowserWidget  from 'paraviewweb/src/React/Widgets/FileBrowserWidget'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.min.css'; // css del click derecho
 import confirm from '../../utils/confirmDialog'
-import Table from '../common/Table';
+import TableAdmin from '../common/TableAdmin';
 import ConfirmForm from '../forms/ConfirmForm';
 import ModalAddUser from '../modals/ModalAdminAddUser';
 import ModalEditUser from '../modals/ModalAdminEditUser'
@@ -139,11 +139,10 @@ class AdminViewUsersForm extends React.Component {
             return (
                     <div className="bs-docs-section">
                         <ContextMenuProvider id = "rightClickContextMenu" >
-                            <Table columns = { columns } data = { this.state.data } />
+                            <TableAdmin columns = { columns } data = { this.state.data } />
                         </ContextMenuProvider>
                         <MenuFile/>
                     </div>
-                
             );
         }
     }

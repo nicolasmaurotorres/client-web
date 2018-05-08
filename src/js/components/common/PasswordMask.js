@@ -37,7 +37,6 @@ class ShowPassword extends React.Component{
     }
   }
 
-
   showHide(e){
     e.preventDefault();
     e.stopPropagation();
@@ -87,6 +86,5 @@ ShowPassword.PropTypes = {
   onChange : PropTypes.func,
   name : PropTypes.string.isRequired
 }
-
 
 export default ShowPassword;

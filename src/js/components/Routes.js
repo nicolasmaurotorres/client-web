@@ -8,11 +8,12 @@ import NavBar from './common/NavBar'
 import DoctorLobby from './lobbys/DoctorLobby'
 import PlademaLobby from './lobbys/PlademaLobby'
 import AdminPage from './pages/AdminLobbyPage'
-import FlashMessagesList from './FlashMessagesList'
+import FlashMessagesList from './common/FlashMessagesList'
 import { authenticateDoctor, authenticatePladema, authenticateAdmin, loginControl }   from '../utils/authentications'
 import AdminViewUsersPage from './pages/AdminViewUsersPage'
 import AdminEditUserPage from './pages/AdminEditUserPage'
 import AdminAddUserPage from './pages/AdminAddUserPage'
+import DoctorRemoteRenderPage from './pages/DoctorRemoteRenderPage'
 
 export default class Routes extends React.Component {
     render(){
@@ -24,6 +25,7 @@ export default class Routes extends React.Component {
                         <Route path="/" component = { FlashMessagesList  } />
                         <Route exact path="/login" component = { loginControl(LoginPage) }/>  
                         <Route exact path="/doctor" component = { authenticateDoctor(DoctorLobby) } />
+                        <Route exact path="/doctor/render" component = { authenticateDoctor(DoctorRemoteRenderPage) } />
                         <Route exact path="/pladema" component = { authenticatePladema(PlademaLobby) } />
                         <Route exact path="/admin" component = { authenticateAdmin(AdminPage) } />
                         <Route exact path="/admin/view" component = { authenticateAdmin(AdminViewUsersPage) } />

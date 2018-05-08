@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types'
 import PasswordMask from '../common/PasswordMask';
 
-class Table extends React.Component {
+class TableAdmin extends React.Component {
     constructor(props){
         super(props);
 
@@ -68,9 +68,9 @@ class Table extends React.Component {
     }
 }
 
-Table.PropTypes = {
+TableAdmin.PropTypes = {
     columns : PropTypes.array.isRequired,
     data : PropTypes.array.isRequired,
 }
 
-export default Table;
+export default TableAdmin;
