@@ -8,22 +8,16 @@ class TableDoctor extends React.Component {
         this.state = {
             data : []
         };
-
-        /* Bindings */
-        this.handleChange = this.handleChange.bind(this);
     }
     
-    handleChange(e){
-        console.log("me clickeaste gato");
-    }
-
     render(){
         var data = [];
+        const { onClickItems, onMouseEnter } = this.props;
         for (var i = 0; i < this.props.data.length; i++) {
             var item = this.props.data[i];
-            var row = ( <tr className = "table-secondary" key = { item[1] } id = { item[1] }>
-                            <td scope="row" name={ item[1] }> { item[0] } </td>
-                            <td>{ item[1] }</td>
+            var row = ( <tr className = "table-secondary" key = { item[1] } id = { item[2]+"-"+item[1] }>
+                            <td onClick = { onClickItems } scope="row" name={ item[1] } onMouseEnter = { onMouseEnter }> { item[0] } </td>
+                            <td onClick = { onClickItems } onMouseEnter = { onMouseEnter }>{ item[1] }</td>
                         </tr>);
             data.push(row);
         }
@@ -33,8 +27,8 @@ class TableDoctor extends React.Component {
                 <table className="table table-hover">
                     <thead>
                         <tr> 
-                            <th className="table-active" scope="col" key="type"> type </th>    
-                            <th className="table-active" scope="col" key="name"> name </th>
+                            <th className="table-active" scope="col" key="type"> Type </th>    
+                            <th className="table-active" scope="col" key="name"> Name </th>
                        </tr>
                     </thead>
                     <tbody>
@@ -48,6 +42,8 @@ class TableDoctor extends React.Component {
 
 TableDoctor.PropTypes = {
     data : PropTypes.array.isRequired,
+    onClickItems : PropTypes.func.isRequired,
+    onMouseEnter : PropTypes.func.isRequired,
 }
 
 export default TableDoctor;

@@ -40,7 +40,7 @@ class TableAdmin extends React.Component {
             var item = this.props.data[i];
             var row = ( <tr className = "table-secondary" key = { item.email } id = { item.email }>
                             <td scope="row" name={item.category}>{ (item.category === 0) ? "Doctor" : "Pladema" }</td>
-                            <td>{ item.email }</td>{/*disable package css*/}
+                            <td>{ item.email }</td>
                             <td><PasswordMask id = { item.email }
                                               name = "password"
                                               placeholder = "Enter password"
