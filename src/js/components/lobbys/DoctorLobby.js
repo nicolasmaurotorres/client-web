@@ -13,7 +13,7 @@ class DoctorLobby extends React.Component {
             rawResponse : {},
             initialLevel : true, // si esta en true, significa que es el nivel inicial y solo son pacientes lo que muestra, es para el click derecho
             isFolder : false,
-            idContextText : "",
+            idContextText : "rightClickContextMenuPacient",
             path : [],
             files : [],
             folders: [],
@@ -25,7 +25,6 @@ class DoctorLobby extends React.Component {
         this._setFolders = this._setFolders.bind(this);
         this._updateTable = this._updateTable.bind(this);
         this._handleOnClickItem = this._handleOnClickItem.bind(this);
-        this._identifyContextMenu = this._identifyContextMenu.bind(this);
         this._onMouseEnter = this._onMouseEnter.bind(this);
         this._handleClickPath = this._handleClickPath.bind(this);
     }
@@ -73,8 +72,6 @@ class DoctorLobby extends React.Component {
       };
       this.setState({ rawResponse : rawResponse});
       this._updateTable(rawResponse);
-      // seteo el id del context menu
-      this._identifyContextMenu();
     }
     // dado un nodo , actualizo los datos de la tabla
     _updateTable(node){
@@ -82,19 +79,7 @@ class DoctorLobby extends React.Component {
         this._setFiles(node);
         this._setFolders(node);
     }
-    // inicializacion del me
-    _identifyContextMenu(){
-        if (this.state.initialLevel) {
-            this.setState({idContextText:"rightClickContextMenuPacient"});
-        } else {
-            if (this.state.isFolder) {
-                this.setState({idContextText:"rightClickContextMenuFolder"});
-            } else {
-                this.setState({idContextText:"rightClickContextMenuFile"});
-            }
-        }
-    }
-
+  
     _setPath(resp){
         this.setState({ path : resp.Folder.split('/') });
     }
@@ -113,7 +98,7 @@ class DoctorLobby extends React.Component {
     }
   
     _handleClickPath(e){
-        console.log("click on labelll");
+        debugger;
         var target = e.target.innerText; // un item del path clickeado, vuelvo a esa carpeta
         var index = this.state.path.indexOf(target);
         var nextTarget = "";
@@ -123,6 +108,12 @@ class DoctorLobby extends React.Component {
         nextTarget = nextTarget + target;
         var nextNode = this._nextNode(nextTarget,this.state.rawResponse); // busco la carpeta para abrirla
         this._updateTable(nextNode);
+        
+        if (index === 0){
+            //click en el principio de todo
+            this.setState({initialLevel:true, idContextText:"rightClickContextMenuPacient"});
+        }
+
     }
 
     _nextNode(name,node) {
@@ -138,8 +129,6 @@ class DoctorLobby extends React.Component {
     }
 
     _handleOnClickItem(e){
-        console.log("click on table items");
-        debugger;
         var parent = e.target.parentElement;
         var idArray = parent.id.split("-"); 
         var nameTarget = "";
@@ -159,7 +148,7 @@ class DoctorLobby extends React.Component {
                     break;
                 }
                 case "file":
-                    console.log("NO PUEDE PASAR ESTOOOOOOOOOOOOOOOO!!11!11!11!!!");
+                    console.log("en teoria no tendria que haber ningun archivo sin paciente!");
                     break;
             }
         } else {
@@ -184,6 +173,8 @@ class DoctorLobby extends React.Component {
     }
 
     _onMouseEnter(e){
+        debugger;
+        var pepe = this;
         var parent = e.target.parentElement;
         if (!this.state.initialLevel){
             if (parent.id.includes("folder")){
