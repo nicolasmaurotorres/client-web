@@ -4,6 +4,7 @@ import TableDoctor from '../common/TableDoctor'
 import PropTypes from 'prop-types'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify';
 import { connect } from 'react-redux'
+import { doctorGetPacients } from '../../actions/doctorActions';
 
 class DoctorLobby extends React.Component {
     constructor(props){
@@ -24,54 +25,23 @@ class DoctorLobby extends React.Component {
         this._setFiles = this._setFiles.bind(this);
         this._setFolders = this._setFolders.bind(this);
         this._updateTable = this._updateTable.bind(this);
-        this._handleOnClickItem = this._handleOnClickItem.bind(this);
-        this._onMouseEnter = this._onMouseEnter.bind(this);
+        this._handleOnClickTableItem = this._handleOnClickTableItem.bind(this);
+        this._onMouseEnterTableItem = this._onMouseEnterTableItem.bind(this);
         this._handleClickPath = this._handleClickPath.bind(this);
     }
  
     componentWillMount(){
-         // mock-i-to
-         var rawResponse =   {
-             "Folder": "doctor@doctor.com",
-             "Files": [],
-             "SubFolders": [{
-                 "Folder": "doctor@doctor.com/paciente2",
-                 "Files": [],
-                 "SubFolders": [{
-                         "Folder": "doctor@doctor.com/paciente2/paciente3",
-                         "Files": [
-                                     "README (copy).txt",
-                                     "README.txt",
-                                     "imagen_procesada31.vtk"
-                                 ],
-                         "SubFolders": []
-                     },
-                     {
-                         "Folder": "doctor@doctor.com/paciente2/paciente31",
-                         "Files": [
-                                     "README.txt"
-                                 ],
-                         "SubFolders": []
-                     },
-                     {
-                         "Folder": "doctor@doctor.com/paciente2/paciente33",
-                         "Files": [
-                                     "README.txt"
-                                 ],
-                         "SubFolders": []
-                     }
-                 ]},
-                 {
-                     "Folder": "doctor@doctor.com/paciente31",
-                     "Files": [
-                             "README.txt",
-                             "imagen_procesada.vtk"
-                         ],
-                     "SubFolders": []
-                 }]
-      };
-      this.setState({ rawResponse : rawResponse});
-      this._updateTable(rawResponse);
+        const { doctorGetPacients } = this.props;
+        doctorGetPacients()
+            .then((response)=>{
+                debugger;
+                this.setState({ rawResponse : response.data.folders});
+                this._updateTable(response.data.folders);
+            })
+            .catch((response)=>{
+                debugger;
+                console.log("error gato");
+            });
     }
     // dado un nodo , actualizo los datos de la tabla
     _updateTable(node){
@@ -110,7 +80,7 @@ class DoctorLobby extends React.Component {
         this._updateTable(nextNode);
         
         if (index === 0){
-            //click en el principio de todo
+            //click en el principio de todo, vuelvo al estado inicial.
             this.setState({initialLevel:true, idContextText:"rightClickContextMenuPacient"});
         }
 
@@ -128,7 +98,7 @@ class DoctorLobby extends React.Component {
         }
     }
 
-    _handleOnClickItem(e){
+    _handleOnClickTableItem(e){
         var parent = e.target.parentElement;
         var idArray = parent.id.split("-"); 
         var nameTarget = "";
@@ -172,7 +142,7 @@ class DoctorLobby extends React.Component {
         }
     }
 
-    _onMouseEnter(e){
+    _onMouseEnterTableItem(e){
         debugger;
         var pepe = this;
         var parent = e.target.parentElement;
@@ -274,7 +244,7 @@ class DoctorLobby extends React.Component {
             <div className="jumbotron"> 
                 <div> { path } </div>
                 <ContextMenuProvider  id = { idMenu }>
-                    <TableDoctor data = { data } onClickItems = { this._handleOnClickItem } onMouseEnter = { this._onMouseEnter }/>
+                    <TableDoctor data = { data } onClickItems = { this._handleOnClickTableItem } onMouseEnter = { this._onMouseEnterTableItem }/>
                 </ContextMenuProvider>
                 { menu }
                 <button> tocame! :$ </button>
@@ -290,7 +260,8 @@ function mapStateToProps(state) {
 }
 
 DoctorLobby.propTypes = {
-    auth : PropTypes.object.isRequired
+    auth : PropTypes.object.isRequired,
+    doctorGetPacients : PropTypes.func.isRequired,
 }
 
-export default connect(mapStateToProps,null)(DoctorLobby);
+export default connect(mapStateToProps,{ doctorGetPacients })(DoctorLobby);
