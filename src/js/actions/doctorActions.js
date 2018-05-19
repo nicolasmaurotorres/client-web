@@ -8,10 +8,9 @@ export function doctorGetPacients(){
      }
 }
 
-export function doctorAddPacient(){
+export function doctorAddPacient(data){
     return function action(dispatch){
-        var obj = {};
-        obj["token"] = localStorage.jwtToken;
-        return axiosInstance.post("/add/folder",obj);
+        data["token"] = localStorage.jwtToken;
+        return axiosInstance.post("/add/folder",data);
      }
 }
