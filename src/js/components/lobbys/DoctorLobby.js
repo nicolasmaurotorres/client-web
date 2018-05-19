@@ -1,10 +1,14 @@
 import React    from 'react'
-import RemoteRender from '../../renders/RemoteRender'
-import TableDoctor from '../common/TableDoctor'
 import PropTypes from 'prop-types'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify';
 import { connect } from 'react-redux'
+
 import { doctorGetPacients } from '../../actions/doctorActions';
+import { addFlashMessage } from '../../actions/flashMessages'
+import RemoteRender from '../../renders/RemoteRender'
+import TableDoctor from '../common/TableDoctor'
+
+import ModalDoctorAddPacient from '../modals/ModalDoctorAddPacient'
 
 class DoctorLobby extends React.Component {
     constructor(props){
@@ -15,6 +19,7 @@ class DoctorLobby extends React.Component {
             initialLevel : true, // si esta en true, significa que es el nivel inicial y solo son pacientes lo que muestra, es para el click derecho
             isFolder : false,
             idContextText : "rightClickContextMenuPacient",
+            showingModalAddPacient: false,
             path : [],
             files : [],
             folders: [],
@@ -28,19 +33,21 @@ class DoctorLobby extends React.Component {
         this._handleOnClickTableItem = this._handleOnClickTableItem.bind(this);
         this._onMouseEnterTableItem = this._onMouseEnterTableItem.bind(this);
         this._handleClickPath = this._handleClickPath.bind(this);
+        this._callbackAddPacient = this._callbackAddPacient.bind(this);
     }
  
     componentWillMount(){
-        const { doctorGetPacients } = this.props;
+        const { doctorGetPacients, addFlashMessage } = this.props;
         doctorGetPacients()
             .then((response)=>{
-                debugger;
                 this.setState({ rawResponse : response.data.folders});
                 this._updateTable(response.data.folders);
             })
             .catch((response)=>{
-                debugger;
-                console.log("error gato");
+                addFlashMessage({
+                    type:"error",
+                    text:"cannot get the files from the doctor , error"+response.errorM
+                });
             });
     }
     // dado un nodo , actualizo los datos de la tabla
@@ -143,7 +150,6 @@ class DoctorLobby extends React.Component {
     }
 
     _onMouseEnterTableItem(e){
-        debugger;
         var pepe = this;
         var parent = e.target.parentElement;
         if (!this.state.initialLevel){
@@ -154,8 +160,29 @@ class DoctorLobby extends React.Component {
             }
         }
     }
+
+    /* callbacks */
+    _callbackAddPacient(){
+        this.setState({showingModalAddPacient:false});
+    }
+    /* callbacks */
+
     
     render(){
+        //modal de agregar un paciente
+        if (this.state.showingModalAddPacient){
+            var othersPacients = {};
+            debugger;
+            var pacients = this.state.rawResponse.SubFolders;
+            for (var i = 0; i < pacients.length ; i++){
+                var name = pacients[i].Folder.split("/")[1]; // obtengo el nombre del paciente
+                othersPacients[name] = i; 
+            }
+            return (
+                <ModalDoctorAddPacient otherPacients = { othersPacients } callbackAddPacient = { this._callbackAddPacient } />
+            );
+        }
+
         // armo los datos de la tabla
         var data = [];
         this.state.folders.forEach((item) => {
@@ -232,8 +259,13 @@ class DoctorLobby extends React.Component {
         const onClickDeletePacient = ({event, ref,data,dataFromProvider}) => {
             console.log("on click delete pacient");
         };
+        const onClickAddPacient = ({event, ref,data,dataFromProvider}) => {
+            console.log("on click add pacient");
+            this.setState({showingModalAddPacient : true});
+        };
         const MenuPacient = () => (
             <ContextMenu  id='rightClickContextMenuPacient'>
+                <Item onClick = { onClickAddPacient }><IconFont className = "fa fa-plus"/> Add </Item>
                 <Item onClick = { onClickEditPacient }><IconFont className = "fa fa-edit"/> Rename </Item>
                 <Item onClick = { onClickDeletePacient }><IconFont className = "fa fa-trash"/> Delete </Item>
             </ContextMenu>
