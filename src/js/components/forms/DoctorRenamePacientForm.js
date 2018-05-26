@@ -6,12 +6,13 @@ import validator from 'validator'
 import 'react-dropdown/style.css'
 import classname from 'classnames'
 
-class DoctorAddPacientForm extends React.Component {
+class DoctorRenamePacientForm extends React.Component {
     constructor(props){
         super(props);
 
         this.state = {
             errors: {},
+            actualName : "",
             name: "",
             otherPacients : [],
         }
@@ -25,22 +26,21 @@ class DoctorAddPacientForm extends React.Component {
     }
 
     componentWillMount(){
-        this.setState({otherPacients : this.props.otherPacients});
+        this.setState({otherPacients : this.props.otherPacients, actualName : this.props.pacientToRename, name : this.props.pacientToRename});
     }
 
     _submitForm(){
         if (this._isValid()){
             var obj = {}
-            const { doctorAddPacient , callbackCreateOrCancel } = this.props;
-            obj["folder"] = this.state.name;
-            doctorAddPacient(obj)
+            const { doctorRenamePacient , callbackRenameOrCancel } = this.props;
+            obj["newfolder"] = this.state.name;
+            obj["oldfolder"] = this.state.actualName;
+            doctorRenamePacient(obj)
             .then((response)=>{
-                debugger;
-                callbackCreateOrCancel(true);
+                callbackRenameOrCancel(true);
             })
             .catch((response)=>{
-                debugger;
-                callbackCreateOrCancel(false);
+                callbackRenameOrCancel(false);
             });
         }
     }
@@ -61,11 +61,16 @@ class DoctorAddPacientForm extends React.Component {
             _errors["name"] = "the name cannot be empty";
         }   
         
+        if (toReturn && this.state.actualName === name){
+            toReturn = false;
+            _errors["name"] = "the name cannot be the same as the old one"
+        }
+
         if (toReturn && this.state.otherPacients[name] != null){
             toReturn = false;
             _errors["name"] = "you already have a pacient with that name";
-        }                                         
-        
+        }                       
+
         this.setState( { errors : _errors });
         return toReturn;
     }
@@ -79,7 +84,7 @@ class DoctorAddPacientForm extends React.Component {
     }
 
     _cancelForm(){
-        this.props.callbackCreateOrCancel();
+        this.props.callbackRenameOrCancel(false);
     }
     
     _onClickCloseMessage(){
@@ -107,10 +112,11 @@ class DoctorAddPacientForm extends React.Component {
     }
 }
 
-DoctorAddPacientForm.propTypes = {
-    callbackCreateOrCancel : PropTypes.func.isRequired,
-    doctorAddPacient : PropTypes.func.isRequired,
-    otherPacients : PropTypes.object.isRequired
+DoctorRenamePacientForm.propTypes = {
+    callbackRenameOrCancel : PropTypes.func.isRequired,
+    doctorRenamePacient : PropTypes.func.isRequired,
+    otherPacients : PropTypes.object.isRequired,
+    pacientToRename : PropTypes.string.isRequired
 }
 
-export default DoctorAddPacientForm;
+export default DoctorRenamePacientForm;

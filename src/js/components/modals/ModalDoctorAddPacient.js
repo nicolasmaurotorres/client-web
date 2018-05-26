@@ -6,7 +6,6 @@ import Modal from 'react-modal';
 
 import DoctorAddPacientForm from '../forms/DoctorAddPacientForm'
 import { doctorAddPacient } from '../../actions/doctorActions'
-import { addFlashMessage } from '../../actions/flashMessages'
 
 const customStyles = {
   content : {
@@ -33,13 +32,13 @@ class ModalDoctorAddPacient extends React.Component {
     this.callbackAddPacientOrCancel = this.callbackAddPacientOrCancel.bind(this);
   }
 
-  callbackAddPacientOrCancel(){
-    this.props.callbackAddPacient();
+  callbackAddPacientOrCancel(updatePacients){
+    this.props.callbackAddPacient(updatePacients);
     this.setState({modalIsOpen : false});
   }
 
   render() {
-    const { doctorAddPacient, addFlashMessage, otherPacients} = this.props;
+    const { doctorAddPacient,  otherPacients} = this.props;
     return (
       <div>
         <Modal
@@ -49,7 +48,6 @@ class ModalDoctorAddPacient extends React.Component {
           contentLabel="Example Modal">
             <DoctorAddPacientForm callbackCreateOrCancel = { this.callbackAddPacientOrCancel } 
                                   doctorAddPacient = { doctorAddPacient } 
-                                  addFlashMessage={ addFlashMessage }
                                   otherPacients = { otherPacients } /> 
         </Modal>
       </div>
@@ -60,9 +58,8 @@ class ModalDoctorAddPacient extends React.Component {
 ModalDoctorAddPacient.propTypes = {
   callbackAddPacient : PropTypes.func.isRequired,
   doctorAddPacient : PropTypes.func.isRequired,
-  addFlashMessage : PropTypes.func.isRequired,
   otherPacients : PropTypes.object.isRequired
 }
 
 
-export default connect(null,{doctorAddPacient,addFlashMessage})(confirmable(ModalDoctorAddPacient));
+export default connect(null,{doctorAddPacient})(confirmable(ModalDoctorAddPacient));

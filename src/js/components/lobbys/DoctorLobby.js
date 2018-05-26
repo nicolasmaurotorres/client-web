@@ -9,6 +9,7 @@ import RemoteRender from '../../renders/RemoteRender'
 import TableDoctor from '../common/TableDoctor'
 
 import ModalDoctorAddPacient from '../modals/ModalDoctorAddPacient'
+import ModalDoctorRenamePacient from '../modals/ModalDoctorRenamePacient'
 
 class DoctorLobby extends React.Component {
     constructor(props){
@@ -20,6 +21,10 @@ class DoctorLobby extends React.Component {
             isFolder : false,
             idContextText : "rightClickContextMenuPacient",
             showingModalAddPacient: false,
+            // modal edit
+            showingModalRenamePacient: false,
+            pacientToRename: "",
+
             path : [],
             files : [],
             folders: [],
@@ -34,9 +39,11 @@ class DoctorLobby extends React.Component {
         this._onMouseEnterTableItem = this._onMouseEnterTableItem.bind(this);
         this._handleClickPath = this._handleClickPath.bind(this);
         this._callbackAddPacient = this._callbackAddPacient.bind(this);
+        this._getPacients = this._getPacients.bind(this);
+        this._callbackRenamePacient = this._callbackRenamePacient.bind(this);
     }
  
-    componentWillMount(){
+    _getPacients(){
         const { doctorGetPacients, addFlashMessage } = this.props;
         doctorGetPacients()
             .then((response)=>{
@@ -44,11 +51,16 @@ class DoctorLobby extends React.Component {
                 this._updateTable(response.data.folders);
             })
             .catch((response)=>{
+                debugger;
                 addFlashMessage({
                     type:"error",
-                    text:"cannot get the files from the doctor , error"+response.errorM
+                    text:"error "+response.response.data.message
                 });
             });
+    }
+
+    componentWillMount(){
+        this._getPacients();
     }
     // dado un nodo , actualizo los datos de la tabla
     _updateTable(node){
@@ -162,27 +174,22 @@ class DoctorLobby extends React.Component {
     }
 
     /* callbacks */
-    _callbackAddPacient(){
+    _callbackAddPacient(updatePacients){
         this.setState({showingModalAddPacient:false});
+        if(updatePacients){
+            this._getPacients(); // TODO: modificar el paciente en vez de hacer un request para evitar el uso de la red
+        }
+    }
+    _callbackRenamePacient(updatePacients){
+        this.setState({showingModalRenamePacient:false, pacientToRename:""});
+        if (updatePacients){
+            this._getPacients(); // TODO: modificar el paciente en vez de hacer un request para evitar el uso de la red
+        }
     }
     /* callbacks */
 
     
     render(){
-        //modal de agregar un paciente
-        if (this.state.showingModalAddPacient){
-            var othersPacients = {};
-            debugger;
-            var pacients = this.state.rawResponse.SubFolders;
-            for (var i = 0; i < pacients.length ; i++){
-                var name = pacients[i].Folder.split("/")[1]; // obtengo el nombre del paciente
-                othersPacients[name] = i; 
-            }
-            return (
-                <ModalDoctorAddPacient otherPacients = { othersPacients } callbackAddPacient = { this._callbackAddPacient } />
-            );
-        }
-
         // armo los datos de la tabla
         var data = [];
         this.state.folders.forEach((item) => {
@@ -254,13 +261,13 @@ class DoctorLobby extends React.Component {
         );
         // context menu del paciente
         const onClickEditPacient = ({event, ref,data,dataFromProvider}) => {
-            console.log("on click edit pacient");
+            var target = event.target.parentElement.children[1].innerText; // obtengo el nombre del paciente a editar
+            this.setState({showingModalRenamePacient : true, pacientToRename : target});
         };
         const onClickDeletePacient = ({event, ref,data,dataFromProvider}) => {
             console.log("on click delete pacient");
         };
         const onClickAddPacient = ({event, ref,data,dataFromProvider}) => {
-            console.log("on click add pacient");
             this.setState({showingModalAddPacient : true});
         };
         const MenuPacient = () => (
@@ -272,6 +279,34 @@ class DoctorLobby extends React.Component {
         );
         const menu =  (this.state.initialLevel) ? <MenuPacient/> :( (this.state.isFolder) ? <MenuFolder/> : <MenuFile/> );
         const idMenu = this.state.idContextText;
+
+        //modal de agregar un paciente
+        if (this.state.showingModalAddPacient){
+            var othersPacients = {};
+            var pacients = this.state.rawResponse.SubFolders;
+            for (var i = 0; i < pacients.length ; i++){
+                var name = pacients[i].Folder.split("/")[1]; // obtengo el nombre de todos los paciente
+                othersPacients[name] = i; 
+            }
+            return (
+                <ModalDoctorAddPacient otherPacients = { othersPacients }  callbackAddPacient = { this._callbackAddPacient } />
+            );
+        }
+
+        //modal editar un paciente
+        if (this.state.showingModalRenamePacient){
+            var pacientToRename = this.state.pacientToRename;
+            var othersPacients = {};
+            var pacients = this.state.rawResponse.SubFolders;
+            for (var i = 0; i < pacients.length ; i++){
+                var name = pacients[i].Folder.split("/")[1]; // obtengo el nombre del paciente
+                othersPacients[name] = i; 
+            }
+            return (
+                <ModalDoctorRenamePacient otherPacients = { othersPacients } pacientToRename = { pacientToRename } callbackRenamePacient = { this._callbackRenamePacient } />
+            );
+        }
+
         return (
             <div className="jumbotron"> 
                 <div> { path } </div>

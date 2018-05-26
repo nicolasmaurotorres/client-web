@@ -14,3 +14,10 @@ export function doctorAddPacient(data){
         return axiosInstance.post("/add/folder",data);
      }
 }
+
+export function doctorRenamePacient(data){
+    return function action(dispatch){
+        data["token"] = localStorage.jwtToken;
+        return axiosInstance.post("/rename/folder",data);
+     }
+}
