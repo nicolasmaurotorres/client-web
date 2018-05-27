@@ -21,3 +21,10 @@ export function doctorRenamePacient(data){
         return axiosInstance.post("/rename/folder",data);
      }
 }
+
+export function doctorRemovePacient(data){
+    return function action(dispatch){
+        data["token"] = localStorage.jwtToken;
+        return axiosInstance.post("/delete/folder",data);
+     }
+}

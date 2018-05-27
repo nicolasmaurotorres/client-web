@@ -7,9 +7,8 @@ import 'react-contexify/dist/ReactContexify.min.css'; // css del click derecho
 import confirm from '../../utils/confirmDialog'
 import TableAdmin from '../common/TableAdmin';
 import ConfirmForm from '../forms/ConfirmForm';
-import ModalAddUser from '../modals/ModalAdminAddUser';
-import ModalEditUser from '../modals/ModalAdminEditUser'
-import { createGzip } from 'zlib';
+import ModalAdminAddUser from '../modals/ModalAdminAddUser';
+import ModalAdminEditUser from '../modals/ModalAdminEditUser'
 
 class AdminViewUsersForm extends React.Component {
     constructor(props){
@@ -127,7 +126,7 @@ class AdminViewUsersForm extends React.Component {
          } else 
          if (this.state.showingAddUserModal){
              return (
-                <ModalAddUser callbackCreateUser = { this.callbackCreateUser } />
+                <ModalAdminAddUser callbackCreateUser = { this.callbackCreateUser } />
              );
          } else 
          if (this.state.showingEditUserModal){

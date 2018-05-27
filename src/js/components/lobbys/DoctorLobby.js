@@ -3,11 +3,13 @@ import PropTypes from 'prop-types'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify';
 import { connect } from 'react-redux'
 
-import { doctorGetPacients } from '../../actions/doctorActions';
-import { addFlashMessage } from '../../actions/flashMessages'
 import RemoteRender from '../../renders/RemoteRender'
-import TableDoctor from '../common/TableDoctor'
 
+import { doctorGetPacients, doctorRemovePacient } from '../../actions/doctorActions';
+import { addFlashMessage } from '../../actions/flashMessages'
+import confirm from '../../utils/confirmDialog'
+import TableDoctor from '../common/TableDoctor'
+import ConfirmForm from '../forms/ConfirmForm';
 import ModalDoctorAddPacient from '../modals/ModalDoctorAddPacient'
 import ModalDoctorRenamePacient from '../modals/ModalDoctorRenamePacient'
 
@@ -38,8 +40,8 @@ class DoctorLobby extends React.Component {
         this._handleOnClickTableItem = this._handleOnClickTableItem.bind(this);
         this._onMouseEnterTableItem = this._onMouseEnterTableItem.bind(this);
         this._handleClickPath = this._handleClickPath.bind(this);
-        this._callbackAddPacient = this._callbackAddPacient.bind(this);
         this._getPacients = this._getPacients.bind(this);
+        this._callbackAddPacient = this._callbackAddPacient.bind(this);
         this._callbackRenamePacient = this._callbackRenamePacient.bind(this);
     }
  
@@ -265,7 +267,36 @@ class DoctorLobby extends React.Component {
             this.setState({showingModalRenamePacient : true, pacientToRename : target});
         };
         const onClickDeletePacient = ({event, ref,data,dataFromProvider}) => {
-            console.log("on click delete pacient");
+            const parts = event.target.parentElement.id.split('-');
+            var folderName = "";
+            for(var i = 1; i < parts.length; i++){
+                folderName += parts[i]+"-"
+            }
+            folderName = folderName.substring(0, folderName.length-1); // elimino el ultimo "-"
+            if (folderName !== ''){
+                const { doctorRemovePacient } = this.props;
+                confirm(ConfirmForm,"Warning","Are you sure you want to remove this pacient?").then(
+                    (result) =>  { // `proceed` callback
+                        var obj = {}
+                        obj["folder"] = folderName;
+                        doctorRemovePacient(obj)
+                        .then((response)=>{                         // actualizo los usuarios
+                            addFlashMessage({
+                                type:"success",
+                                text:"pacient "+folderName+" removed"
+                            });
+                            this._getPacients(); 
+                        })
+                        .catch((response)=>{
+
+                        });
+                    },
+                    (result) => {
+                        // `cancel` callback
+                        //TODO: fijar si si esta logueado sino mostrar el error
+                    }
+                );
+            };
         };
         const onClickAddPacient = ({event, ref,data,dataFromProvider}) => {
             this.setState({showingModalAddPacient : true});
@@ -329,6 +360,7 @@ function mapStateToProps(state) {
 DoctorLobby.propTypes = {
     auth : PropTypes.object.isRequired,
     doctorGetPacients : PropTypes.func.isRequired,
+    doctorRemovePacient : PropTypes.func.isRequired,
 }
 
-export default connect(mapStateToProps,{ doctorGetPacients })(DoctorLobby);
+export default connect(mapStateToProps,{ doctorGetPacients, doctorRemovePacient })(DoctorLobby);
