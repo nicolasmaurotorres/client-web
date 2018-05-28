@@ -28,3 +28,17 @@ export function doctorRemovePacient(data){
         return axiosInstance.post("/delete/folder",data);
      }
 }
+
+export function doctorAddFolder(data){
+    return function action(dispatch){
+        data["token"] = localStorage.jwtToken;
+        return axiosInstance.post("/add/folder",data);
+     }
+}
+
+export function doctorAddFile(data){
+    return function action(dispatch){
+        data["token"] = localStorage.jwtToken;
+        return axiosInstance.post("/add/file",data);
+     }
+}

@@ -12,21 +12,24 @@ import TableDoctor from '../common/TableDoctor'
 import ConfirmForm from '../forms/ConfirmForm';
 import ModalDoctorAddPacient from '../modals/ModalDoctorAddPacient'
 import ModalDoctorRenamePacient from '../modals/ModalDoctorRenamePacient'
+import ModalDoctorAddFolder from '../modals/ModalDoctorAddFolder'
+import ModalDoctorAddFile from '../modals/ModalDoctorAddFile'
 
 class DoctorLobby extends React.Component {
     constructor(props){
         super(props);
         
         this.state = {
-            rawResponse : {},
             initialLevel : true, // si esta en true, significa que es el nivel inicial y solo son pacientes lo que muestra, es para el click derecho
             isFolder : false,
             idContextText : "rightClickContextMenuPacient",
-            showingModalAddPacient: false,
-            // modal edit
-            showingModalRenamePacient: false,
+            showingModalAddPacient : false,
+            showingModalRenamePacient: false, // modal rename
             pacientToRename: "",
-
+            showingModalAddFolder : false,
+            showingModalAddFile : false,
+            // state of the table
+            rawResponse : {},
             path : [],
             files : [],
             folders: [],
@@ -41,8 +44,13 @@ class DoctorLobby extends React.Component {
         this._onMouseEnterTableItem = this._onMouseEnterTableItem.bind(this);
         this._handleClickPath = this._handleClickPath.bind(this);
         this._getPacients = this._getPacients.bind(this);
+        this._onClickAddPacient = this._onClickAddPacient.bind(this);
+        this._onClickAddFolder = this._onClickAddFolder.bind(this);
+        this._onClickAddFile = this._onClickAddFile.bind(this);
         this._callbackAddPacient = this._callbackAddPacient.bind(this);
         this._callbackRenamePacient = this._callbackRenamePacient.bind(this);
+        this._callbackAddFolder = this._callbackAddFolder.bind(this);
+        this._callbackAddFile = this._callbackAddFile.bind(this);
     }
  
     _getPacients(){
@@ -175,11 +183,13 @@ class DoctorLobby extends React.Component {
         }
     }
 
+
+
     /* callbacks */
     _callbackAddPacient(updatePacients){
         this.setState({showingModalAddPacient:false});
         if(updatePacients){
-            this._getPacients(); // TODO: modificar el paciente en vez de hacer un request para evitar el uso de la red
+            this._getPacients(); // TODO: agregar el paciente en vez de hacer un request para evitar el uso de la red
         }
     }
     _callbackRenamePacient(updatePacients){
@@ -188,9 +198,52 @@ class DoctorLobby extends React.Component {
             this._getPacients(); // TODO: modificar el paciente en vez de hacer un request para evitar el uso de la red
         }
     }
+
+    _callbackAddFolder(updateFolder,newFolder){
+        debugger;
+        this.setState({showingModalAddFolder:false});
+        if (updateFolder){
+            //TODO: tengo que hacer un request buscar la carpeta que se modifico (?) no lo se...
+            var path = "";
+            var originalPath = "";
+            for (var i = 0 ;  i < this.state.path.length; i++){
+                path += this.state.path[i] + "/"
+            }
+            originalPath = path;
+            path = path.substring(0,path.length-1); // quito el ultimo "/"
+            var nextNode = this._nextNode(path,this.state.rawResponse);
+            var auxNode = {
+                Folder : originalPath + newFolder,
+                Files : [],
+                SubFolders : []
+            }
+            nextNode.SubFolders.push(auxNode);
+            this._updateTable(nextNode);
+            debugger;
+        }
+    }
+
+    _callbackAddFile(updateFolder,path){
+        this.setState({showingModalAddFolder:false});
+        if (updateFolder){
+            //TODO: tengo que hacer un request buscar la carpeta que se modifico (?) no lo se...
+        }
+    }
+
     /* callbacks */
 
+    _onClickAddPacient(){
+        this.setState({showingModalAddPacient : true});
+    }
     
+    _onClickAddFolder(){
+        this.setState({showingModalAddFolder  : true});
+    } 
+
+    _onClickAddFile(){
+        this.setState({showingModalAddFile : true});
+    }
+
     render(){
         // armo los datos de la tabla
         var data = [];
@@ -237,9 +290,6 @@ class DoctorLobby extends React.Component {
             </ContextMenu>
         );
         // context menu de la carpeta adentro de un paciente
-        const onClickAddFolder = ({event, ref,data,dataFromProvider}) => {
-            console.log("on click add folder");
-        };
         const onClickRenameFolder = ({event, ref,data,dataFromProvider}) => {
             console.log("on click rename folder");
         };
@@ -254,7 +304,6 @@ class DoctorLobby extends React.Component {
         };
         const MenuFolder = () => (
             <ContextMenu  id='rightClickContextMenuFolder'>
-                <Item onClick = { onClickAddFolder }><IconFont className = "fa fa-plus"/> Add </Item>
                 <Item onClick = { onClickRenameFolder }><IconFont className = "fa fa-edit"/> Rename </Item>
                 <Item onClick = { onClickCopyFolder }><IconFont className = "fa fa-copy"/> Copy </Item>
                 <Item onClick = { onClickPasteFolder }><IconFont className = "fa fa-paste"/> Paste </Item>
@@ -299,7 +348,7 @@ class DoctorLobby extends React.Component {
             };
         };
         const onClickAddPacient = ({event, ref,data,dataFromProvider}) => {
-            this.setState({showingModalAddPacient : true});
+            this._onClickAddPacient();
         };
         const MenuPacient = () => (
             <ContextMenu  id='rightClickContextMenuPacient'>
@@ -308,8 +357,6 @@ class DoctorLobby extends React.Component {
                 <Item onClick = { onClickDeletePacient }><IconFont className = "fa fa-trash"/> Delete </Item>
             </ContextMenu>
         );
-        const menu =  (this.state.initialLevel) ? <MenuPacient/> :( (this.state.isFolder) ? <MenuFolder/> : <MenuFile/> );
-        const idMenu = this.state.idContextText;
 
         //modal de agregar un paciente
         if (this.state.showingModalAddPacient){
@@ -338,14 +385,55 @@ class DoctorLobby extends React.Component {
             );
         }
 
+        if (this.state.showingModalAddFolder){
+            var actualPath = "";
+            var files = {};
+            for (var i = 0; i < this.state.files; i++){
+                var file = this.state.files[i];
+                files[file] = i;
+            }
+            var folders = {};
+            for (var i = 0; i < this.state.folders; i++){
+                var folder = this.state.folders[i];
+                folders[folder] = i;
+            }
+            for (var i = 1; i < this.state.path.length; i++){
+                actualPath += this.state.path[i] + "/"
+            }
+
+            return (
+                <ModalDoctorAddFolder  otherFiles = { files } otherFolders = { folders } path = { actualPath } callbackAddFolder = { this._callbackAddFolder }/>
+            );
+        }
+
+        if (this.state.showingModalAddFile){
+            var actualPath = "";
+            const { files, folders } = this.state;
+            for (var i = 0; i < this.state.path.length; i++){
+                actualPath += this.state.path[i] + "/"
+            }
+            actualPath = actualPath.substring(0,actualPath.length - 1); // quito el ultimo "/"
+            return (
+                <ModalDoctorAddFile otherFiles = { files } folders = { folders } callbackAddFile = { this._callbackAddFile }/>
+            );
+        }
+
+        const menu =  (this.state.initialLevel) ? <MenuPacient/> : ( (this.state.isFolder) ? <MenuFolder/> : <MenuFile/> );
+        const addPacientButton = (this.state.initialLevel) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddPacient  }> Add pacient </botton> </div> : null;
+        const addFolderButton = (!this.state.initialLevel) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFolder }> Add Folder </botton>  </div> : null;
+        const addFileButton = (!this.state.initialLevel) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick =   { this._onClickAddFile }> Add File </botton> </div>  : null;
+        const idMenu = this.state.idContextText;
+
         return (
             <div className="jumbotron"> 
+                { addPacientButton }
+                { addFolderButton }
+                { addFileButton }
                 <div> { path } </div>
                 <ContextMenuProvider  id = { idMenu }>
                     <TableDoctor data = { data } onClickItems = { this._handleOnClickTableItem } onMouseEnter = { this._onMouseEnterTableItem }/>
                 </ContextMenuProvider>
                 { menu }
-                <button> tocame! :$ </button>
             </div>
         );
     }
