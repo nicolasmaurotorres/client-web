@@ -198,6 +198,7 @@ class DoctorLobby extends React.Component {
     }
 
     _callbackAddFolder(updateFolder,newFolder){
+        debugger;
         this.setState({showingModalAddFolder:false});
         if (updateFolder){
             //TODO: tengo que hacer un request buscar la carpeta que se modifico (?) no lo se...
@@ -219,8 +220,8 @@ class DoctorLobby extends React.Component {
         }
     }
 
-    _callbackAddFile(updateFolder,path){
-        this.setState({showingModalAddFolder:false});
+    _callbackAddFile(updateFolder,newFileName){
+        this.setState({showingModalAddFile:false});
         if (updateFolder){
             //TODO: tengo que hacer un request buscar la carpeta que se modifico (?) no lo se...
         }
@@ -381,6 +382,7 @@ class DoctorLobby extends React.Component {
             );
         }
 
+        // modal agregar una carpeta en un paciente
         if (this.state.showingModalAddFolder){
             var actualPath = "";
             var files = {};
@@ -402,15 +404,28 @@ class DoctorLobby extends React.Component {
             );
         }
 
+        // modal para agregar un archivo en una carpeta adentro de un paciente
         if (this.state.showingModalAddFile){
             var actualPath = "";
-            const { files, folders } = this.state;
-            for (var i = 0; i < this.state.path.length; i++){
+            var files = {};
+            var folders = {};
+
+            for (var i = 0; i < this.state.files.length; i++){
+                var file = this.state.files[i];
+                files[file] = i;
+            }
+            
+            for (var i = 0; i < this.state.folders.length; i++){
+                var folder = this.state.folders[i];
+                folders[folder] = i;
+            }
+
+            for (var i = 1; i < this.state.path.length; i++){
                 actualPath += this.state.path[i] + "/"
             }
-            actualPath = actualPath.substring(0,actualPath.length - 1); // quito el ultimo "/"
+
             return (
-                <ModalDoctorAddFile otherFiles = { files } folders = { folders } callbackAddFile = { this._callbackAddFile }/>
+                <ModalDoctorAddFile otherFiles = { files } otherFolders = { folders }  actualPath = { actualPath } callbackAddFile = { this._callbackAddFile }/>
             );
         }
 

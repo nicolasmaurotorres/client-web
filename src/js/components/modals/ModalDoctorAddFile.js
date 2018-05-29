@@ -29,26 +29,27 @@ class ModalDoctorAddFile extends React.Component {
       modalIsOpen: true
     };
 
-    this.callbackAddPacientOrCancel = this.callbackAddPacientOrCancel.bind(this);
+    this.callbackAddFileOrCancel = this.callbackAddFileOrCancel.bind(this);
   }
 
-  callbackAddPacientOrCancel(updatePacients){
-    this.props.callbackAddPacient(updatePacients);
+  callbackAddFileOrCancel(updatePacients){
+    this.props.callbackAddFile(updatePacients);
     this.setState({modalIsOpen : false});
   }
 
   render() {
-    const { doctorAddFile,  otherPacients} = this.props;
+    const { doctorAddFile,  otherFiles, otherFolders, actualPath} = this.props;
     return (
       <div>
         <Modal
           isOpen = { this.state.modalIsOpen }
-          onRequestClose={ this.closeModal }
           style={ customStyles }
           contentLabel="Example Modal">
-            <DoctorAddPacientForm callbackCreateOrCancel = { this.callbackAddPacientOrCancel } 
+            <DoctorAddFileForm callbackAddOrCancel = { this.callbackAddFileOrCancel } 
                                   doctorAddFile = { doctorAddFile } 
-                                  otherPacients = { otherPacients } /> 
+                                  otherFiles = { otherFiles } 
+                                  otherFolders = { otherFolders}
+                                  actualPath = { actualPath }/> 
         </Modal>
       </div>
     );
@@ -56,9 +57,11 @@ class ModalDoctorAddFile extends React.Component {
 }
 
 ModalDoctorAddFile.propTypes = {
-  callbackAddPacient : PropTypes.func.isRequired,
+  callbackAddFile : PropTypes.func.isRequired,
   doctorAddFile : PropTypes.func.isRequired,
-  otherPacients : PropTypes.object.isRequired
+  otherFiles : PropTypes.object.isRequired,
+  otherFolders : PropTypes.object.isRequired,
+  actualPath : PropTypes.string.isRequired,
 }
 
 

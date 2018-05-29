@@ -38,7 +38,11 @@ export function doctorAddFolder(data){
 
 export function doctorAddFile(data){
     return function action(dispatch){
-        data["token"] = localStorage.jwtToken;
-        return axiosInstance.post("/add/file",data);
+        data.append("token",localStorage.jwtToken);
+        return axiosInstance.post("/add/file",data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
      }
 }
