@@ -35,11 +35,9 @@ class DoctorAddFolderForm extends React.Component {
             obj["folder"] = this.state.actualPath + this.state.name;
             doctorAddFolder(obj)
             .then((response)=>{
-                debugger;
                 callbackAddFolderOrCancel(true,this.state.name);
             })
             .catch((response)=>{
-                debugger;
                 callbackAddFolderOrCancel(false);
             });
         }

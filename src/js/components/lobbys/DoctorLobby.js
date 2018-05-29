@@ -61,7 +61,6 @@ class DoctorLobby extends React.Component {
                 this._updateTable(response.data.folders);
             })
             .catch((response)=>{
-                debugger;
                 addFlashMessage({
                     type:"error",
                     text:"error "+response.response.data.message
@@ -97,7 +96,6 @@ class DoctorLobby extends React.Component {
     }
   
     _handleClickPath(e){
-        debugger;
         var target = e.target.innerText; // un item del path clickeado, vuelvo a esa carpeta
         var index = this.state.path.indexOf(target);
         var nextTarget = "";
@@ -200,7 +198,6 @@ class DoctorLobby extends React.Component {
     }
 
     _callbackAddFolder(updateFolder,newFolder){
-        debugger;
         this.setState({showingModalAddFolder:false});
         if (updateFolder){
             //TODO: tengo que hacer un request buscar la carpeta que se modifico (?) no lo se...
@@ -219,7 +216,6 @@ class DoctorLobby extends React.Component {
             }
             nextNode.SubFolders.push(auxNode);
             this._updateTable(nextNode);
-            debugger;
         }
     }
 
@@ -388,12 +384,12 @@ class DoctorLobby extends React.Component {
         if (this.state.showingModalAddFolder){
             var actualPath = "";
             var files = {};
-            for (var i = 0; i < this.state.files; i++){
+            for (var i = 0; i < this.state.files.length; i++){
                 var file = this.state.files[i];
                 files[file] = i;
             }
             var folders = {};
-            for (var i = 0; i < this.state.folders; i++){
+            for (var i = 0; i < this.state.folders.length; i++){
                 var folder = this.state.folders[i];
                 folders[folder] = i;
             }
