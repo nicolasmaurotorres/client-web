@@ -198,10 +198,8 @@ class DoctorLobby extends React.Component {
     }
 
     _callbackAddFolder(updateFolder,newFolder){
-        debugger;
         this.setState({showingModalAddFolder:false});
         if (updateFolder){
-            //TODO: tengo que hacer un request buscar la carpeta que se modifico (?) no lo se...
             var path = "";
             var originalPath = "";
             for (var i = 0 ;  i < this.state.path.length; i++){
@@ -223,7 +221,16 @@ class DoctorLobby extends React.Component {
     _callbackAddFile(updateFolder,newFileName){
         this.setState({showingModalAddFile:false});
         if (updateFolder){
-            //TODO: tengo que hacer un request buscar la carpeta que se modifico (?) no lo se...
+            var path = "";
+            var originalPath = "";
+            for (var i = 0 ;  i < this.state.path.length; i++){
+                path += this.state.path[i] + "/"
+            }
+            originalPath = path;
+            path = path.substring(0,path.length-1); // quito el ultimo "/"
+            var nextNode = this._nextNode(path,this.state.rawResponse);
+            nextNode.Files.push(newFileName);
+            this._updateTable(nextNode);
         }
     }
 
@@ -423,7 +430,7 @@ class DoctorLobby extends React.Component {
             for (var i = 1; i < this.state.path.length; i++){
                 actualPath += this.state.path[i] + "/"
             }
-
+            actualPath = actualPath.substring(0,actualPath.length-1); // quito el ultimo /
             return (
                 <ModalDoctorAddFile otherFiles = { files } otherFolders = { folders }  actualPath = { actualPath } callbackAddFile = { this._callbackAddFile }/>
             );

@@ -38,6 +38,7 @@ export function doctorAddFolder(data){
 
 export function doctorAddFile(data){
     return function action(dispatch){
+        debugger;
         data.append("token",localStorage.jwtToken);
         return axiosInstance.post("/add/file",data, {
             headers: {

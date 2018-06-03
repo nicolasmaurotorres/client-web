@@ -32,8 +32,8 @@ class ModalDoctorAddFile extends React.Component {
     this.callbackAddFileOrCancel = this.callbackAddFileOrCancel.bind(this);
   }
 
-  callbackAddFileOrCancel(updatePacients){
-    this.props.callbackAddFile(updatePacients);
+  callbackAddFileOrCancel(updatePacients,newFile){
+    this.props.callbackAddFile(updatePacients,newFile);
     this.setState({modalIsOpen : false});
   }
 

@@ -35,12 +35,12 @@ class DoctorAddFileForm extends React.Component {
             const { doctorAddFile, callbackAddOrCancel } = this.props;
             const { file, actualPath }  = this.state;
             var formData = new FormData();
-
+            var name = file.name;
             formData.append("file", file);
-            formData.append("path", actualPath)
+            formData.append("folder", actualPath)
             doctorAddFile(formData)
             .then((response)=>{
-                callbackAddOrCancel(true);
+                callbackAddOrCancel(true,name);
             })
             .catch((response)=>{
                 callbackAddOrCancel(false);
@@ -50,15 +50,22 @@ class DoctorAddFileForm extends React.Component {
 
     _isValid(){
         var toReturn = true;
-        var file = this.state.file.name;
         var _errors = {};
-        var parts = file.split(".");
-        var ext = parts[parts.length - 1] ; // me quedo con la extension
-        //TODO: en productivo sacar esto, es para pruebas
+
+        if (this.state.file === null){
+            toReturn = false;
+            _errors["file"] = "you have to select a file to send";   
+        } else { 
+            var file = this.state.file.name;
+            var parts = file.split(".");
+            var ext = parts[parts.length - 1] ; // me quedo con la extension
+        }
+        //TODO: sacado temporalmente
         /*if (ext !== "vtk"){
             toReturn = false;
             _errors["file"] = "only files with vtk extention are allowed";
         }*/
+        
         if (toReturn && this.state.otherFiles[file] != null){
             toReturn = false;
             _errors["file"] = "you already have a file with that name";
