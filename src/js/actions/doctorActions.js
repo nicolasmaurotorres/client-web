@@ -38,7 +38,6 @@ export function doctorAddFolder(data){
 
 export function doctorAddFile(data){
     return function action(dispatch){
-        debugger;
         data.append("token",localStorage.jwtToken);
         return axiosInstance.post("/add/file",data, {
             headers: {
@@ -46,4 +45,11 @@ export function doctorAddFile(data){
             }
         });
      }
+}
+
+export function doctorRenameFolder(data){
+    return function action(dispatch){
+        data["token"] = localStorage.jwtToken;
+        return axiosInstance.post("/rename/folder",data);
+    }
 }

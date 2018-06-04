@@ -14,6 +14,7 @@ import ModalDoctorAddPacient from '../modals/ModalDoctorAddPacient'
 import ModalDoctorRenamePacient from '../modals/ModalDoctorRenamePacient'
 import ModalDoctorAddFolder from '../modals/ModalDoctorAddFolder'
 import ModalDoctorAddFile from '../modals/ModalDoctorAddFile'
+import ModalDoctorRenameFolder from '../modals/ModalDoctorRenameFolder'
 
 class DoctorLobby extends React.Component {
     constructor(props){
@@ -22,12 +23,14 @@ class DoctorLobby extends React.Component {
         this.state = {
             initialLevel : true, // si esta en true, significa que es el nivel inicial y solo son pacientes lo que muestra, es para el click derecho
             isFolder : false,
-            idContextText : "rightClickContextMenuPacient",
+            idContextText : "rightClickContextMenuPacient", // right click context to show
             showingModalAddPacient : false,
-            showingModalRenamePacient: false, // modal rename
+            showingModalRenamePacient: false, // modal rename pacient
             pacientToRename: "",
             showingModalAddFolder : false,
             showingModalAddFile : false,
+            showingmodalRenameFolder : false, // modal rename folder
+            folderToRename : "",
             // state of the table
             rawResponse : {},
             path : [],
@@ -51,6 +54,10 @@ class DoctorLobby extends React.Component {
         this._callbackRenamePacient = this._callbackRenamePacient.bind(this);
         this._callbackAddFolder = this._callbackAddFolder.bind(this);
         this._callbackAddFile = this._callbackAddFile.bind(this);
+        this._callbackRenameFolder = this._callbackRenameFolder.bind(this);
+        this._getCurrentPath = this._getCurrentPath.bind(this);
+        this._getCurrentFolders = this._getCurrentFolders.bind(this);
+        this._getCurrentFiles = this._getCurrentFiles.bind(this);
     }
  
     _getPacients(){
@@ -77,13 +84,29 @@ class DoctorLobby extends React.Component {
         this._setFiles(node);
         this._setFolders(node);
     }
-  
+    
     _setPath(resp){
         this.setState({ path : resp.Folder.split('/') });
     }
 
+    _getCurrentPath(){
+        var toReturn = "";
+        for(var i = 1; i < this.state.path.length; i++){ // quito el email
+            toReturn = toReturn + this.state.path[i] + "/";
+        }
+        return toReturn;
+    }
+    
     _setFiles(resp){
         this.setState({ files: resp.Files });        
+    }
+
+    _getCurrentFiles(){ // devuelve un hash con los nombres de los archivos
+        var toReturn = {};
+        for (var i = 0; i < this.state.files.length; i++){
+            toReturn[this.state.files[i]] = i;
+        }
+        return toReturn;
     }
 
     _setFolders(resp){
@@ -93,6 +116,14 @@ class DoctorLobby extends React.Component {
             subFolders.push(split[split.length - 1]); // el 0 es el email del doctor --> doctor@doctor.com/paciente2
         });
         this.setState({ folders : subFolders });
+    }
+
+    _getCurrentFolders(){ // devuelve un hash con los nombres de los archivos
+        var toReturn = {};
+        for (var i = 0; i < this.state.folders.length; i++){
+            toReturn[this.state.folders[i]] = i;
+        }
+        return toReturn;
     }
   
     _handleClickPath(e){
@@ -110,7 +141,6 @@ class DoctorLobby extends React.Component {
             //click en el principio de todo, vuelvo al estado inicial.
             this.setState({initialLevel:true, idContextText:"rightClickContextMenuPacient"});
         }
-
     }
 
     _nextNode(name,node) {
@@ -170,6 +200,7 @@ class DoctorLobby extends React.Component {
     }
 
     _onMouseEnterTableItem(e){
+        //cada vez que paso el mouse por encima de algo, cambio los menues que se muestran
         var pepe = this;
         var parent = e.target.parentElement;
         if (!this.state.initialLevel){
@@ -180,8 +211,6 @@ class DoctorLobby extends React.Component {
             }
         }
     }
-
-
 
     /* callbacks */
     _callbackAddPacient(updatePacients){
@@ -230,6 +259,31 @@ class DoctorLobby extends React.Component {
             path = path.substring(0,path.length-1); // quito el ultimo "/"
             var nextNode = this._nextNode(path,this.state.rawResponse);
             nextNode.Files.push(newFileName);
+            this._updateTable(nextNode);
+        }
+    }
+
+    _callbackRenameFolder(updateFolder,newFolderName,oldFolderName){
+        this.setState({showingmodalRenameFolder:false});
+        if (updateFolder){
+            debugger;
+            const { username } = this.props.auth.user;
+            var previousFolder = username+"/";
+            var split = oldFolderName.split("/");
+            for (var i = 0; i < split.length-1; i++){ // me paro en la carpeta que lo contiene al viejo nombre
+                previousFolder += split[i] + "/";
+            }
+            previousFolder = previousFolder.substring(0,previousFolder.length-1);  // quito el ultimo /
+            var nextNode = this._nextNode(previousFolder,this.state.rawResponse);
+            var toRename = username+"/"+oldFolderName;
+            var newNameFolder = username+"/"+newFolderName;
+            var found = false;
+            for (var i = 0; !found && i < nextNode.SubFolders.length;i++){
+                if (nextNode.SubFolders[i].Folder === toRename){
+                    nextNode.SubFolders[i].Folder = newNameFolder;
+                    found = true;
+                }
+            }
             this._updateTable(nextNode);
         }
     }
@@ -295,7 +349,8 @@ class DoctorLobby extends React.Component {
         );
         // context menu de la carpeta adentro de un paciente
         const onClickRenameFolder = ({event, ref,data,dataFromProvider}) => {
-            console.log("on click rename folder");
+            var target = event.target.parentElement.children[1].innerText; // obtengo el nombre de la carpeta a editar
+            this.setState({showingmodalRenameFolder : true, folderToRename : target});
         };
         const onClickCopyFolder = ({event, ref,data,dataFromProvider}) => {
             console.log("on click copy folder");
@@ -362,6 +417,18 @@ class DoctorLobby extends React.Component {
             </ContextMenu>
         );
 
+        //modal renombrar una carpeta 
+        if (this.state.showingmodalRenameFolder){
+            var folderToRename = this.state.folderToRename;
+            var othersFolders = {};
+            var currentPath = this._getCurrentPath();
+            var currentFiles = this._getCurrentFiles();
+            var currentFolders = this._getCurrentFolders();
+            return (
+                <ModalDoctorRenameFolder otherFolders = { currentFolders } otherFiles = { currentFiles } folderToRename = { folderToRename } actualPath = { currentPath } callbackRenameFolder = { this._callbackRenameFolder } />
+            );
+        }
+
         //modal de agregar un paciente
         if (this.state.showingModalAddPacient){
             var othersPacients = {};
@@ -375,13 +442,13 @@ class DoctorLobby extends React.Component {
             );
         }
 
-        //modal editar un paciente
+        //modal renombrar un paciente
         if (this.state.showingModalRenamePacient){
             var pacientToRename = this.state.pacientToRename;
             var othersPacients = {};
             var pacients = this.state.rawResponse.SubFolders;
             for (var i = 0; i < pacients.length ; i++){
-                var name = pacients[i].Folder.split("/")[1]; // obtengo el nombre del paciente
+                var name = pacients[i].Folder.split("/")[1]; // obtengo el nombre de los otros pacientes
                 othersPacients[name] = i; 
             }
             return (
