@@ -1,11 +1,11 @@
 import React    from 'react'
 import PropTypes from 'prop-types'
-import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify';
+import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
 import { connect } from 'react-redux'
 
 import RemoteRender from '../../renders/RemoteRender'
 
-import { doctorGetPacients, doctorRemovePacient } from '../../actions/doctorActions';
+import { doctorGetPacients, doctorRemovePacient } from '../../actions/doctorActions'
 import { addFlashMessage } from '../../actions/flashMessages'
 import confirm from '../../utils/confirmDialog'
 import TableDoctor from '../common/TableDoctor'
@@ -15,6 +15,7 @@ import ModalDoctorRenamePacient from '../modals/ModalDoctorRenamePacient'
 import ModalDoctorAddFolder from '../modals/ModalDoctorAddFolder'
 import ModalDoctorAddFile from '../modals/ModalDoctorAddFile'
 import ModalDoctorRenameFolder from '../modals/ModalDoctorRenameFolder'
+import ModalDoctorRenameFile from '../modals/ModalDoctorRenameFile'
 
 class DoctorLobby extends React.Component {
     constructor(props){
@@ -31,6 +32,8 @@ class DoctorLobby extends React.Component {
             showingModalAddFile : false,
             showingmodalRenameFolder : false, // modal rename folder
             folderToRename : "",
+            showingModalRenameFile: false,
+            fileToRename: "",
             // state of the table
             rawResponse : {},
             path : [],
@@ -55,6 +58,7 @@ class DoctorLobby extends React.Component {
         this._callbackAddFolder = this._callbackAddFolder.bind(this);
         this._callbackAddFile = this._callbackAddFile.bind(this);
         this._callbackRenameFolder = this._callbackRenameFolder.bind(this);
+        this._callbackRenameFile = this._callbackRenameFile.bind(this);
         this._getCurrentPath = this._getCurrentPath.bind(this);
         this._getCurrentFolders = this._getCurrentFolders.bind(this);
         this._getCurrentFiles = this._getCurrentFiles.bind(this);
@@ -78,7 +82,13 @@ class DoctorLobby extends React.Component {
     componentWillMount(){
         this._getPacients();
     }
-    // dado un nodo , actualizo los datos de la tabla
+    /**
+    * Dado un nodo , actualizo los datos de la tabla
+    * 
+    * @param {number} first Path de la carpeta
+    * @param {number} second arbol a buscar
+    * @returns {number} nodo donde esta la carpeta
+    */
     _updateTable(node){
         this._setPath(node);
         this._setFiles(node);
@@ -143,6 +153,13 @@ class DoctorLobby extends React.Component {
         }
     }
 
+    /**
+    * Dado un path de carpeta devuelve el nodo donde esta es esa carpetaen el arbol
+    * 
+    * @param {number} first Path de la carpeta
+    * @param {number} second arbol a buscar
+    * @returns {number} nodo donde esta la carpeta
+    */
     _nextNode(name,node) {
         if (node.Folder === name){
             return node;
@@ -201,7 +218,6 @@ class DoctorLobby extends React.Component {
 
     _onMouseEnterTableItem(e){
         //cada vez que paso el mouse por encima de algo, cambio los menues que se muestran
-        var pepe = this;
         var parent = e.target.parentElement;
         if (!this.state.initialLevel){
             if (parent.id.includes("folder")){
@@ -251,11 +267,9 @@ class DoctorLobby extends React.Component {
         this.setState({showingModalAddFile:false});
         if (updateFolder){
             var path = "";
-            var originalPath = "";
             for (var i = 0 ;  i < this.state.path.length; i++){
                 path += this.state.path[i] + "/"
             }
-            originalPath = path;
             path = path.substring(0,path.length-1); // quito el ultimo "/"
             var nextNode = this._nextNode(path,this.state.rawResponse);
             nextNode.Files.push(newFileName);
@@ -286,6 +300,25 @@ class DoctorLobby extends React.Component {
             }
             this._updateTable(nextNode);
         }
+    }   
+
+    _callbackRenameFile(update,newFileName,oldFileName){
+        debugger;
+        this.setState({showingModalRenameFile:false});
+        if (update){
+            const { username } = this.props.auth.user;
+            var actualPath = username+"/"+this._getCurrentPath();
+            actualPath = actualPath.substring(0,actualPath.length-1); // quito el ultimo "/""
+            var node = this._nextNode(actualPath,this.state.rawResponse);
+            var found = false;
+            for (var i = 0; i < node.Files.length && !found; i++){
+                if (node.Files[i] === oldFileName){
+                    node.Files[i] = newFileName;
+                    found = true;
+                }
+            }
+            this._updateTable(node);
+        }
     }
 
     /* callbacks */
@@ -303,21 +336,6 @@ class DoctorLobby extends React.Component {
     }
 
     render(){
-        // armo los datos de la tabla
-        var data = [];
-        this.state.folders.forEach((item) => {
-            data.push([<IconFont className = "fa fa-folder-o"/> , item, "folder"]);
-        });
-        this.state.files.forEach((item) => {
-            data.push([<IconFont className = "fa fa-file-text-o"/> , item, "file"]);
-        });
-        // armo el path
-        var path = ["/"];
-        this.state.path.forEach((item) => {
-            path.push(<label key = { item } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>)
-            path.push("/");
-        });
-        path.pop(); // quito el ultimo "/"
         // context menu del archivo adentro de un paciente
         const onClickRenderFile = ({event, ref,data,dataFromProvider}) => {
             console.log("on click render file");
@@ -326,7 +344,9 @@ class DoctorLobby extends React.Component {
             console.log("on click upgrade file");
         };
         const onClickRenameFile = ({event, ref,data,dataFromProvider}) => {
-            console.log("on click rename file");
+            var fileToRename = event.target.parentElement.id.split("-");
+            var fileToRename = fileToRename[1]+"."+fileToRename[2]; // le agrego el punto al archivo, aunque solo muestre el nombre
+            this.setState({showingModalRenameFile:true,fileToRename});
         };
         const onClickCopyFile = ({event, ref,data,dataFromProvider}) => {
             console.log("on click copy file");
@@ -417,10 +437,22 @@ class DoctorLobby extends React.Component {
             </ContextMenu>
         );
 
+        //modal renombrar un archivo
+        if (this.state.showingModalRenameFile){
+            var fileSplited = this.state.fileToRename.split(".");
+            var fileToRename = fileSplited[0]; // solo el nombre del archivo
+            var fileExt = fileSplited[1]; // extencion del archivo, el usuario final no puede cambiar la extencion del archivo, solo el nombre
+            var currentPath = this._getCurrentPath();
+            var currentFiles = this._getCurrentFiles();
+            var currentFolder = this._getCurrentFolders();
+            return (
+                <ModalDoctorRenameFile fileExtension = { fileExt } fileToRename = { fileToRename } otherFiles = { currentFiles } otherFolders = { currentFolder } actualPath = { currentPath } callbackRenameFile = { this._callbackRenameFile }/>
+            );
+        }
+
         //modal renombrar una carpeta 
         if (this.state.showingmodalRenameFolder){
             var folderToRename = this.state.folderToRename;
-            var othersFolders = {};
             var currentPath = this._getCurrentPath();
             var currentFiles = this._getCurrentFiles();
             var currentFolders = this._getCurrentFolders();
@@ -508,6 +540,25 @@ class DoctorLobby extends React.Component {
         const addFolderButton = (!this.state.initialLevel) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFolder }> Add Folder </botton>  </div> : null;
         const addFileButton = (!this.state.initialLevel) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick =   { this._onClickAddFile }> Add File </botton> </div>  : null;
         const idMenu = this.state.idContextText;
+        
+        // armo los datos de la tabla
+        var data = [];
+        this.state.folders.forEach((item) => {
+            data.push([<IconFont className = "fa fa-folder-o"/> , item, "folder"]);
+        });
+        this.state.files.forEach((item) => {
+            var dataSplitted = item.split(".")
+            var name = dataSplitted[0];
+            var extention = dataSplitted[1];
+            data.push([<IconFont className = "fa fa-file-text-o"/> , name, "file",extention]);
+        });
+        // armo el path
+        var path = ["/"];
+        this.state.path.forEach((item) => {
+            path.push(<label key = { item } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>)
+            path.push("/");
+        });
+        path.pop(); // quito el ultimo "/"
 
         return (
             <div className="jumbotron"> 

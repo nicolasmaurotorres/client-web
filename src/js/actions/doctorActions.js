@@ -53,3 +53,10 @@ export function doctorRenameFolder(data){
         return axiosInstance.post("/rename/folder",data);
     }
 }
+
+export function doctorRenameFile(data){
+    return function action(dispatch){
+        data["token"] = localStorage.jwtToken;
+        return axiosInstance.post("/rename/file",data);
+    }
+}

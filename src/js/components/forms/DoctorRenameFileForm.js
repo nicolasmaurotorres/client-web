@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import TextFieldGroup from '../common/TextFieldGroup'
 import validator from 'validator'
 
-class DoctorRenameFolderForm extends React.Component {
+class DoctorRenameFileForm extends React.Component {
     constructor(props){
         super(props);
 
@@ -24,19 +24,20 @@ class DoctorRenameFolderForm extends React.Component {
     }
 
     componentWillMount(){
-        const { otherFolders, otherFiles,folderToRename,actualPath } = this.props;
-        this.setState({otherFolders, otherFiles, actualPath, actualName : folderToRename, name : folderToRename});
+        const { otherFolders, otherFiles,fileToRename,actualPath } = this.props;
+        this.setState({otherFolders, otherFiles, actualPath, actualName : fileToRename, name : fileToRename});
     }
 
     _submitForm(){
         if (this._isValid()){
             var obj = {}
-            const { doctorRenameFolder , callbackRenameOrCancel } = this.props;
-            var newName = this.state.actualPath + this.state.name;
-            var oldName = this.state.actualPath + this.state.actualName;
-            obj["newfolder"] = newName;
-            obj["oldfolder"] = oldName;
-            doctorRenameFolder(obj)
+            const { doctorRenameFile , callbackRenameOrCancel,fileExtension} = this.props;
+            var newName = this.state.name+ "."+ fileExtension;
+            var oldName = this.state.actualName + "."+ fileExtension;
+            obj["filenew"] =  newName;// le agrego la extension al renombrarlos
+            obj["fileold"] = oldName;
+            obj["folder"] = this.state.actualPath;
+            doctorRenameFile(obj)
             .then((response)=>{
                 callbackRenameOrCancel(true,newName,oldName);
             })
@@ -51,10 +52,10 @@ class DoctorRenameFolderForm extends React.Component {
         var name = this.state.name;
         name = name.trim();
         var _errors = {};
-        var res = name.match(/^[a-z0-9]+$/i); // solo letras y numeros 
+        var res = name.match(/^[a-zA-Z0-9 _]+$/i); // solo letras y numeros 
         if (res === null){
             toReturn = false;
-            _errors["name"] = "only can contains numbers and letters the name of the folder";
+            _errors["name"] = "only can contains numbers and letters the name of the file";
         }
         
         if (toReturn && validator.isEmpty(name)){
@@ -113,13 +114,15 @@ class DoctorRenameFolderForm extends React.Component {
     }
 }
 
-DoctorRenameFolderForm.propTypes = {
+DoctorRenameFileForm.propTypes = {
     callbackRenameOrCancel : PropTypes.func.isRequired,
-    doctorRenameFolder : PropTypes.func.isRequired,
+    doctorRenameFile : PropTypes.func.isRequired,
     addFlashMessage : PropTypes.func.isRequired,
     otherFolders : PropTypes.object.isRequired,
     otherFiles : PropTypes.object.isRequired,
-    folderToRename : PropTypes.string.isRequired,
+    fileToRename : PropTypes.string.isRequired,
+    actualPath : PropTypes.string.isRequired,
+    fileExtension : PropTypes.string.isRequired
 }
 
-export default DoctorRenameFolderForm;
+export default DoctorRenameFileForm;

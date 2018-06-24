@@ -14,8 +14,12 @@ class TableDoctor extends React.Component {
         var data = [];
         const { onClickItems, onMouseEnter } = this.props;
         for (var i = 0; i < this.props.data.length; i++) {
-            var item = this.props.data[i];
-            var row = ( <tr className = "table-secondary" key = { item[1] } id = { item[2]+"-"+item[1] }>
+            var item = this.props.data[i]; // solo agrego el item[3] si es distinto de undefined
+            var id = item[2]+"-"+item[1];
+            if (item[3] !== undefined){
+                id = id+"-"+item[3]
+            }
+            var row = ( <tr className = "table-secondary" key = { item[1] } id = { id }>
                             <td onClick = { onClickItems } scope="row" name={ item[1] } onMouseEnter = { onMouseEnter }> { item[0] } </td>
                             <td onClick = { onClickItems } onMouseEnter = { onMouseEnter }>{ item[1] }</td>
                         </tr>);

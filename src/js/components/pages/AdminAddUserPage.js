@@ -8,7 +8,7 @@ import { addFlashMessage } from '../../actions/flashMessages'
 
 class AdminAddUserPage extends React.Component {
     render(){ 
-        const { createUserRequest, addFlashMessage, callbackCreateOrCancel } = this.props;
+        const { createUserRequest, addFlashMessage } = this.props;
         return (
             <AdminAddUserForm createUserRequest = { createUserRequest } 
                               addFlashMessage = { addFlashMessage } />
