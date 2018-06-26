@@ -34,7 +34,6 @@ class ModalAdminAddUser extends React.Component {
   }
 
   callbackCreateOrCancel(){
-    debugger;
     this.props.callbackCreateUser();
     this.setState({modalIsOpen : false});
   }

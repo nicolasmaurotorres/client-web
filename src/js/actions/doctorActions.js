@@ -60,3 +60,17 @@ export function doctorRenameFile(data){
         return axiosInstance.post("/rename/file",data);
     }
 }
+
+export function doctorRemoveFile(data){
+    return function action(dispatch){
+        data["token"] = localStorage.jwtToken;
+        return axiosInstance.post("/delete/file",data);
+    }
+}
+
+export function doctorRemoveFolder (data){
+    return function action(dispatch){
+        data["token"] = localStorage.jwtToken;
+        return axiosInstance.post("/delete/folder",data);
+    }
+}

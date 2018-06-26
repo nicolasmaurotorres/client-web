@@ -3,9 +3,7 @@ import PropTypes from 'prop-types'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
 import { connect } from 'react-redux'
 
-import RemoteRender from '../../renders/RemoteRender'
-
-import { doctorGetPacients, doctorRemovePacient } from '../../actions/doctorActions'
+import { doctorGetPacients, doctorRemovePacient,doctorRemoveFile, doctorRemoveFolder } from '../../actions/doctorActions'
 import { addFlashMessage } from '../../actions/flashMessages'
 import confirm from '../../utils/confirmDialog'
 import TableDoctor from '../common/TableDoctor'
@@ -355,7 +353,42 @@ class DoctorLobby extends React.Component {
             console.log("on click paste file");
         };
         const onClickDeleteFile = ({event, ref,data,dataFromProvider}) => {
-            console.log("on click delete file");
+            debugger;
+            const parts = event.target.parentElement.id.split('-');
+            var fileName = "";
+            for(var i = 1; i < parts.length-1; i++){//arranco de 1 por que 0 es el file/folder
+                fileName += parts[i]+"-";
+            }
+            fileName = fileName.substring(0, fileName.length-1); // elimino el ultimo "-"
+            fileName = fileName+"."+parts[parts.length-1]; // agrego la extencion
+            if (fileName !== ''){
+                const { doctorRemoveFile } = this.props;
+                confirm(ConfirmForm,"Warning","Are you sure you want to remove this file?").then(
+                    (result) =>  { // `proceed` callback
+                        debugger;
+                        var obj = {}
+                       var path = this._getCurrentPath();
+                        obj["file"] = path+fileName;
+                        doctorRemoveFile(obj)
+                        .then((response)=>{                         // actualizo los usuarios
+                            debugger;
+                            addFlashMessage({
+                                type:"success",
+                                text:"file "+fileName+" removed"
+                            });
+                            this._getPacients(); 
+                        })
+                        .catch((response)=>{
+                            debugger;
+                        });
+                    },
+                    (result) => {
+                        // `cancel` callback
+                        //TODO: fijar si si esta logueado sino mostrar el error
+                    }
+                );
+            };
+
         };
         const MenuFile = () => (
             <ContextMenu  id='rightClickContextMenuFile'>
@@ -587,4 +620,4 @@ DoctorLobby.propTypes = {
     doctorRemovePacient : PropTypes.func.isRequired,
 }
 
-export default connect(mapStateToProps,{ doctorGetPacients, doctorRemovePacient })(DoctorLobby);
+export default connect(mapStateToProps,{ doctorGetPacients, doctorRemovePacient, doctorRemoveFile,doctorRemoveFolder })(DoctorLobby);
