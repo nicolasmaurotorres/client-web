@@ -365,13 +365,11 @@ class DoctorLobby extends React.Component {
                 const { doctorRemoveFile } = this.props;
                 confirm(ConfirmForm,"Warning","Are you sure you want to remove this file?").then(
                     (result) =>  { // `proceed` callback
-                        debugger;
                         var obj = {}
                        var path = this._getCurrentPath();
                         obj["file"] = path+fileName;
                         doctorRemoveFile(obj)
                         .then((response)=>{                         // actualizo los usuarios
-                            debugger;
                             addFlashMessage({
                                 type:"success",
                                 text:"file "+fileName+" removed"
@@ -412,7 +410,39 @@ class DoctorLobby extends React.Component {
             console.log("on click paste folder");
         };
         const onClickDeleteFolder = ({event, ref,data,dataFromProvider}) => {
-            console.log("on click delete folder");
+            const parts = event.target.parentElement.id.split('-');
+            debugger;
+            var folderName = "";
+            for(var i = 1; i < parts.length; i++){//arranco de 1 por que 0 es el file/folder
+                folderName += parts[i]+"-";
+            }
+            folderName = folderName.substring(0, folderName.length-1); // elimino el ultimo "-"
+            if (folderName !== ''){
+                const { doctorRemoveFolder } = this.props;
+                confirm(ConfirmForm,"Warning","Are you sure you want to remove this folder?").then(
+                    (result) =>  { // `proceed` callback
+                       var obj = {}
+                       var path = this._getCurrentPath();
+                        obj["folder"] = path+folderName;
+                        doctorRemoveFolder(obj)
+                        .then((response)=>{       
+                            debugger;                  // actualizo los usuarios
+                            addFlashMessage({
+                                type:"success",
+                                text:"file "+folderName+" removed"
+                            });
+                            this._getPacients(); 
+                        })
+                        .catch((response)=>{
+                            debugger;
+                        });
+                    },
+                    (result) => {
+                        // `cancel` callback
+                        //TODO: fijar si si esta logueado sino mostrar el error
+                    }
+                );                
+            }
         };
         const MenuFolder = () => (
             <ContextMenu  id='rightClickContextMenuFolder'>
