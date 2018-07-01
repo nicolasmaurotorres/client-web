@@ -1,8 +1,8 @@
-import React from 'react';
+import React from 'react'
 import PropTypes from 'prop-types'
-import { confirmable } from 'react-confirm';
-import { connect } from 'react-redux';
-import Modal from 'react-modal';
+import { confirmable } from 'react-confirm'
+import { connect } from 'react-redux'
+import Modal from 'react-modal'
 
 import DoctorRenamePacientForm from '../forms/DoctorRenamePacientForm'
 import { doctorRenamePacient } from '../../actions/doctorActions'
