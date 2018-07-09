@@ -1,32 +1,97 @@
-import { render } from 'react-dom'
 import React from 'react'
-
-export function openModal(props){
-    const target = document.createElement('div');
-    document.body.appendChild(target);
-    const { children, ...rest } = props;
-    render(
-        <Modal {...rest} reference={target} >
-            { children }
-        </Modal>,
-        target
-    );
-}
+import { connect } from 'react-redux';
+import { closeModal } from '../../actions/modalActions'
+import ModalPlademaAddFile from '../modals/ModalPlademaAddFile';
 
 class Modal extends React.Component {
     onClose(){
-        this.props.reference.remove()
+      if(this.props.item.onClose){
+        this.props.item.onClose();
+      } 
+      this.props.onClose(this.props.item);
+    }
+    onConfirm(){
+      if(this.props.item.onConfirm){
+        this.props.item.onConfirm();
+      }
+      this.props.onClose(this.props.item);
+    }
+    render() {
+      const { zIndex } = this.props;
+      const { type } = this.props.item;
+      switch(type){
+          case 'confirmation': {
+            const { text } = this.props.item;
+            return (
+            <div className="modal-wrapper" style={{zIndex: (zIndex+1)*10}}>
+                <div className="modal">
+                <div className="text">{ text }</div>
+                <div className="buttons">
+                    <button className="modal-button" onClick={() => this.onConfirm()}>Confirm</button>
+                    <button className="modal-button" onClick={() => this.onClose()}>Close</button>
+                </div>
+                </div>
+            </div>
+            );
+          }
+          case 'custom':{
+            const { content } = this.props.item;
+            return (
+              <div className="modal-wrapper" style={{zIndex: (zIndex+1)*10}}>
+                <div className="modal">
+                  {content}
+                  <button className="close" onClick={() => this.onClose()}>&times;</button>
+                </div>
+              </div>
+            );
+          }
+          default: 
+            return null;
+      }
+    }
+  }
+
+class Modals extends React.Component {
+    constructor(props){
+        super(props);
+
+        this.state = {
+            isOpened : false
+        }
+    }
+
+    componentWillMount(){
+        this.setState({isOpened : (this.props.modals.length > 0)});
+    }
+
+    componentWillReceiveProps(nextProps){
+        this.setState({isOpened : (nextProps.modals.length > 0)});
     }
     
     render() {
-    const { text } = this.props;
-    return (
-            <div className="modal-wrapper">
-                <div className="modal">
-                     <button className="close" onClick={() => this.onClose()}>&times;</button>
-                    <div className="text">{text}</div>
-                </div>
-            </div>
-    );
+      const modals = this.props.modals.map((item,i) => 
+        <Modal  item={item} 
+                key={i} 
+                zIndex={i} 
+                onClose={(item) => this.props.dispatch(closeModal(item))}/>
+      );
+      return (
+        <div className="modals" style = {(this.state.isOpened > 0 ) ? {height:'100%'} :{height:'30%'} }> {/*para que no toquen los botones de atras*/}
+          { modals }
+        </div>
+      );
+    }
   }
-}
+
+  export const ModalContainer = connect(
+      function mapStateToProps(state) {
+          return {
+              modals: state.modals.modals
+          };
+      },
+      function mapDispatchToProps(dispatch) {
+          return {
+              dispatch
+          }
+      }
+  )(Modals);

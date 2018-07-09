@@ -1,8 +1,20 @@
 import React from 'react'
 import TablePladema from '../common/TablePladema'
-import { openModal } from '../common/Modal'
+import { openModal } from '../../actions/modalActions'
+import { connect } from 'react-redux';
+import uuid from 'uuid'
+import { ModalContainer }  from '../common/Modal';
 
-export default class PlademaLobby extends React.Component {
+
+  class CustomModalContent extends React.Component {
+    render() {
+      return (
+        <div className="modal-content">Custom Modal Content</div>
+      )
+    }
+  }
+
+class PlademaLobby extends React.Component {
     constructor(props) {
         super(props);
 
@@ -22,14 +34,17 @@ export default class PlademaLobby extends React.Component {
         this._getFiles = this._getFiles.bind(this);
         this._getPath = this._getPath.bind(this);
         this.handleModalClick = this.handleModalClick.bind(this);
+        this.callbackTest = this.callbackTest.bind(this);
+    }
+
+    callbackTest(){
+        console.log('soy un callback');
     }
 
     handleModalClick(){
-        openModal({
-            text: 'Modal Content'
-        });
+       
     }
-
+    
     componentWillMount() {
         //mock de la respuesta del servidor
         var rawResponse = [{
@@ -184,7 +199,7 @@ export default class PlademaLobby extends React.Component {
             auxFolders.push(elem);
         });
         
-        this.setState({ rawResponse: rawResponse.folders, folders: auxFolders, path:"/", files:[] });
+        this.setState({ rawResponse: rawResponse.folders, folders: auxFolders, path:["/"], files:[] });
     }
 
     _setFolders(nodo) {
@@ -232,13 +247,33 @@ export default class PlademaLobby extends React.Component {
     }
 
     render() {
-
         return (
             <div>
                 <TablePladema files = { this.state.files } folders = { this.state.folders } />
-                <button className="test-button" onClick={ this.handleModalClick }>Open Modal</button>
-            </div>
+                <button className="test-button" 
+                    onClick={() => this.props.dispatch(openModal({
+                                        id: uuid.v4(),
+                                        type: 'confirmation',
+                                        text: 'Are you sure to do this?',
+                                        onClose: () => console.log("fire at closing event"),
+                                        onConfirm: () => console.log("fire at confirming event")}))}>
+                    Open confirmation modal
+                </button>
+                <button className="test-button" onClick={() => this.props.dispatch(openModal({
+                                        id: uuid.v4(),
+                                        type: 'custom',
+                                        content: <CustomModalContent />}))}>
+                    Open custom modal
+                </button>
+                <ModalContainer />
+            </div> 
         );
-    
     }
 }
+
+function mapDispatchToProps(dispatch) {
+    return {
+      dispatch,
+    }
+}
+export default connect(null,mapDispatchToProps)(PlademaLobby);

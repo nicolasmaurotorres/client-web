@@ -10,8 +10,6 @@ import rootReducer from './reducers/rootReducer'
 import setAuthorizationInfo from './utils/setAuthorizationInfo';
 import { setCurrentUser } from './actions/authActions';
 
-import FontAwesome from 'react-fontawesome'
-
 const store = createStore(
     rootReducer,
     compose(

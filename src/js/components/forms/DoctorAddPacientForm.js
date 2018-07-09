@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types'
 import TextFieldGroup from '../common/TextFieldGroup'
-import Dropdown from 'react-dropdown'
 import validator from 'validator'
 import 'react-dropdown/style.css'
-import classname from 'classnames'
+
 
 class DoctorAddPacientForm extends React.Component {
     constructor(props){

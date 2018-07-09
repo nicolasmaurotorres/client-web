@@ -1,10 +1,7 @@
 import React from 'react'
-import classnames from 'classnames'
 import { BeatLoader } from 'react-spinners'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
 import validator from 'validator'
-import isEmpty from 'lodash/isEmpty'
 
 import TextFieldGroup from '../common/TextFieldGroup'
 

@@ -2,16 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-class DoctorAddFileForm extends React.Component {
+class PlademaAddFileForm extends React.Component {
     constructor(props){
         super(props);
 
         this.state = {
-            errors: {},
-            file: null,
-            otherFolders : [],
-            otherFiles : [],
-            actualPath:""
+            errors : {},
+            file : null,
+            folders : [],
+            files : [],
+            path : ""
         }
 
         /* bindings */
@@ -22,9 +22,9 @@ class DoctorAddFileForm extends React.Component {
     }
 
     componentWillMount(){
-        this.setState({otherFiles : this.props.otherFiles,
-                      otherFolders : this.props.otherFolders,
-                      actualPath : this.props.actualPath});
+        this.setState({files : this.props.files,
+                      folders : this.props.folders,
+                      path : this.props.path});
     }
 
     _submitForm(){
@@ -35,13 +35,20 @@ class DoctorAddFileForm extends React.Component {
             var formData = new FormData();
             var name = file.name;
             formData.append("file", file);
-            formData.append("folder", actualPath)
+            formData.append("folder", path)
             doctorAddFile(formData)
             .then((response)=>{
-                callbackAddOrCancel(true,name);
+                var params = {
+                    update : true,
+                    fileName : name
+                };
+                callbackAddOrCancel(params);
             })
             .catch((response)=>{
-                callbackAddOrCancel(false);
+                var params = {
+                    update : false
+                };
+                callbackAddOrCancel(params);
             });
         }
     }
@@ -64,12 +71,12 @@ class DoctorAddFileForm extends React.Component {
             _errors["file"] = "only files with vtk extention are allowed";
         }*/
         
-        if (toReturn && this.state.otherFiles[file] != null){
+        if (toReturn && this.state.files[file] != null){
             toReturn = false;
             _errors["file"] = "you already have a file with that name";
         }
 
-        if (toReturn && this.state.otherFolders[file] != null){
+        if (toReturn && this.state.folders[file] != null){
             toReturn = false;
             _errors["file"] = "you already have a folder with that name";
         }
@@ -86,7 +93,10 @@ class DoctorAddFileForm extends React.Component {
     }
 
     _cancelForm(){
-        this.props.callbackAddOrCancel(false);
+        var params = {
+            update : false
+        }
+        this.props.callback(params);
     }
       
     render(){
@@ -108,12 +118,12 @@ class DoctorAddFileForm extends React.Component {
     }
 }
 
-DoctorAddFileForm.propTypes = {
-    callbackAddOrCancel : PropTypes.func.isRequired,
+PlademaAddFileForm.propTypes = {
+    callback : PropTypes.func.isRequired,
     doctorAddFile : PropTypes.func.isRequired,
-    otherFiles : PropTypes.object.isRequired,
-    otherFolders : PropTypes.object.isRequired,
-    actualPath : PropTypes.string.isRequired,
+    files : PropTypes.object.isRequired,
+    folders : PropTypes.object.isRequired,
+    path : PropTypes.string.isRequired,
 }    
 
-export default DoctorAddFileForm;
+export default PlademaAddFileForm;
