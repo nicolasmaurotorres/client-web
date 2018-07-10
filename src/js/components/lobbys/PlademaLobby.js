@@ -3,6 +3,7 @@ import TablePladema from '../common/TablePladema'
 import { openModal } from '../../actions/modalActions'
 import { connect } from 'react-redux';
 import uuid from 'uuid'
+import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
 import { ModalContainer }  from '../common/Modal';
 
 
@@ -22,7 +23,11 @@ class PlademaLobby extends React.Component {
             rawResponse: {},
             folders: [],
             files: [],
-            path: []
+            path: [],
+            isModalOpen : false,
+            isFolder : false,
+            idContextText : 'rightClickContextMenuInitialMenuFolder',
+            initialLevel : true
         };
 
         /* bindings */
@@ -33,18 +38,97 @@ class PlademaLobby extends React.Component {
         this._getFolders = this._getFolders.bind(this);
         this._getFiles = this._getFiles.bind(this);
         this._getPath = this._getPath.bind(this);
-        this.handleModalClick = this.handleModalClick.bind(this);
+        this._hoverTableItem = this._hoverTableItem.bind(this);
+        this._handleOnClickTableItem = this._handleOnClickTableItem.bind(this);
+        this._nextNode = this._nextNode.bind(this);
+        /*callbacks*/
         this.callbackTest = this.callbackTest.bind(this);
     }
+
+    /**
+    * Dado un path de carpeta devuelve el nodo donde esta es esa carpetaen el arbol
+    * 
+    * @param {number} first Path de la carpeta
+    * @param {number} second arbol a buscar
+    * @returns {number} nodo donde esta la carpeta
+    */
+   _nextNode(name,node) {
+       debugger;
+    if (node.Folder === name){
+        return node;
+    }
+    for(var i = 0; i < node.SubFolders.length; i++){
+        var aux = this._nextNode(name,node.SubFolders[i]);
+        if (aux != null){
+            return aux
+        }
+    }
+}
+
+
+    _hoverTableItem(e){
+        //cada vez que paso el mouse por encima de algo, cambio los menues que se muestran
+        var parent = e.target.parentElement;
+        if (this.state.initialLevel){
+            this.setState({isFolder: true, idContextText:"rightClickContextMenuInitialMenuFolder"});
+        } else {
+            if (parent.id.includes("folder")){
+                this.setState({isFolder: true, idContextText:"rightClickContextMenuNotInitialMenuFolder"});
+            } else {
+                this.setState({isFolder: false, idContextText:"rightClickContextMenuNotInitialMenuFile"});
+                }
+            }
+    }
+
+    _handleOnClickTableItem(e){
+        var parent = e.target.parentElement;
+        var idArray = parent.id.split("-"); 
+        var nameTarget = "";
+        for (var i = 1; i < idArray.length; i++){ // el nombre del archivo o carpeta puede contener "-", pero el primer elemento (0), es el folder ó file element
+            nameTarget = nameTarget + idArray[i] + "-";
+        }
+        nameTarget = nameTarget.substr(0,nameTarget.length - 1); // quito el ultimo "-"
+        if (this.state.initialLevel){
+            switch (idArray[0]){
+                case "folder":{
+                    // estoy en el nivel inicial, cambio a una subcarpeta
+                    this.setState({initialLevel : false});
+                    const { username } = this.props.auth.user;
+                    nameTarget = username + "/" + nameTarget;
+                    var nextNode = this._nextNode(nameTarget,this.state.rawResponse); // busco la carpeta para abrirla
+                    this._updateTable(nextNode);
+                    break;
+                }
+                case "file":
+                    console.log("en teoria no tendria que haber ningun archivo sin paciente!");
+                    break;
+            }
+        } else {
+            // tengo que armar el path
+            var path = "";
+            for (var i = 0; i < this.state.path.length; i++){
+                path = path + this.state.path[i] + "/";
+            }
+            path = path + nameTarget;
+            switch (idArray[0]){
+                case "folder":{
+                    var nextNode = this._nextNode(path,this.state.rawResponse); // busco la carpeta para abrirla
+                    this._updateTable(nextNode);
+                    break;
+                }
+                case "file":{
+                    console.log("no es el nivel inicial y clikeaste un archivo");
+                    break;
+                }
+            }
+        }
+    }
+    
 
     callbackTest(){
         console.log('soy un callback');
     }
 
-    handleModalClick(){
-       
-    }
-    
     componentWillMount() {
         //mock de la respuesta del servidor
         var rawResponse = [{
@@ -247,10 +331,36 @@ class PlademaLobby extends React.Component {
     }
 
     render() {
+
+        const onClickAddPacient = ({event, ref,data,dataFromProvider}) => {
+            this._onClickAddPacient();
+        }; 
+
+        const InitialMenuFolder = () => (
+            <ContextMenu  id='rightClickContextMenuInitialMenuFolder'>
+                <Item onClick = { onClickAddPacient }><IconFont className = "fa fa-upload"/> Upload File </Item>
+            </ContextMenu>
+        );
+
+        const NotInitialMenuFolder = () => (
+            <ContextMenu  id='rightClickContextMenuNotInitialMenuFolder'>
+                <Item onClick = { onClickAddPacient }><IconFont className = "fa fa-upload"/> Upload File </Item>
+                <Item onClick = { onClickAddPacient }><IconFont className = "fa fa-plus"/> Create Folder </Item>
+            </ContextMenu>
+        );
+
+        const NotInitialMenuFile = () => (
+            <ContextMenu  id='rightClickContextMenuNotInitialMenuFile'>
+                <Item onClick = { onClickAddPacient }><IconFont className = "fa fa-download"/> Download </Item>
+            </ContextMenu>
+        );
+
+        const idMenu = this.state.idContextText;
+        const menu = (this.state.initialLevel) ? <InitialMenuFolder /> : ((this.state.isFolder) ? <NotInitialMenuFolder />: <NotInitialMenuFile />)
         return (
             <div>
-                <TablePladema files = { this.state.files } folders = { this.state.folders } />
                 <button className="test-button" 
+                        tabIndex = {(this.state.isModalOpen) ? 1 : -1 }
                     onClick={() => this.props.dispatch(openModal({
                                         id: uuid.v4(),
                                         type: 'confirmation',
@@ -265,6 +375,10 @@ class PlademaLobby extends React.Component {
                                         content: <CustomModalContent />}))}>
                     Open custom modal
                 </button>
+                <ContextMenuProvider  id = { idMenu }>
+                    <TablePladema files = { this.state.files } folders = { this.state.folders } onMouseEnter = { this._hoverTableItem } onClickItems = { this._handleOnClickTableItem }/>
+                </ContextMenuProvider>
+                { menu }
                 <ModalContainer />
             </div> 
         );

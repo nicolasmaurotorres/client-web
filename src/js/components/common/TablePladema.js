@@ -43,8 +43,8 @@ class TableDoctor extends React.Component {
     componentWillMount(){
         this._updateState(this.props);
     }
-
-    componentWillUpdate(nextProps){
+    
+    componentWillReceiveProps(nextProps){
         this._updateState(nextProps)
     }
 
