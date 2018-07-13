@@ -2,24 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types'
 import { IconFont } from 'react-contexify'
 
-class TableDoctor extends React.Component {
-    constructor(props){
-        super(props);
-
-        this.state = {
-            files: {},
-            folders : {}
-        };
-
-        /* Bindings */
-        this._updateState = this._updateState.bind(this);
-    }
-    
-    _updateState(props){
-        const { onClickItems, onMouseEnter } = props;
+class TablePladema extends React.Component {
+    render(){
+        const { onClickItems, onMouseEnter } = this.props;
         var files = [];
         var folders = [];
-        props.files.forEach(function(elem){
+
+        this.props.files.forEach(function(elem){
             var parts = elem.split(".");
             var extention = parts[parts.length-1]; // me quedo con la extencion
             var row = ( <tr className = "table-secondary" key = { elem } id = { "file-"+elem+"-"+extention }>
@@ -29,26 +18,14 @@ class TableDoctor extends React.Component {
             files.push(row);
         });
 
-        props.folders.forEach(function(elem){
-            var row = (<tr className = "table-secondary" key = { elem.Folder } id = { "folder-"+elem.Folder }>
+        this.props.folders.forEach(function(elem){
+            var row = (<tr className = "table-secondary" key = { elem } id = { "folder-"+elem }>
                         <td onClick = { onClickItems } scope="row" name={ elem.Folder } onMouseEnter = { onMouseEnter }><IconFont className = "fa fa-folder-o"/> </td>
-                        <td onClick = { onClickItems } onMouseEnter = { onMouseEnter }>{ elem.Folder }</td>
+                        <td onClick = { onClickItems } onMouseEnter = { onMouseEnter }>{ elem }</td>
                        </tr>
             );
             folders.push(row);
         });
-        this.setState({files,folders});
-    }
-
-    componentWillMount(){
-        this._updateState(this.props);
-    }
-    
-    componentWillReceiveProps(nextProps){
-        this._updateState(nextProps)
-    }
-
-    render(){
         return (
             <div className="bs-component">
                 <table className="table table-hover">
@@ -59,8 +36,8 @@ class TableDoctor extends React.Component {
                        </tr>
                     </thead>
                     <tbody>
-                        { this.state.folders }
-                        { this.state.files }
+                        { folders }
+                        { files }
                     </tbody>
                 </table>
             </div>
@@ -68,11 +45,11 @@ class TableDoctor extends React.Component {
     }
 }
 
-TableDoctor.PropTypes = {
+TablePladema.PropTypes = {
     files : PropTypes.array.isRequired,
     folders : PropTypes.array.isRequired,
     onClickItems : PropTypes.func.isRequired,
     onMouseEnter : PropTypes.func.isRequired,
 }
 
-export default TableDoctor;
+export default TablePladema;

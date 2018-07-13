@@ -41,6 +41,9 @@ class PlademaLobby extends React.Component {
         this._hoverTableItem = this._hoverTableItem.bind(this);
         this._handleOnClickTableItem = this._handleOnClickTableItem.bind(this);
         this._nextNode = this._nextNode.bind(this);
+        this._updateTable = this._updateTable.bind(this);
+        this._handleClickPath = this._handleClickPath.bind(this);
+        this._init = this._init.bind(this);
         /*callbacks*/
         this.callbackTest = this.callbackTest.bind(this);
     }
@@ -53,19 +56,18 @@ class PlademaLobby extends React.Component {
     * @returns {number} nodo donde esta la carpeta
     */
    _nextNode(name,node) {
-       debugger;
-    if (node.Folder === name){
-        return node;
-    }
-    for(var i = 0; i < node.SubFolders.length; i++){
-        var aux = this._nextNode(name,node.SubFolders[i]);
-        if (aux != null){
-            return aux
+        if (node.Folder === name){
+            return node;
         }
+        for(var i = 0; i < node.SubFolders.length; i++){
+            var aux = this._nextNode(name,node.SubFolders[i]);
+            if (aux != null){
+                return aux
+            }
+        }
+        return null;
     }
-}
-
-
+    
     _hoverTableItem(e){
         //cada vez que paso el mouse por encima de algo, cambio los menues que se muestran
         var parent = e.target.parentElement;
@@ -81,6 +83,7 @@ class PlademaLobby extends React.Component {
     }
 
     _handleOnClickTableItem(e){
+        debugger;
         var parent = e.target.parentElement;
         var idArray = parent.id.split("-"); 
         var nameTarget = "";
@@ -93,10 +96,21 @@ class PlademaLobby extends React.Component {
                 case "folder":{
                     // estoy en el nivel inicial, cambio a una subcarpeta
                     this.setState({initialLevel : false});
-                    const { username } = this.props.auth.user;
-                    nameTarget = username + "/" + nameTarget;
-                    var nextNode = this._nextNode(nameTarget,this.state.rawResponse); // busco la carpeta para abrirla
-                    this._updateTable(nextNode);
+                    var nextNode = null;
+                    var found = false;
+                    for (var i = 0; i < this.state.rawResponse.length && !found; i++) {
+                        var nextNode = this._nextNode(nameTarget,this.state.rawResponse[i]); // busco la carpeta para abrirla
+                        if (nextNode !== null){
+                            found=true;
+                        }
+                    }
+                    if (nextNode === null){
+                        // significa que hizo click en Home del path, tengo que cargarlo de 0
+                        this._init(this.state.rawResponse);
+                    } else {
+                        this._updateTable(nextNode);
+                    }
+                    
                     break;
                 }
                 case "file":
@@ -112,7 +126,14 @@ class PlademaLobby extends React.Component {
             path = path + nameTarget;
             switch (idArray[0]){
                 case "folder":{
-                    var nextNode = this._nextNode(path,this.state.rawResponse); // busco la carpeta para abrirla
+                    var nextNode = null;
+                    var found = false;
+                    for (var i = 0; i < this.state.rawResponse.length && !found; i++) {
+                        var nextNode = this._nextNode(path,this.state.rawResponse[i]); // busco la carpeta para abrirla
+                        if (nextNode !== null){
+                            found=true;
+                        }
+                    }
                     this._updateTable(nextNode);
                     break;
                 }
@@ -278,18 +299,32 @@ class PlademaLobby extends React.Component {
         }
         ];
 
+               
+        this.setState({ rawResponse: rawResponse});
+        this._init(rawResponse);
+    }
+
+    _init(rawResponse){
         var auxFolders = [];
         rawResponse.forEach(function(elem){
-            auxFolders.push(elem);
+            auxFolders.push(elem.Folder);
         });
-        
-        this.setState({ rawResponse: rawResponse.folders, folders: auxFolders, path:["/"], files:[] });
+        debugger;
+        this.setState({folders: auxFolders, path:["/"], files:[] });
     }
+
+    _updateTable(nodo){
+        this._setFolders(nodo);        
+        this._setPath(nodo);
+        this._setFiles(nodo);
+    }
+
 
     _setFolders(nodo) {
         var auxFolders = [];
-        nodo.SubFolders.Folder.forEach(function (element) {
-            auxFolders.push(element.Folder);
+        nodo.SubFolders.forEach(function (element) {
+            var parts = element.Folder.split("/");
+            auxFolders.push(parts[parts.length-1]); // obtengo el ultimo a la derecha
         });
         this.setState({ folders: auxFolders });
     }
@@ -299,8 +334,9 @@ class PlademaLobby extends React.Component {
     }
 
     _setFiles(nodo) {
+        debugger;
         var auxFiles = [];
-        nodo.forEach(function (elem) {
+        nodo.Files.forEach(function (elem) {
            auxFiles.push(elem);
         });
         this.setState({ files: auxFiles });
@@ -330,6 +366,32 @@ class PlademaLobby extends React.Component {
         return toReturn;
     }
 
+    _handleClickPath(e){
+        debugger;
+        var target = e.target.innerText; // un item del path clickeado, vuelvo a esa carpeta
+        var index = this.state.path.indexOf(target);
+        if (index === -1){ // hizo click en Home
+            //click en el principio de todo, vuelvo al estado inicial.
+            this.setState({initialLevel:true, idContextText:"rightClickContextMenuInitialMenuFolder", path: []});
+            this._init(this.state.rawResponse);
+        } else {
+            var nextTarget = "";
+            for(var i = 0; i < index; i++){
+                nextTarget = nextTarget + this.state.path[i] + "/";
+            }
+            nextTarget = nextTarget + target;
+            var nextNode = null;
+            var found = false;
+            for (var i = 0; i < this.state.rawResponse.length && !found; i++){
+                var nextNode = this._nextNode(nextTarget,this.state.rawResponse[i]); // busco la carpeta para abrirla
+                if (nextNode !== null){
+                    found = true;
+                }
+            }
+            this._updateTable(nextNode);
+        }
+    }
+
     render() {
 
         const onClickAddPacient = ({event, ref,data,dataFromProvider}) => {
@@ -357,6 +419,17 @@ class PlademaLobby extends React.Component {
 
         const idMenu = this.state.idContextText;
         const menu = (this.state.initialLevel) ? <InitialMenuFolder /> : ((this.state.isFolder) ? <NotInitialMenuFolder />: <NotInitialMenuFile />)
+
+        var path = ["/",<label key = "Home" onClick = { this._handleClickPath } style={{cursor:"pointer"}}> Home </label>];
+        this.state.path.forEach((item) => {
+            debugger;
+            if (item !== "/"){
+                path.push("/");
+                path.push(<label key = { item } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
+            } else {
+                path.push(<label key = { item } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
+            }
+        });
         return (
             <div>
                 <button className="test-button" 
@@ -375,6 +448,7 @@ class PlademaLobby extends React.Component {
                                         content: <CustomModalContent />}))}>
                     Open custom modal
                 </button>
+                <div> { path }</div>
                 <ContextMenuProvider  id = { idMenu }>
                     <TablePladema files = { this.state.files } folders = { this.state.folders } onMouseEnter = { this._hoverTableItem } onClickItems = { this._handleOnClickTableItem }/>
                 </ContextMenuProvider>
