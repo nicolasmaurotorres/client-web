@@ -7,11 +7,11 @@ class PlademaAddFileForm extends React.Component {
         super(props);
 
         this.state = {
-            errors : {},
-            file : null,
-            folders : [],
-            files : [],
-            path : ""
+            errors: {},
+            file: null,
+            otherFolders : [],
+            otherFiles : [],
+            actualPath:""
         }
 
         /* bindings */
@@ -22,9 +22,9 @@ class PlademaAddFileForm extends React.Component {
     }
 
     componentWillMount(){
-        this.setState({files : this.props.files,
-                      folders : this.props.folders,
-                      path : this.props.path});
+        this.setState({otherFiles : this.props.otherFiles,
+                      otherFolders : this.props.otherFolders,
+                      actualPath : this.props.actualPath});
     }
 
     _submitForm(){
@@ -35,20 +35,13 @@ class PlademaAddFileForm extends React.Component {
             var formData = new FormData();
             var name = file.name;
             formData.append("file", file);
-            formData.append("folder", path)
+            formData.append("folder", actualPath)
             doctorAddFile(formData)
             .then((response)=>{
-                var params = {
-                    update : true,
-                    fileName : name
-                };
-                callbackAddOrCancel(params);
+                callbackAddOrCancel(true,name);
             })
             .catch((response)=>{
-                var params = {
-                    update : false
-                };
-                callbackAddOrCancel(params);
+                callbackAddOrCancel(false);
             });
         }
     }
@@ -71,12 +64,12 @@ class PlademaAddFileForm extends React.Component {
             _errors["file"] = "only files with vtk extention are allowed";
         }*/
         
-        if (toReturn && this.state.files[file] != null){
+        if (toReturn && this.state.otherFiles[file] != null){
             toReturn = false;
             _errors["file"] = "you already have a file with that name";
         }
 
-        if (toReturn && this.state.folders[file] != null){
+        if (toReturn && this.state.otherFolders[file] != null){
             toReturn = false;
             _errors["file"] = "you already have a folder with that name";
         }
@@ -93,10 +86,7 @@ class PlademaAddFileForm extends React.Component {
     }
 
     _cancelForm(){
-        var params = {
-            update : false
-        }
-        this.props.callback(params);
+        this.props.callbackAddOrCancel(false);
     }
       
     render(){
@@ -119,11 +109,11 @@ class PlademaAddFileForm extends React.Component {
 }
 
 PlademaAddFileForm.propTypes = {
-    callback : PropTypes.func.isRequired,
+    callbackAddOrCancel : PropTypes.func.isRequired,
     doctorAddFile : PropTypes.func.isRequired,
-    files : PropTypes.object.isRequired,
-    folders : PropTypes.object.isRequired,
-    path : PropTypes.string.isRequired,
+    otherFiles : PropTypes.object.isRequired,
+    otherFolders : PropTypes.object.isRequired,
+    actualPath : PropTypes.string.isRequired,
 }    
 
 export default PlademaAddFileForm;

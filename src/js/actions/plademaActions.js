@@ -6,3 +6,11 @@ export function plademaGetData(param){
         return axiosInstance.post("/pladema/search/files",obj);
      }
 }
+
+export function plademaAddFolder(data){
+    return function action(dispatch){
+        data["token"] = localStorage.jwtToken;
+        return axiosInstance.post("/add/folder",data);
+     }
+}
+

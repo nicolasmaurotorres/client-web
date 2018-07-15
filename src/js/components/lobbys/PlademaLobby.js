@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import uuid from 'uuid'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
 import { ModalContainer }  from '../common/Modal';
-
+import ModalPlademaAddFolder from '../modals/pladema/ModalPlademaAddFolder';
 
   class CustomModalContent extends React.Component {
     render() {
@@ -27,7 +27,7 @@ class PlademaLobby extends React.Component {
             isModalOpen : false,
             isFolder : false,
             idContextText : 'rightClickContextMenuInitialMenuFolder',
-            initialLevel : true
+            level : 0
         };
 
         /* bindings */
@@ -45,7 +45,7 @@ class PlademaLobby extends React.Component {
         this._handleClickPath = this._handleClickPath.bind(this);
         this._init = this._init.bind(this);
         /*callbacks*/
-        this.callbackTest = this.callbackTest.bind(this);
+        this._callbackTest = this._callbackTest.bind(this);
     }
 
     /**
@@ -83,7 +83,6 @@ class PlademaLobby extends React.Component {
     }
 
     _handleOnClickTableItem(e){
-        debugger;
         var parent = e.target.parentElement;
         var idArray = parent.id.split("-"); 
         var nameTarget = "";
@@ -91,65 +90,41 @@ class PlademaLobby extends React.Component {
             nameTarget = nameTarget + idArray[i] + "-";
         }
         nameTarget = nameTarget.substr(0,nameTarget.length - 1); // quito el ultimo "-"
-        if (this.state.initialLevel){
-            switch (idArray[0]){
-                case "folder":{
-                    // estoy en el nivel inicial, cambio a una subcarpeta
-                    this.setState({initialLevel : false});
-                    var nextNode = null;
-                    var found = false;
-                    for (var i = 0; i < this.state.rawResponse.length && !found; i++) {
-                        var nextNode = this._nextNode(nameTarget,this.state.rawResponse[i]); // busco la carpeta para abrirla
-                        if (nextNode !== null){
-                            found=true;
-                        }
-                    }
-                    if (nextNode === null){
-                        // significa que hizo click en Home del path, tengo que cargarlo de 0
-                        this._init(this.state.rawResponse);
-                    } else {
-                        this._updateTable(nextNode);
-                    }
-                    
-                    break;
-                }
-                case "file":
-                    console.log("en teoria no tendria que haber ningun archivo sin paciente!");
-                    break;
-            }
-        } else {
-            // tengo que armar el path
-            var path = "";
-            for (var i = 0; i < this.state.path.length; i++){
-                path = path + this.state.path[i] + "/";
-            }
-            path = path + nameTarget;
-            switch (idArray[0]){
-                case "folder":{
-                    var nextNode = null;
-                    var found = false;
-                    for (var i = 0; i < this.state.rawResponse.length && !found; i++) {
-                        var nextNode = this._nextNode(path,this.state.rawResponse[i]); // busco la carpeta para abrirla
-                        if (nextNode !== null){
-                            found=true;
-                        }
-                    }
-                    this._updateTable(nextNode);
-                    break;
-                }
-                case "file":{
-                    console.log("no es el nivel inicial y clikeaste un archivo");
-                    break;
-                }
-            }
+        // tengo que armar el path
+        var path = "";
+        for (var i = 0; i < this.state.path.length; i++){//arranco en 1 para no poner el primer /
+            path = path + this.state.path[i] + "/";
         }
-    }
+        path = path + nameTarget;
+        switch (idArray[0]){
+            case "folder":{
+                // estoy en el nivel inicial, cambio a una subcarpeta
+                var nextNode = null;
+                var found = false;
+                for (var i = 0; i < this.state.rawResponse.length && !found; i++) {
+                    var nextNode = this._nextNode(path,this.state.rawResponse[i]); // busco la carpeta para abrirla
+                    if (nextNode !== null){
+                        found=true;
+                    }
+                }
+                if (nextNode === null){
+                    // significa que hizo click en Home del path, tengo que cargarlo de 0
+                    this._init(this.state.rawResponse);
+                    this.setState({level: 0 })
+                } else {
+                    this._updateTable(nextNode);
+                    var actualLevel = this.state.level + 1;
+                    this.setState({level :actualLevel});
+                }
+                
+                break;
+            }
+            case "file":
+                console.log("en teoria no tendria que haber ningun archivo sin paciente!");
+                break;
+        }
+    }    
     
-
-    callbackTest(){
-        console.log('soy un callback');
-    }
-
     componentWillMount() {
         //mock de la respuesta del servidor
         var rawResponse = [{
@@ -309,8 +284,7 @@ class PlademaLobby extends React.Component {
         rawResponse.forEach(function(elem){
             auxFolders.push(elem.Folder);
         });
-        debugger;
-        this.setState({folders: auxFolders, path:["/"], files:[] });
+        this.setState({folders: auxFolders, path:[], files:[] });
     }
 
     _updateTable(nodo){
@@ -318,7 +292,6 @@ class PlademaLobby extends React.Component {
         this._setPath(nodo);
         this._setFiles(nodo);
     }
-
 
     _setFolders(nodo) {
         var auxFolders = [];
@@ -334,7 +307,6 @@ class PlademaLobby extends React.Component {
     }
 
     _setFiles(nodo) {
-        debugger;
         var auxFiles = [];
         nodo.Files.forEach(function (elem) {
            auxFiles.push(elem);
@@ -344,9 +316,10 @@ class PlademaLobby extends React.Component {
 
     _getPath(){
         var toReturn = "";
-        for(var i = 1; i < this.state.path.length; i++){ // quito el email
+        for(var i = 0; i < this.state.path.length; i++){
             toReturn = toReturn + this.state.path[i] + "/";
         }
+        toReturn = toReturn.substring(0,toReturn.length-1); // quito el ultimo /
         return toReturn;
     }
 
@@ -367,14 +340,14 @@ class PlademaLobby extends React.Component {
     }
 
     _handleClickPath(e){
-        debugger;
         var target = e.target.innerText; // un item del path clickeado, vuelvo a esa carpeta
         var index = this.state.path.indexOf(target);
         if (index === -1){ // hizo click en Home
             //click en el principio de todo, vuelvo al estado inicial.
-            this.setState({initialLevel:true, idContextText:"rightClickContextMenuInitialMenuFolder", path: []});
+            this.setState({initialLevel:true, idContextText:"", path: [], level:0});
             this._init(this.state.rawResponse);
         } else {
+            this.setState({level:index+1});
             var nextTarget = "";
             for(var i = 0; i < index; i++){
                 nextTarget = nextTarget + this.state.path[i] + "/";
@@ -392,37 +365,47 @@ class PlademaLobby extends React.Component {
         }
     }
 
-    render() {
+    _callbackTest(e){
+        console.log('soy un callback test');
+    }
 
-        const onClickAddPacient = ({event, ref,data,dataFromProvider}) => {
-            this._onClickAddPacient();
+    render() {
+        const onClickAddFolder = ({event, ref,data,dataFromProvider}) => {
+            this.props.dispatch(openModal({
+                id: uuid.v4(),
+                type: 'custom',
+                content: <ModalPlademaAddFolder path = { this._getPath() } folders = { this._getFolders() } files = { this._getFiles() }/>,
+                callback : this._callbackTest 
+            }));
         }; 
 
-        const InitialMenuFolder = () => (
-            <ContextMenu  id='rightClickContextMenuInitialMenuFolder'>
-                <Item onClick = { onClickAddPacient }><IconFont className = "fa fa-upload"/> Upload File </Item>
-            </ContextMenu>
-        );
+        const onClickUploadFile = ({event, ref,data,dataFromProvider}) => {
+            console.log('click on upload file');
+        }; 
+        
+        const onClickDownloadFile = ({event, ref,data,dataFromProvider}) => {
+            console.log('click on download file');
+        }; 
 
         const NotInitialMenuFolder = () => (
             <ContextMenu  id='rightClickContextMenuNotInitialMenuFolder'>
-                <Item onClick = { onClickAddPacient }><IconFont className = "fa fa-upload"/> Upload File </Item>
-                <Item onClick = { onClickAddPacient }><IconFont className = "fa fa-plus"/> Create Folder </Item>
+                <Item onClick = { onClickUploadFile }><IconFont className = "fa fa-upload"/> Upload File </Item>
+                <Item onClick = { onClickAddFolder }><IconFont className = "fa fa-plus"/> Create Folder </Item>
             </ContextMenu>
         );
 
         const NotInitialMenuFile = () => (
             <ContextMenu  id='rightClickContextMenuNotInitialMenuFile'>
-                <Item onClick = { onClickAddPacient }><IconFont className = "fa fa-download"/> Download </Item>
+                <Item onClick = { onClickDownloadFile }><IconFont className = "fa fa-download"/> Download </Item>
+                <Item onClick = { onClickAddFolder }><IconFont className = "fa fa-plus"/> Create Folder </Item>
             </ContextMenu>
         );
 
         const idMenu = this.state.idContextText;
-        const menu = (this.state.initialLevel) ? <InitialMenuFolder /> : ((this.state.isFolder) ? <NotInitialMenuFolder />: <NotInitialMenuFile />)
+        const menu = (this.state.level < 2) ? null : ((this.state.isFolder) ? <NotInitialMenuFolder />: <NotInitialMenuFile />)
 
         var path = ["/",<label key = "Home" onClick = { this._handleClickPath } style={{cursor:"pointer"}}> Home </label>];
         this.state.path.forEach((item) => {
-            debugger;
             if (item !== "/"){
                 path.push("/");
                 path.push(<label key = { item } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
@@ -432,7 +415,7 @@ class PlademaLobby extends React.Component {
         });
         return (
             <div>
-                <button className="test-button" 
+              {/*  <button className="test-button" 
                         tabIndex = {(this.state.isModalOpen) ? 1 : -1 }
                     onClick={() => this.props.dispatch(openModal({
                                         id: uuid.v4(),
@@ -447,7 +430,7 @@ class PlademaLobby extends React.Component {
                                         type: 'custom',
                                         content: <CustomModalContent />}))}>
                     Open custom modal
-                </button>
+                </button>*/}
                 <div> { path }</div>
                 <ContextMenuProvider  id = { idMenu }>
                     <TablePladema files = { this.state.files } folders = { this.state.folders } onMouseEnter = { this._hoverTableItem } onClickItems = { this._handleOnClickTableItem }/>

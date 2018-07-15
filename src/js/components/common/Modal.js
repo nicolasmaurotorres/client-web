@@ -1,55 +1,72 @@
 import React from 'react'
 import { connect } from 'react-redux';
 import { closeModal } from '../../actions/modalActions'
-import ModalPlademaAddFile from '../modals/ModalPlademaAddFile';
 
 class Modal extends React.Component {
-    onClose(){
-      if(this.props.item.onClose){
-        this.props.item.onClose();
-      } 
-      this.props.onClose(this.props.item);
+  constructor(props){
+    super(props);
+    /* bindings */
+    this.onClose = this.onClose.bind(this);
+  }
+
+  onClose(update,newName,oldName){
+    debugger;
+    if(this.props.item.onClose){
+      this.props.item.onClose();
+    } 
+    if(this.props.item.callback){
+      this.props.item.callback(update,newName,oldName);
+    } 
+    this.props.onClose(this.props.item);
+  }
+
+  onConfirm(update,newName,oldName){
+    debugger;
+    if(this.props.item.onConfirm){
+      this.props.item.onConfirm();
     }
-    onConfirm(){
-      if(this.props.item.onConfirm){
-        this.props.item.onConfirm();
-      }
-      this.props.onClose(this.props.item);
-    }
-    render() {
-      const { zIndex } = this.props;
-      const { type } = this.props.item;
-      switch(type){
-          case 'confirmation': {
-            const { text } = this.props.item;
-            return (
-            <div className="modal-wrapper" style={{zIndex: (zIndex+1)*10}}>
-                <div className="modal">
-                <div className="text">{ text }</div>
-                <div className="buttons">
-                    <button className="modal-button" onClick={() => this.onConfirm()}>Confirm</button>
-                    <button className="modal-button" onClick={() => this.onClose()}>Close</button>
-                </div>
-                </div>
-            </div>
-            );
-          }
-          case 'custom':{
-            const { content } = this.props.item;
-            return (
-              <div className="modal-wrapper" style={{zIndex: (zIndex+1)*10}}>
-                <div className="modal">
-                  {content}
-                  <button className="close" onClick={() => this.onClose()}>&times;</button>
-                </div>
+    if(this.props.item.callback){
+      this.props.item.callback(update,newName,oldName);
+    } 
+    this.props.onClose(this.props.item);
+  }
+
+  render() {
+    const { zIndex } = this.props;
+    const { type } = this.props.item;
+    switch(type){
+        case 'confirmation': {
+          const { text } = this.props.item;
+          return (
+          <div className="modal-wrapper" style={{zIndex: (zIndex+1)*10}}>
+              <div className="modal">
+              <div className="text">{ text }</div>
+              <div className="buttons">
+                  <button className="modal-button" onClick={() => this.onConfirm()}>Confirm</button>
+                  <button className="modal-button" onClick={() => this.onClose()}>Close</button>
               </div>
-            );
-          }
-          default: 
-            return null;
-      }
+              </div>
+          </div>
+          );
+        }
+        case 'custom':{
+          debugger;
+          var content = this.props.item.content;
+         
+          return (
+            <div className="modal-wrapper" style={{zIndex: (zIndex+1)*10}}>
+              <div className="modal">
+              { React.cloneElement(content,{ callback : this.onClose }) }
+                <button className="close" onClick={() => this.onClose()}>&times;</button>
+              </div>
+            </div>
+          );
+        }
+        default: 
+          return null;
     }
   }
+}
 
 class Modals extends React.Component {
     constructor(props){
@@ -69,6 +86,7 @@ class Modals extends React.Component {
     }
     
     render() {
+      debugger;
       const modals = this.props.modals.map((item,i) => 
         <Modal  item={item} 
                 key={i} 
