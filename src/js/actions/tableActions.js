@@ -1,8 +1,15 @@
-import { SET_TABLE_STATE } from './types'
+import { SET_TABLE_STATE,SET_TABLE_LEVEL} from './types'
 
-export function setTableState(table){
+export function setTableState(obj){
     return {
         type: SET_TABLE_STATE,
-        table
+        content : obj.content
+    }
+}
+
+export function setCurrentLevel(level){
+    return {
+        type : SET_TABLE_LEVEL,
+        level
     }
 }

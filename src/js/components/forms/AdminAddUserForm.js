@@ -37,12 +37,10 @@ class AdminAddUserForm extends React.Component {
             obj["category"] = parseInt(this.state.category);
             this.props.createUserRequest(obj)
             .then((response)=>{
-                debugger;
                 this.setState({serverMessage : response.data.message, serverStatus:"OK"})
                 this.callback();
             })
             .catch((response)=>{
-                debugger;
                 if (typeof response.response === 'undefined'){
                     this.setState({serverMessage : "network error", serverStatus:"BAD_STATUS"})
                 } else {
@@ -81,7 +79,6 @@ class AdminAddUserForm extends React.Component {
     }
 
     callback(){
-        debugger;
         const { callbackCreateOrCancel } = this.props;
         if (callbackCreateOrCancel != null || typeof callbackCreateOrCancel !== 'undefined'){
             callbackCreateOrCancel();

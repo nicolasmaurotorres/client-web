@@ -30,13 +30,11 @@ class PlademaAddFolderForm extends React.Component {
 
     _submitForm(){
         if (this._isValid()){
-            debugger;
             var obj = {}
             const { plademaAddFolder , callback } = this.props;
             obj["folder"] = this.state.path +"/"+ this.state.name;
             plademaAddFolder(obj)
             .then((response)=>{
-                debugger;
                 callback(true,this.state.name);
             })
             .catch((response)=>{

@@ -34,11 +34,9 @@ class DoctorAddPacientForm extends React.Component {
             obj["folder"] = this.state.name;
             doctorAddPacient(obj)
             .then((response)=>{
-                debugger;
                 callbackCreateOrCancel(true);
             })
             .catch((response)=>{
-                debugger;
                 callbackCreateOrCancel(false);
             });
         }

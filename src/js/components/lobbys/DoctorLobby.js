@@ -278,7 +278,6 @@ class DoctorLobby extends React.Component {
     _callbackRenameFolder(updateFolder,newFolderName,oldFolderName){
         this.setState({showingmodalRenameFolder:false});
         if (updateFolder){
-            debugger;
             const { username } = this.props.auth.user;
             var previousFolder = username+"/";
             var split = oldFolderName.split("/");
@@ -301,7 +300,6 @@ class DoctorLobby extends React.Component {
     }   
 
     _callbackRenameFile(update,newFileName,oldFileName){
-        debugger;
         this.setState({showingModalRenameFile:false});
         if (update){
             const { username } = this.props.auth.user;
@@ -353,7 +351,6 @@ class DoctorLobby extends React.Component {
             console.log("on click paste file");
         };
         const onClickDeleteFile = ({event, ref,data,dataFromProvider}) => {
-            debugger;
             const parts = event.target.parentElement.id.split('-');
             var fileName = "";
             for(var i = 1; i < parts.length-1; i++){//arranco de 1 por que 0 es el file/folder
@@ -377,7 +374,6 @@ class DoctorLobby extends React.Component {
                             this._getPacients(); 
                         })
                         .catch((response)=>{
-                            debugger;
                         });
                     },
                     (result) => {
@@ -411,7 +407,6 @@ class DoctorLobby extends React.Component {
         };
         const onClickDeleteFolder = ({event, ref,data,dataFromProvider}) => {
             const parts = event.target.parentElement.id.split('-');
-            debugger;
             var folderName = "";
             for(var i = 1; i < parts.length; i++){//arranco de 1 por que 0 es el file/folder
                 folderName += parts[i]+"-";
@@ -426,7 +421,7 @@ class DoctorLobby extends React.Component {
                         obj["folder"] = path+folderName;
                         doctorRemoveFolder(obj)
                         .then((response)=>{       
-                            debugger;                  // actualizo los usuarios
+                            // actualizo los usuarios
                             addFlashMessage({
                                 type:"success",
                                 text:"file "+folderName+" removed"
@@ -434,7 +429,6 @@ class DoctorLobby extends React.Component {
                             this._getPacients(); 
                         })
                         .catch((response)=>{
-                            debugger;
                         });
                     },
                     (result) => {

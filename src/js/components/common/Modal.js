@@ -10,7 +10,6 @@ class Modal extends React.Component {
   }
 
   onClose(update,newName,oldName){
-    debugger;
     if(this.props.item.onClose){
       this.props.item.onClose();
     } 
@@ -21,7 +20,6 @@ class Modal extends React.Component {
   }
 
   onConfirm(update,newName,oldName){
-    debugger;
     if(this.props.item.onConfirm){
       this.props.item.onConfirm();
     }
@@ -50,10 +48,8 @@ class Modal extends React.Component {
           );
         }
         case 'custom':{
-          debugger;
           var content = this.props.item.content;
-         
-          return (
+           return (
             <div className="modal-wrapper" style={{zIndex: (zIndex+1)*10}}>
               <div className="modal">
               { React.cloneElement(content,{ callback : this.onClose }) }
@@ -86,7 +82,6 @@ class Modals extends React.Component {
     }
     
     render() {
-      debugger;
       const modals = this.props.modals.map((item,i) => 
         <Modal  item={item} 
                 key={i} 
@@ -94,7 +89,7 @@ class Modals extends React.Component {
                 onClose={(item) => this.props.dispatch(closeModal(item))}/>
       );
       return (
-        <div className="modals" style = {(this.state.isOpened > 0 ) ? {height:'100%'} :{height:'30%'} }> {/*para que no toquen los botones de atras*/}
+        <div className="modals" style = {(this.state.isOpened > 0 ) ? {height:'100%'} :{height:'1%'} }> {/*para que no toquen los botones de atras*/}
           { modals }
         </div>
       );

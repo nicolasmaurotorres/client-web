@@ -36,7 +36,6 @@ class LocalRender extends React.Component {
 //            _this.reader.parseAsArrayBuffer(fileReader.result);
             _this._update();
           };
-          debugger;
           fileReader.readAsText(files[0]);
         }
     }

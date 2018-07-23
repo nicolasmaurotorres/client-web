@@ -7,7 +7,6 @@ import { plademaAddFolder } from '../../../actions/plademaActions'
 
 class ModalPlademaAddFolder extends React.Component {
   render() {
-    debugger;
     const { plademaAddFolder,  files, folders, path , callback } = this.props;
     return (
       <div>

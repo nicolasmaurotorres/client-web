@@ -99,7 +99,6 @@ class AdminEditUserForm extends React.Component {
     }
 
     callback(){
-        debugger;
         const { callbackEditUser } = this.props;
         if (callbackEditUser != null || typeof callbackEditUser !== 'undefined'){
             callbackEditUser();
