@@ -7,13 +7,18 @@ import { plademaAddFolder } from '../../../actions/plademaActions'
 
 class ModalPlademaAddFolder extends React.Component {
   render() {
-    const { plademaAddFolder,  files, folders, path , callback } = this.props;
+    const { plademaAddFolder, callback } = this.props;
+    var path  = "";
+    for (var i = 0;  i < this.props.table.level.path.length; i++){
+      path += this.props.table.level.path[i] + "/";
+    }
+    path = path.substring(0,path.length-1);
     return (
       <div>
             <PlademaAddFolderForm callback = { callback }
                                   plademaAddFolder = { plademaAddFolder } 
-                                  files = { files } 
-                                  folders = { folders}
+                                  files = { this.props.table.level.files } 
+                                  folders = { this.props.table.level.folders}
                                   path = { path }/> 
       </div>
     );
@@ -23,10 +28,12 @@ class ModalPlademaAddFolder extends React.Component {
 ModalPlademaAddFolder.propTypes = {
   callback : PropTypes.func,
   plademaAddFolder : PropTypes.func.isRequired,
-  files : PropTypes.object.isRequired,
-  folders : PropTypes.object.isRequired,
-  path : PropTypes.string.isRequired,
 }
  
+function mapStateToProps(state){
+  return {
+      table : state.table,
+  }
+}
 
-export default connect(null,{ plademaAddFolder })(ModalPlademaAddFolder);
+export default connect(mapStateToProps,{ plademaAddFolder })(ModalPlademaAddFolder);

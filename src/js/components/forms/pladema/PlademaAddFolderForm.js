@@ -23,9 +23,15 @@ class PlademaAddFolderForm extends React.Component {
     }
 
     componentWillMount(){
-        this.setState({ files : this.props.files, 
-                        folders : this.props.folders,
-                        path : this.props.path});
+        var files = {};
+        var folders = {};
+        for (var i = 0; i < this.props.files.length; i++ ){
+            files[this.props.files[i]] = i;
+        }
+        for (var i = 0; i < this.props.folders.length; i++ ){
+            folders[this.props.folders[i]] = i;
+        }
+        this.setState({ files, folders, path : this.props.path});
     }
 
     _submitForm(){
@@ -38,7 +44,9 @@ class PlademaAddFolderForm extends React.Component {
                 callback(true,this.state.name);
             })
             .catch((response)=>{
-               // callback(false);
+                var errors = {};
+                errors["name"] = (typeof response.response === 'undefined') ? response.message : response.response.data.message ;
+                this.setState({errors});
             });
         }
     }
@@ -73,7 +81,6 @@ class PlademaAddFolderForm extends React.Component {
         return toReturn;
     }
 
-
     _onChange(e) {
         this.setState({ [e.target.name]: e.target.value },()=>{
             this._isValid();
@@ -96,7 +103,7 @@ class PlademaAddFolderForm extends React.Component {
                         field = "name" />
 
                     <div className="form-group">
-                        <button onClick={ this._submitForm } className="btn btn-primary btn-lg"> Add </button>
+                        <button onClick={ this._submitForm } className="btn btn-primary btn-lg"> Create </button>
                         <button onClick={ this._cancelForm } className="btn btn-danger btn-lg marginButton"> Cancel </button>
                     </div>
                 </div>
@@ -108,8 +115,8 @@ class PlademaAddFolderForm extends React.Component {
 PlademaAddFolderForm.propTypes = {
     callback : PropTypes.func.isRequired,
     plademaAddFolder : PropTypes.func.isRequired,
-    files : PropTypes.object.isRequired,
-    folders : PropTypes.object.isRequired,
+    files : PropTypes.array.isRequired,
+    folders : PropTypes.array.isRequired,
     path : PropTypes.string.isRequired,
 }
 

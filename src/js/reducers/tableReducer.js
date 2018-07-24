@@ -19,6 +19,7 @@ export default (state = initialState, action = {}) => {
                 content : action.content
             }
         case SET_TABLE_LEVEL : 
+        debugger;
         return {
             ...state,
             level : {

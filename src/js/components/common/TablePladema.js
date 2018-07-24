@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { IconFont } from 'react-contexify'
 import { connect } from 'react-redux';
 import { setCurrentLevel } from '../../actions/tableActions'
+import { _nextNode } from '../common/Utils';
 
 class TablePladema extends React.Component {
     constructor(props){
@@ -10,34 +11,12 @@ class TablePladema extends React.Component {
 
         /*bindings*/
         this._handleOnClickTableItem = this._handleOnClickTableItem.bind(this);
-        this._nextNode = this._nextNode.bind(this);
         this._getFiles = this._getFiles.bind(this);
         this._getFolders = this._getFolders.bind(this);
         this._getPath = this._getPath.bind(this);
         this._handleClickPath = this._handleClickPath.bind(this);
     }
-
-    /**
-    * Dado un path de carpeta devuelve el nodo donde esta es esa carpetaen el arbol
-    * 
-    * @param {number} first Path de la carpeta
-    * @param {number} second arbol a buscar
-    * @returns {number} nodo donde esta la carpeta
-    */
-   _nextNode(name,node) {
-        if (node.Folder === name){
-            return node;
-        }
-        for(var i = 0; i < node.SubFolders.length; i++){
-            var aux = this._nextNode(name,node.SubFolders[i]);
-            if (aux != null){
-                return aux
-            }
-        }
-        return null;
-    }
-
-
+    
     _handleOnClickTableItem(e){
         var parent = e.target.parentElement;
         var idArray = parent.id.split("-"); 
@@ -58,7 +37,7 @@ class TablePladema extends React.Component {
                 var nextNode = null;
                 var found = false;
                 for (var i = 0; i < this.props.table.content.length && !found; i++) {
-                    var nextNode = this._nextNode(path,this.props.table.content[i]); // busco la carpeta para abrirla
+                    var nextNode = _nextNode(path,this.props.table.content[i]); // busco la carpeta para abrirla
                     if (nextNode !== null){
                         found=true;
                     }
@@ -136,7 +115,7 @@ class TablePladema extends React.Component {
             var nextNode = null;
             var found = false;
             for (var i = 0; i < this.props.table.content.length && !found; i++){
-                var nextNode = this._nextNode(nextTarget,this.props.table.content[i]); // busco la carpeta para abrirla
+                var nextNode = _nextNode(nextTarget,this.props.table.content[i]); // busco la carpeta para abrirla
                 if (nextNode !== null){
                     found = true;
                 }

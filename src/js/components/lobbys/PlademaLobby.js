@@ -10,6 +10,7 @@ import { setTableState, setCurrentLevel } from '../../actions/tableActions'
 import { addFlashMessage } from '../../actions/flashMessages'
 import { ModalContainer }  from '../common/Modal';
 import ModalPlademaAddFolder from '../modals/pladema/ModalPlademaAddFolder';
+import { _nextNode } from '../common/Utils';
 
 class PlademaLobby extends React.Component {
     constructor(props) {
@@ -50,7 +51,6 @@ class PlademaLobby extends React.Component {
                 position : 0
             }));
         }).catch((response) =>{
-            console.log(response);
             this.props.dispatch(addFlashMessage({
                 text : "cannot get the folders, please relog "+response.message,
                 type : "error"
@@ -98,13 +98,14 @@ class PlademaLobby extends React.Component {
     }
 
     _callbackAddFolder(update,newName){
+        debugger;
         if (update === true){
             var found = false;
             var currentPath = this._getPath();
-            var currentRawResponse = this.state.rawResponse;
+            var _content = this.props.table.content;
             var aux = null;
-            for (var i = 0; i < currentRawResponse.length && !found; i++){
-                aux = this._nextNode(currentPath,currentRawResponse[i]);
+            for (var i = 0; i < _content.length && !found; i++){
+                aux = _nextNode(currentPath,_content[i]);
                 if (aux !== null){
                     found = true;
                 }
@@ -115,7 +116,18 @@ class PlademaLobby extends React.Component {
                 SubFolders:[]
             }
             aux.SubFolders.push(newFolder);
-            this._updateTable(aux);
+            this.props.dispatch(setTableState({
+                content : _content
+            }));
+            var _folders = this.props.table.level.folders;
+            _folders.push(newName);
+            this.props.dispatch(setCurrentLevel({
+                files : this.props.table.level.files,
+                folders : _folders,
+                path: this.props.table.level.path,
+                position : this.props.table.level.position
+            }))
+            debugger;
         }
     }
 
@@ -124,7 +136,7 @@ class PlademaLobby extends React.Component {
             this.props.dispatch(openModal({
                 id: uuid.v4(),
                 type: 'custom',
-                content: <ModalPlademaAddFolder path = { this._getPath() } folders = { this._getFolders() } files = { this._getFiles() }/>,
+                content: <ModalPlademaAddFolder/>,
                 callback : this._callbackAddFolder 
             }));
         }; 
@@ -152,6 +164,7 @@ class PlademaLobby extends React.Component {
         );
         const idMenu = this.state.idContextText;
         const menu = (this.props.table.level.position < 2) ? null : ((this.state.isFolder) ? <NotInitialMenuFolder />: <NotInitialMenuFile />)
+        const showMenu = (menu == null);
         return (
             <div>
                 <ContextMenuProvider  id = { idMenu }>
@@ -173,7 +186,6 @@ function mapDispatchToProps(dispatch) {
 function mapStateToProps(state){
     return {
         table : state.table,
-        level : state.table.level,
     }
 }
 
