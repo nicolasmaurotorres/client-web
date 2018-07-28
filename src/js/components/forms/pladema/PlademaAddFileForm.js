@@ -3,6 +3,10 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { connect } from 'react-redux';
 
+import { plademaAddFile } from '../../../actions/plademaActions'
+import { _nextNode, _getFoldersAsObject, _getFilesAsObject, _getPathAsString } from '../../../utils/tableFunctions';
+import { setTableState, setCurrentLevel } from '../../../actions/tableActions';
+
 class PlademaAddFileForm extends React.Component {
     constructor(props){
         super(props);
@@ -10,9 +14,9 @@ class PlademaAddFileForm extends React.Component {
         this.state = {
             errors: {},
             file: null,
-            otherFolders : [],
-            otherFiles : [],
-            actualPath:""
+            folders : [],
+            files : [],
+            path: ""
         }
 
         /* bindings */
@@ -20,29 +24,30 @@ class PlademaAddFileForm extends React.Component {
         this._handleFileSelect = this._handleFileSelect.bind(this);
         this._isValid = this._isValid.bind(this);
         this._cancelForm = this._cancelForm.bind(this);
+        this._callbackAddFile = this._callbackAddFile.bind(this);
     }
 
     componentWillMount(){
-        this.setState({otherFiles : this.props.table.level.files,
-                      otherFolders : this.props.table.level.folders,
-                      actualPath : this.props.table.level.path});
+        this.setState({files : _getFilesAsObject(this.props.table.level.files),
+                       folders : _getFoldersAsObject(this.props.table.level.folders),
+                       path : _getPathAsString(this.props.table.level.path) });
     }
 
     _submitForm(){
         if (this._isValid()){
-            var obj = {}
-            const { doctorAddFile, callback } = this.props;
-            const { file, actualPath }  = this.state;
+            const { callback } = this.props;
+            const { file, path }  = this.state;
             var formData = new FormData();
             var name = file.name;
             formData.append("file", file);
-            formData.append("folder", actualPath)
-            doctorAddFile(formData)
+            formData.append("folder", path)
+            plademaAddFile(formData)
             .then((response)=>{
-                callback(true,name);
+                callback();
+                this._callbackAddFile(name);
             })
             .catch((response)=>{
-                callback(false);
+                callback();
             });
         }
     }
@@ -65,12 +70,12 @@ class PlademaAddFileForm extends React.Component {
             _errors["file"] = "only files with vtk extention are allowed";
         }*/
         
-        if (toReturn && this.state.otherFiles[file] != null){
+        if (toReturn && this.state.files[file] != null){
             toReturn = false;
             _errors["file"] = "you already have a file with that name";
         }
 
-        if (toReturn && this.state.otherFolders[file] != null){
+        if (toReturn && this.state.folders[file] != null){
             toReturn = false;
             _errors["file"] = "you already have a folder with that name";
         }
@@ -78,7 +83,6 @@ class PlademaAddFileForm extends React.Component {
         this.setState( { errors : _errors });
         return toReturn;
     }
-
 
     _handleFileSelect(e) {
         this.setState({file:e.target.files[0]},()=>{
@@ -90,36 +94,30 @@ class PlademaAddFileForm extends React.Component {
         this.props.callback(false);
     }
       
-    _callbackAddFolder(update,newName){
-        if (update === true){
-            var found = false;
-            var currentPath = this._getPath();
-            var _content = this.props.table.content;
-            var aux = null;
-            for (var i = 0; i < _content.length && !found; i++){
-                aux = _nextNode(currentPath,_content[i]);
-                if (aux !== null){
-                    found = true;
-                }
+    _callbackAddFile(newFile){
+        
+        var found = false;
+        var currentPath = _getPathAsString(this.props.table.level.path);
+        var _content = this.props.table.content;
+        var aux = null;
+        for (var i = 0; i < _content.length && !found; i++){
+            aux = _nextNode(currentPath,_content[i]);
+            if (aux !== null){
+                found = true;
             }
-            var newFolder = {
-                Files:[],
-                Folder:currentPath+"/"+newName,
-                SubFolders:[]
-            }
-            aux.SubFolders.push(newFolder);
-            this.props.dispatch(setTableState({
-                content : _content
-            }));
-            var _folders = this.props.table.level.folders;
-            _folders.push(newName);
-            this.props.dispatch(setCurrentLevel({
-                files : this.props.table.level.files,
-                folders : _folders,
-                path: this.props.table.level.path,
-                position : this.props.table.level.position
-            }));
         }
+        aux.Files.push(newFile);
+        this.props.dispatch(setTableState({
+            content : _content
+        }));
+        var _files = this.props.table.level.files;
+        _files.push(newFile);
+        this.props.dispatch(setCurrentLevel({
+            files : _files,
+            folders : this.props.table.level.folders,
+            path: this.props.table.level.path,
+            position : this.props.table.level.position
+        }));
     }
 
     render(){

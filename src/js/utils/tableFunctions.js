@@ -54,7 +54,6 @@ export function _getFilesAsArray(nodo) {
 }
 
 export function _getPathAsString(path){
-    debugger;
     var toReturn = "";
     for(var i = 0; i < path.length; i++){
         toReturn = toReturn + path[i] + "/";

@@ -3,13 +3,15 @@ import { connect } from 'react-redux';
 import uuid from 'uuid'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
 
-import TablePladema from '../common/TablePladema'
 import { openModal } from '../../actions/modalActions'
 import { plademaGetAllFolders } from '../../actions/plademaActions'
 import { setTableState, setCurrentLevel } from '../../actions/tableActions'
 import { addFlashMessage } from '../../actions/flashMessages'
 import { ModalContainer }  from '../common/Modal';
+
+import TablePladema from '../common/TablePladema'
 import PlademaAddFolderForm from '../forms/pladema/PlademaAddFolderForm'
+import PlademaAddFileForm from '../forms/pladema/PlademaAddFileForm'
 
 
 class PlademaLobby extends React.Component {
@@ -75,7 +77,11 @@ class PlademaLobby extends React.Component {
         }; 
 
         const onClickUploadFile = ({event, ref,data,dataFromProvider}) => {
-            console.log('click on upload file');
+            this.props.dispatch(openModal({
+                id: uuid.v4(),
+                type: 'custom',
+                content: <PlademaAddFileForm/>,
+            }));
         }; 
         
         const onClickDownloadFile = ({event, ref,data,dataFromProvider}) => {

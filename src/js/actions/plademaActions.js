@@ -10,4 +10,14 @@ export function plademaAddFolder(data){
     return axiosInstance.post("/add/folder",data);
 }
 
+export function plademaAddFile(data){
+    data.append("token",localStorage.jwtToken);
+    return axiosInstance.post("/add/file",data);
+}
+
+export function plademaGetFile(){
+    data["token"] = localStorage.jwtToken;
+    return axiosInstance.post("/pladema/get/file",data);
+}
+
 

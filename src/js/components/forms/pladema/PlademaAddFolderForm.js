@@ -94,7 +94,6 @@ class PlademaAddFolderForm extends React.Component {
     }
     
     _callbackAddFolder(newName){
-        debugger;
         var found = false;
         var currentPath = _getPathAsString(this.props.table.level.path);
         var _content = this.props.table.content;
