@@ -8,7 +8,6 @@ export function setTableState(obj){
 }
 
 export function setCurrentLevel(level){
-    debugger;
     return {
         type : SET_TABLE_LEVEL,
         level

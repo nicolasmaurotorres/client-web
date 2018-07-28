@@ -9,23 +9,17 @@ class Modal extends React.Component {
     this.onClose = this.onClose.bind(this);
   }
 
-  onClose(update,newName,oldName){
+  onClose(){
     if(this.props.item.onClose){
       this.props.item.onClose();
-    } 
-    if(this.props.item.callback){
-      this.props.item.callback(update,newName,oldName);
     } 
     this.props.onClose(this.props.item);
   }
 
-  onConfirm(update,newName,oldName){
+  onConfirm(){
     if(this.props.item.onConfirm){
       this.props.item.onConfirm();
     }
-    if(this.props.item.callback){
-      this.props.item.callback(update,newName,oldName);
-    } 
     this.props.onClose(this.props.item);
   }
 

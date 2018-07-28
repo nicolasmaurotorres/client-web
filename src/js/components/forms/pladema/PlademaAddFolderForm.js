@@ -2,6 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types'
 import TextFieldGroup from '../../common/TextFieldGroup'
 import validator from 'validator'
+import { connect } from 'react-redux';
+import { _nextNode, _getPathAsString, _getFoldersAsObject, _getFilesAsObject } from '../../../utils/tableFunctions'
+import { setTableState, setCurrentLevel } from '../../../actions/tableActions';
+import { plademaAddFolder } from '../../../actions/plademaActions';
 
 class PlademaAddFolderForm extends React.Component {
     constructor(props){
@@ -20,28 +24,26 @@ class PlademaAddFolderForm extends React.Component {
         this._onChange = this._onChange.bind(this);
         this._isValid = this._isValid.bind(this);
         this._cancelForm = this._cancelForm.bind(this);
+        this._callbackAddFolder = this._callbackAddFolder.bind(this);
     }
 
     componentWillMount(){
-        var files = {};
-        var folders = {};
-        for (var i = 0; i < this.props.files.length; i++ ){
-            files[this.props.files[i]] = i;
-        }
-        for (var i = 0; i < this.props.folders.length; i++ ){
-            folders[this.props.folders[i]] = i;
-        }
-        this.setState({ files, folders, path : this.props.path});
+        var files = _getFilesAsObject(this.props.table.level.files);
+        var folders = _getFoldersAsObject(this.props.table.level.folders);
+        var path = _getPathAsString(this.props.table.level.path);
+        this.setState({ files, folders, path});
     }
 
     _submitForm(){
         if (this._isValid()){
             var obj = {}
-            const { plademaAddFolder , callback } = this.props;
+            const { callback } = this.props;
+            const _callbackAddFolder = this._callbackAddFolder;
             obj["folder"] = this.state.path +"/"+ this.state.name;
             plademaAddFolder(obj)
             .then((response)=>{
-                callback(true,this.state.name);
+                callback();
+                _callbackAddFolder(this.state.name);
             })
             .catch((response)=>{
                 var errors = {};
@@ -88,9 +90,40 @@ class PlademaAddFolderForm extends React.Component {
     }
 
     _cancelForm(){
-        this.props.callback(false);
+        this.props.callback();
     }
     
+    _callbackAddFolder(newName){
+        debugger;
+        var found = false;
+        var currentPath = _getPathAsString(this.props.table.level.path);
+        var _content = this.props.table.content;
+        var aux = null;
+        for (var i = 0; i < _content.length && !found; i++){
+            aux = _nextNode(currentPath,_content[i]);
+            if (aux !== null){
+                found = true;
+            }
+        }
+        var newFolder = {
+            Files:[],
+            Folder:currentPath+"/"+newName,
+            SubFolders:[]
+        }
+        aux.SubFolders.push(newFolder);
+        this.props.dispatch(setTableState({
+            content : _content
+        }));
+        var _folders = this.props.table.level.folders;
+        _folders.push(newName);
+        this.props.dispatch(setCurrentLevel({
+            files : this.props.table.level.files,
+            folders : _folders,
+            path: this.props.table.level.path,
+            position : this.props.table.level.position
+        }));
+    }
+
     render(){
         return (
             <div className="jumbotron">
@@ -114,10 +147,18 @@ class PlademaAddFolderForm extends React.Component {
 
 PlademaAddFolderForm.propTypes = {
     callback : PropTypes.func.isRequired,
-    plademaAddFolder : PropTypes.func.isRequired,
-    files : PropTypes.array.isRequired,
-    folders : PropTypes.array.isRequired,
-    path : PropTypes.string.isRequired,
 }
 
-export default PlademaAddFolderForm;
+function mapDispatchToProps(dispatch) {
+    return {
+      dispatch,
+    }
+};
+  
+function mapStateToProps(state){
+   return {
+       table : state.table,
+   }
+};
+  
+export default  connect(mapStateToProps,mapDispatchToProps)(PlademaAddFolderForm);

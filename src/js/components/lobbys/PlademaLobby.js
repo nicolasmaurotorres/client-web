@@ -9,25 +9,18 @@ import { plademaGetAllFolders } from '../../actions/plademaActions'
 import { setTableState, setCurrentLevel } from '../../actions/tableActions'
 import { addFlashMessage } from '../../actions/flashMessages'
 import { ModalContainer }  from '../common/Modal';
-import ModalPlademaAddFolder from '../modals/pladema/ModalPlademaAddFolder';
-import { _nextNode } from '../common/Utils';
+import PlademaAddFolderForm from '../forms/pladema/PlademaAddFolderForm'
+
 
 class PlademaLobby extends React.Component {
     constructor(props) {
         super(props);
-
         this.state = {
             isFolder : false,
             idContextText : 'rightClickContextMenuInitialMenuFolder',
         };
-
         /* bindings */
-        this._getFolders = this._getFolders.bind(this);
-        this._getFiles = this._getFiles.bind(this);
-        this._getPath = this._getPath.bind(this);
         this._hoverTableItem = this._hoverTableItem.bind(this);
-        /*callbacks*/
-        this._callbackAddFolder = this._callbackAddFolder.bind(this);
     }
 
     componentWillMount() {
@@ -72,72 +65,12 @@ class PlademaLobby extends React.Component {
         }
     }
    
-    _getPath(){
-        var toReturn = "";
-        for(var i = 0; i < this.props.table.level.path.length; i++){
-            toReturn = toReturn + this.props.table.level.path[i] + "/";
-        }
-        toReturn = toReturn.substring(0,toReturn.length-1); // quito el ultimo /
-        return toReturn;
-    }
-
-    _getFiles(){
-        var toReturn = {};
-        for (var i = 0; i < this.props.table.level.files.length; i++){
-            toReturn[this.props.table.level.files[i]] = i;
-        }
-        return toReturn;
-    }
-
-    _getFolders(){
-        var toReturn = {};
-        for (var i = 0; i < this.state.folders.length; i++){
-            toReturn[this.state.folders[i]] = i;
-        }
-        return toReturn;
-    }
-
-    _callbackAddFolder(update,newName){
-        debugger;
-        if (update === true){
-            var found = false;
-            var currentPath = this._getPath();
-            var _content = this.props.table.content;
-            var aux = null;
-            for (var i = 0; i < _content.length && !found; i++){
-                aux = _nextNode(currentPath,_content[i]);
-                if (aux !== null){
-                    found = true;
-                }
-            }
-            var newFolder = {
-                Files:[],
-                Folder:currentPath+"/"+newName,
-                SubFolders:[]
-            }
-            aux.SubFolders.push(newFolder);
-            this.props.dispatch(setTableState({
-                content : _content
-            }));
-            var _folders = this.props.table.level.folders;
-            _folders.push(newName);
-            this.props.dispatch(setCurrentLevel({
-                files : this.props.table.level.files,
-                folders : _folders,
-                path: this.props.table.level.path,
-                position : this.props.table.level.position
-            }))
-            debugger;
-        }
-    }
-
     render() {
         const onClickAddFolder = ({event, ref,data,dataFromProvider}) => {
             this.props.dispatch(openModal({
                 id: uuid.v4(),
                 type: 'custom',
-                content: <ModalPlademaAddFolder/>,
-                callback : this._callbackAddFolder 
+                content: <PlademaAddFolderForm/>,
             }));
         }; 
 
@@ -164,7 +97,6 @@ class PlademaLobby extends React.Component {
         );
         const idMenu = this.state.idContextText;
         const menu = (this.props.table.level.position < 2) ? null : ((this.state.isFolder) ? <NotInitialMenuFolder />: <NotInitialMenuFile />)
-        const showMenu = (menu == null);
         return (
             <div>
                 <ContextMenuProvider  id = { idMenu }>

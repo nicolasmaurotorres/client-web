@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import { connect } from 'react-redux';
 
 class PlademaAddFileForm extends React.Component {
     constructor(props){
@@ -22,15 +23,15 @@ class PlademaAddFileForm extends React.Component {
     }
 
     componentWillMount(){
-        this.setState({otherFiles : this.props.otherFiles,
-                      otherFolders : this.props.otherFolders,
-                      actualPath : this.props.actualPath});
+        this.setState({otherFiles : this.props.table.level.files,
+                      otherFolders : this.props.table.level.folders,
+                      actualPath : this.props.table.level.path});
     }
 
     _submitForm(){
         if (this._isValid()){
             var obj = {}
-            const { doctorAddFile, callbackAddOrCancel } = this.props;
+            const { doctorAddFile, callback } = this.props;
             const { file, actualPath }  = this.state;
             var formData = new FormData();
             var name = file.name;
@@ -38,10 +39,10 @@ class PlademaAddFileForm extends React.Component {
             formData.append("folder", actualPath)
             doctorAddFile(formData)
             .then((response)=>{
-                callbackAddOrCancel(true,name);
+                callback(true,name);
             })
             .catch((response)=>{
-                callbackAddOrCancel(false);
+                callback(false);
             });
         }
     }
@@ -86,9 +87,41 @@ class PlademaAddFileForm extends React.Component {
     }
 
     _cancelForm(){
-        this.props.callbackAddOrCancel(false);
+        this.props.callback(false);
     }
       
+    _callbackAddFolder(update,newName){
+        if (update === true){
+            var found = false;
+            var currentPath = this._getPath();
+            var _content = this.props.table.content;
+            var aux = null;
+            for (var i = 0; i < _content.length && !found; i++){
+                aux = _nextNode(currentPath,_content[i]);
+                if (aux !== null){
+                    found = true;
+                }
+            }
+            var newFolder = {
+                Files:[],
+                Folder:currentPath+"/"+newName,
+                SubFolders:[]
+            }
+            aux.SubFolders.push(newFolder);
+            this.props.dispatch(setTableState({
+                content : _content
+            }));
+            var _folders = this.props.table.level.folders;
+            _folders.push(newName);
+            this.props.dispatch(setCurrentLevel({
+                files : this.props.table.level.files,
+                folders : _folders,
+                path: this.props.table.level.path,
+                position : this.props.table.level.position
+            }));
+        }
+    }
+
     render(){
         var error = this.state.errors.file;
         return (
@@ -109,11 +142,19 @@ class PlademaAddFileForm extends React.Component {
 }
 
 PlademaAddFileForm.propTypes = {
-    callbackAddOrCancel : PropTypes.func.isRequired,
-    doctorAddFile : PropTypes.func.isRequired,
-    otherFiles : PropTypes.object.isRequired,
-    otherFolders : PropTypes.object.isRequired,
-    actualPath : PropTypes.string.isRequired,
+    callback : PropTypes.func.isRequired,
 }    
 
-export default PlademaAddFileForm;
+function mapDispatchToProps(dispatch) {
+    return {
+      dispatch,
+    }
+  };
+  
+  function mapStateToProps(state){
+    return {
+        table : state.table,
+    }
+  }
+  
+export default connect(mapStateToProps,mapDispatchToProps)(PlademaAddFileForm);

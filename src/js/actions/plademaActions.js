@@ -6,10 +6,8 @@ export function plademaGetAllFolders(param){
 }
 
 export function plademaAddFolder(data){
-    return function action(dispatch){
-        data["token"] = localStorage.jwtToken;
-        return axiosInstance.post("/add/folder",data);
-     }
+    data["token"] = localStorage.jwtToken;
+    return axiosInstance.post("/add/folder",data);
 }
 
 

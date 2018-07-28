@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { IconFont } from 'react-contexify'
 import { connect } from 'react-redux';
 import { setCurrentLevel } from '../../actions/tableActions'
-import { _nextNode } from '../common/Utils';
+import { _nextNode, _getFilesAsArray, _getPathAsArray, _getFoldersAsArray } from '../../utils/tableFunctions';
 
 class TablePladema extends React.Component {
     constructor(props){
@@ -11,9 +11,6 @@ class TablePladema extends React.Component {
 
         /*bindings*/
         this._handleOnClickTableItem = this._handleOnClickTableItem.bind(this);
-        this._getFiles = this._getFiles.bind(this);
-        this._getFolders = this._getFolders.bind(this);
-        this._getPath = this._getPath.bind(this);
         this._handleClickPath = this._handleClickPath.bind(this);
     }
     
@@ -56,9 +53,9 @@ class TablePladema extends React.Component {
                     }));
                 } else {
                     this.props.dispatch(setCurrentLevel({
-                        path : this._getPath(nextNode),
-                        files : this._getFiles(nextNode),
-                        folders : this._getFolders(nextNode),
+                        path : _getPathAsArray(nextNode),
+                        files : _getFilesAsArray(nextNode),
+                        folders : _getFoldersAsArray(nextNode),
                         position : this.props.table.level.position+1
                     }));
                 }
@@ -69,27 +66,6 @@ class TablePladema extends React.Component {
                 break;
         }
     }    
-
-    _getFolders(nodo) {
-        var auxFolders = [];
-        nodo.SubFolders.forEach(function (element) {
-            var parts = element.Folder.split("/");
-            auxFolders.push(parts[parts.length-1]); // obtengo el ultimo a la derecha
-        });
-        return auxFolders;
-    }
-
-    _getPath(node) {
-        return node.Folder.split('/');
-    }
-
-    _getFiles(nodo) {
-        var auxFiles = [];
-        nodo.Files.forEach(function (elem) {
-           auxFiles.push(elem);
-        });
-        return auxFiles;
-    }
 
     _handleClickPath(e){
         var target = e.target.innerText; // un item del path clickeado, vuelvo a esa carpeta
@@ -121,9 +97,9 @@ class TablePladema extends React.Component {
                 }
             }
             this.props.dispatch(setCurrentLevel({
-                path : this._getPath(nextNode),
-                files : this._getFiles(nextNode),
-                folders : this._getFolders(nextNode),
+                path : _getPathAsArray(nextNode),
+                files : _getFilesAsArray(nextNode),
+                folders : _getFoldersAsArray(nextNode),
                 position : index+1
             }));
         }

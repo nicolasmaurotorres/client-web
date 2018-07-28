@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux';
 
 import PlademaAddFolderForm from '../../forms/pladema/PlademaAddFolderForm'
 import { plademaAddFolder } from '../../../actions/plademaActions'
@@ -30,10 +29,15 @@ ModalPlademaAddFolder.propTypes = {
   plademaAddFolder : PropTypes.func.isRequired,
 }
  
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch,
+  }
+};
+
 function mapStateToProps(state){
   return {
       table : state.table,
   }
 }
-
 export default connect(mapStateToProps,{ plademaAddFolder })(ModalPlademaAddFolder);
