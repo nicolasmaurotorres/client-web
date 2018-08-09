@@ -4,7 +4,7 @@ import uuid from 'uuid'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
 
 import { openModal } from '../../actions/modalActions'
-import { plademaGetAllFolders } from '../../actions/plademaActions'
+import { plademaGetAllFolders, plademaGetFile } from '../../actions/plademaActions'
 import { setTableState, setCurrentLevel } from '../../actions/tableActions'
 import { addFlashMessage } from '../../actions/flashMessages'
 import { ModalContainer }  from '../common/Modal';
@@ -12,7 +12,7 @@ import { ModalContainer }  from '../common/Modal';
 import TablePladema from '../common/TablePladema'
 import PlademaAddFolderForm from '../forms/pladema/PlademaAddFolderForm'
 import PlademaAddFileForm from '../forms/pladema/PlademaAddFileForm'
-
+import { _getPathAsString } from '../../utils/tableFunctions';
 
 class PlademaLobby extends React.Component {
     constructor(props) {
@@ -23,6 +23,7 @@ class PlademaLobby extends React.Component {
         };
         /* bindings */
         this._hoverTableItem = this._hoverTableItem.bind(this);
+        this._onConfirmDownloadFile = this._onConfirmDownloadFile.bind(this);
     }
 
     componentWillMount() {
@@ -67,6 +68,32 @@ class PlademaLobby extends React.Component {
         }
     }
    
+    _onConfirmDownloadFile(nameFile){
+        var path = _getPathAsString(this.props.table.level.path);
+        var obj = {};
+        obj["file"] = path+"/"+nameFile;
+        plademaGetFile(obj)
+        .then((response)=>{ 
+            var fileName = "";
+            var parts = nameFile.split(".");
+            for (var i = 0; i < parts.length-1; i++){
+                fileName += parts[i] + ".";
+            }
+            fileName = fileName.substring(0,fileName.length-1);//quito el ultimo .
+            console.log("fileName: "+fileName);
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName+".zip");
+            document.body.appendChild(link);
+            link.click();
+        })
+        .catch((response)=>{
+            debugger;
+            console.log("se rompio la cafetera ameo");
+        });
+    }
+
     render() {
         const onClickAddFolder = ({event, ref,data,dataFromProvider}) => {
             this.props.dispatch(openModal({
@@ -85,7 +112,19 @@ class PlademaLobby extends React.Component {
         }; 
         
         const onClickDownloadFile = ({event, ref,data,dataFromProvider}) => {
-            console.log('click on download file');
+            var parts = event.target.parentElement.id.split("-");
+            var fileName = ""; 
+            for (var i = 1; i < parts.length-1; i++){ // por si el archivo contenia un "-"
+                fileName = fileName + parts[i] + "-";
+            }
+            fileName = fileName.substring(0,fileName.length-1); // quito el ultimo -
+            this.props.dispatch(openModal({
+                id: uuid.v4(),
+                type: 'confirmation',
+                text: 'Are you sure to download this file?',
+                onClose: null,
+                onConfirm: () => this._onConfirmDownloadFile(fileName),
+              }));
         }; 
 
         const NotInitialMenuFolder = () => (

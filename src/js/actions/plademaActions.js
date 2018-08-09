@@ -15,9 +15,11 @@ export function plademaAddFile(data){
     return axiosInstance.post("/add/file",data);
 }
 
-export function plademaGetFile(){
+export function plademaGetFile(data){
     data["token"] = localStorage.jwtToken;
-    return axiosInstance.post("/pladema/get/file",data);
+    return axiosInstance.post("/pladema/get/file",data,{
+        responseType : 'arraybuffer'
+    });
 }
 
 

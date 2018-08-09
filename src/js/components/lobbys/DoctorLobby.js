@@ -432,7 +432,7 @@ class DoctorLobby extends React.Component {
                         });
                     },
                     (result) => {
-                        // `cancel` callback
+                        // `cancel` cfallback
                         //TODO: fijar si si esta logueado sino mostrar el error
                     }
                 );                

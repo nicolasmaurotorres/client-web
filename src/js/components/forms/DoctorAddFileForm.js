@@ -78,9 +78,9 @@ class DoctorAddFileForm extends React.Component {
         return toReturn;
     }
 
-
     _handleFileSelect(e) {
-        this.setState({file:e.target.files[0]},()=>{
+        var epe = e.target.files[0];
+        this.setState({file:epe},()=>{
             this._isValid();
         });
     }
