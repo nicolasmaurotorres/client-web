@@ -5,3 +5,4 @@ export const SET_TABLE_STATE = "SET_TABLE_PLADEMA";
 export const SET_TABLE_LEVEL = "SET_TABLE_LEVEL";
 export const OPEN_MODAL = 'OPEN_MODAL';
 export const CLOSE_MODAL = 'CLOSE_MODAL';
+export const SET_SPINNER_STATE = 'SET_SPINNER_STATE';

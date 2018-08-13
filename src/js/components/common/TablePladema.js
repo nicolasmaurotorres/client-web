@@ -120,6 +120,7 @@ class TablePladema extends React.Component {
         var files = [];
         var folders = [];
         var handleOnClickTableItem = this._handleOnClickTableItem;
+
         this.props.table.level.files.forEach(function(elem){
             var parts = elem.split(".");
             var extention = parts[parts.length-1]; // me quedo con la extencion
@@ -138,6 +139,7 @@ class TablePladema extends React.Component {
             );
             folders.push(row);
         });
+        
         return (
             <div>
                 <div> { path } </div>

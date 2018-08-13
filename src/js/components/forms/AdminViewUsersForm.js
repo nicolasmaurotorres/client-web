@@ -1,98 +1,95 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { BeatLoader } from 'react-spinners'
-import FileBrowserWidget  from 'paraviewweb/src/React/Widgets/FileBrowserWidget';
-import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify';
-import 'react-contexify/dist/ReactContexify.min.css'; // css del click derecho
-import confirm from '../../utils/confirmDialog'
-import TableAdmin from '../common/TableAdmin';
-import ConfirmForm from '../forms/ConfirmForm';
-import ModalAdminAddUser from '../modals/ModalAdminAddUser';
-import ModalAdminEditUser from '../modals/ModalAdminEditUser'
+import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
+import 'react-contexify/dist/ReactContexify.min.css' // css del click derecho
+import TableAdmin from '../common/TableAdmin'
+import { deleteUserRequest } from '../../actions/adminActions'
+import AdminAddUserForm from '../forms/AdminAddUserForm'
+import AdminEditUserForm from '../forms/AdminEditUserForm'
+import { openModal } from '../../actions/modalActions'
+import { addFlashMessage } from '../../actions/flashMessages'
+import { connect } from 'react-redux'
+import { viewUsersRequest } from '../../actions/adminActions'
+import { setTableState } from '../../actions/tableActions'
+import uuid from 'uuid'
 
 class AdminViewUsersForm extends React.Component {
     constructor(props){
         super(props);
         
         this.state = {
-            data : [],
             loading: false,
             errors: null,
-            showingAddUserModal : false,
-            showingEditUserModal: false,
             editedUser : {}
         }
 
         /*bindings*/
-        this._getAllUsers = this._getAllUsers.bind(this);
-        this.callbackCreateUser = this.callbackCreateUser.bind(this);
-        this.callbackEditUser = this.callbackEditUser.bind(this);
-    }
-
-    _getAllUsers(){
-        this.setState({ loading : true });
-        this.props.viewUsersRequest({ token : localStorage.jwtToken })
-        .then((response)=>{
-            var usersServer = response.data.users;
-            this.setState({data: usersServer, loading: false})
-        })
-        .catch((response)=>{
-            this.props.addFlashMessage({
-                type:"error",
-                text:"cannot get the users from server"
-            });
-            this.setState({ loading : false });
-        });
+        this._confirmDeleteUser = this._confirmDeleteUser.bind(this);
     }
 
     componentWillMount(){
-        this._getAllUsers();
+        this.setState({ loading : true });
+        viewUsersRequest()
+        .then((response)=>{
+            var usersServer = response.data.users;
+            this.props.dispatch(setTableState({
+                content : usersServer,
+            }));
+            this.setState({loading: false})
+        })
+        .catch((response)=>{
+            this.props.dispatch(addFlashMessage({
+                type:"error",
+                text:"cannot get the users from server"
+            }));
+            this.setState({ loading : false });
+        });
     }
-
-    callbackCreateUser(){
-        this.setState({showingAddUserModal : false});
-        this._getAllUsers();
-    }
-   
-    callbackEditUser(){
-        this.setState({showingEditUserModal : false, editedUser : []});
-        this._getAllUsers();
+    
+    _confirmDeleteUser(email){
+        var obj = {}
+        obj["email"] = email;
+        deleteUserRequest(obj)
+        .then((response)=>{                         // actualizo los usuarios
+            this.props.dispatch(addFlashMessage({
+                type:"success",
+                text:"user "+email+" deleted"
+            }));
+            let arr = this.props.table.content;
+            arr = arr.filter(e => e.email !== email);
+            this.props.dispatch(setTableState({
+                content: arr
+            }));
+        })
+        .catch((response)=>{
+            this.props.dispatch(addFlashMessage({
+                type:"error",
+                text:"pacient "+folderName+" removed"
+            }));
+        });
     }
 
     render(){ 
-        const columns = ["Category","Email","Password"];
-        const { addFlashMessage, deleteUserRequest } = this.props;
         const onClickDelete = ({ event, ref, data, dataFromProvider }) => {
             const email = event.target.parentElement.id;
             if (email !== ''){
-                confirm(ConfirmForm,"Warning","Are you sure you want to delete this user?")
-                .then((result) => { // `proceed` callback
-                    var obj = {}
-                    obj["email"] = email;
-                    deleteUserRequest(obj)
-                    .then((response)=>{                         // actualizo los usuarios
-                        addFlashMessage({
-                            type:"success",
-                            text:"user "+email+" deleted"
-                        });
-                        let arr = this.state.data;
-                        arr = arr.filter(e => e.email !== email);
-                        this.setState({ data : arr });
-                    })
-                    .catch((response)=>{
-                        //TODO: fijar si si esta logueado sino mostrar el error
-                    });
-                },
-                (result) => {
-                    // `cancel` callback
-                    //TODO: fijar si si esta logueado sino mostrar el error
-                    }  
-                );
-            };
+                this.props.dispatch(openModal({
+                    id: uuid.v4(),
+                    type: 'confirmation',
+                    text: 'Are you sure to delete this user?',
+                    onClose: null,
+                    onConfirm: () => this._confirmDeleteUser(email),
+                }));   
+            }
         };
 
         const onClickAdd = ({event, ref,data,dataFromProvider}) => {
-            this.setState({ showingAddUserModal : true });
+            this.props.dispatch(openModal({
+                id: uuid.v4(),
+                type: 'custom',
+                content: <AdminAddUserForm />,
+            }));
         };
 
         const onClickEdit = ({event, ref,data,dataFromProvider}) => {
@@ -106,7 +103,11 @@ class AdminViewUsersForm extends React.Component {
                     obj["email"] = email;
                     obj["password"] = password;
                     obj["category"] = category;
-                    this.setState({ showingEditUserModal : true, editedUser : obj })
+                    this.props.dispatch(openModal({
+                        id: uuid.v4(),
+                        type: 'custom',
+                        content: <AdminEditUserForm user = { obj } />,
+                    }));
                 }
             } 
         }
@@ -123,22 +124,11 @@ class AdminViewUsersForm extends React.Component {
             return (
                 <BeatLoader color =  { '#2FA4E7' } loading = { this.state.loading }/>
             );
-         } else 
-         if (this.state.showingAddUserModal){
-             return (
-                <ModalAdminAddUser callbackCreateUser = { this.callbackCreateUser } />
-             );
-         } else 
-         if (this.state.showingEditUserModal){
-            return (
-                <ModalEditUser callbackEditUser = { this.callbackEditUser } user = { this.state.editedUser }/>
-            );
-         }
-         else {
+         } else {
             return (
                     <div className="bs-docs-section">
                         <ContextMenuProvider id = "rightClickContextMenu" >
-                            <TableAdmin columns = { columns } data = { this.state.data } />
+                            <TableAdmin />
                         </ContextMenuProvider>
                         <MenuFile/>
                     </div>
@@ -147,14 +137,21 @@ class AdminViewUsersForm extends React.Component {
     }
 }
 
-AdminViewUsersForm.propTypes = {
-    deleteUserRequest : PropTypes.func.isRequired,
-    addFlashMessage : PropTypes.func.isRequired,
-    viewUsersRequest : PropTypes.func.isRequired
-}
-
 AdminViewUsersForm.contextTypes = {
     router : PropTypes.object.isRequired
 }
 
-export default AdminViewUsersForm;
+function mapStateToProps(state) {
+    return {
+        auth : state.auth,
+        table : state.table
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+      dispatch,
+    }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(AdminViewUsersForm);

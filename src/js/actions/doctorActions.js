@@ -1,11 +1,9 @@
 import axiosInstance from '../utils/axiosInstance'
 
 export function doctorGetPacients(){
-    return function action(dispatch){
-        var obj = {};
-        obj["token"] = localStorage.jwtToken;
-        return axiosInstance.post("/doctor/get/files",obj);
-     }
+    var obj = {};
+    obj["token"] = localStorage.jwtToken;
+    return axiosInstance.post("/doctor/get/files",obj);
 }
 
 export function doctorAddPacient(data){
@@ -23,10 +21,8 @@ export function doctorRenamePacient(data){
 }
 
 export function doctorRemovePacient(data){
-    return function action(dispatch){
-        data["token"] = localStorage.jwtToken;
-        return axiosInstance.post("/delete/folder",data);
-     }
+    data["token"] = localStorage.jwtToken;
+    return axiosInstance.post("/delete/folder",data);
 }
 
 export function doctorAddFolder(data){
@@ -48,24 +44,18 @@ export function doctorAddFile(data){
 }
 
 export function doctorRenameFolder(data){
-    return function action(dispatch){
-        data["token"] = localStorage.jwtToken;
-        return axiosInstance.post("/rename/folder",data);
-    }
+    data["token"] = localStorage.jwtToken;
+    return axiosInstance.post("/rename/folder",data);
 }
 
 export function doctorRenameFile(data){
-    return function action(dispatch){
-        data["token"] = localStorage.jwtToken;
-        return axiosInstance.post("/rename/file",data);
-    }
+    data["token"] = localStorage.jwtToken;
+    return axiosInstance.post("/rename/file",data);
 }
 
 export function doctorRemoveFile(data){
-    return function action(dispatch){
-        data["token"] = localStorage.jwtToken;
-        return axiosInstance.post("/delete/file",data);
-    }
+    data["token"] = localStorage.jwtToken;
+    return axiosInstance.post("/delete/file",data);
 }
 
 export function doctorRemoveFolder (data){

@@ -1,15 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types'
 import PasswordMask from '../common/PasswordMask';
+import { connect } from 'react-redux'
 
 class TableAdmin extends React.Component {
     constructor(props){
         super(props);
-
-        this.state = {
-            passwords: [],
-            data : []
-        };
 
         /* Bindings */
         this.handleChange = this.handleChange.bind(this);
@@ -18,26 +13,16 @@ class TableAdmin extends React.Component {
     handleChange(e){
         console.log("me clickeaste gato");
     }
-
-    componentWillMount(){
-        var passwords = [];
-        for (var i = 0; i < this.props.data.length; i++) {
-            var item = this.props.data[i];
-            var user = [item.email , item.password];
-            passwords.push(user);
-        }
-        this.setState({passwords});
-    }
-
-
+    
     render(){
-        var columns = this.props.columns.map( (element) => {
+        var columns = ["Category","Email","Password"];
+        columns = columns.map( (element) => {
             return <th className="table-active" scope="col" key={element}> { element } </th>    
         });
-
-        var data = [];
-        for (var i = 0; i < this.props.data.length; i++) {
-            var item = this.props.data[i];
+        var body = [];
+        var data = this.props.table.content;
+        for (var i = 0; i < data.length; i++) {
+            var item = data[i];
             var row = ( <tr className = "table-secondary" key = { item.email } id = { item.email }>
                             <td scope="row" name={item.category}>{ (item.category === 0) ? "Doctor" : "Pladema" }</td>
                             <td>{ item.email }</td>
@@ -48,7 +33,7 @@ class TableAdmin extends React.Component {
                                               onChange = { this.handleChange }
                                               editable = { false } /></td>
                         </tr>);
-            data.push(row);
+            body.push(row);
         }
 
         return (
@@ -60,7 +45,7 @@ class TableAdmin extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        { data }
+                        { body }
                     </tbody>
                 </table>
             </div>
@@ -68,9 +53,16 @@ class TableAdmin extends React.Component {
     }
 }
 
-TableAdmin.PropTypes = {
-    columns : PropTypes.array.isRequired,
-    data : PropTypes.array.isRequired,
+function mapStateToProps(state) {
+    return {
+        table : state.table
+    }
 }
 
-export default TableAdmin;
+function mapDispatchToProps(dispatch) {
+    return {
+      dispatch,
+    }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(TableAdmin);

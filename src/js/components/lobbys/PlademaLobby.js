@@ -7,7 +7,6 @@ import { openModal } from '../../actions/modalActions'
 import { plademaGetAllFolders, plademaGetFile } from '../../actions/plademaActions'
 import { setTableState, setCurrentLevel } from '../../actions/tableActions'
 import { addFlashMessage } from '../../actions/flashMessages'
-import { ModalContainer }  from '../common/Modal';
 
 import TablePladema from '../common/TablePladema'
 import PlademaAddFolderForm from '../forms/pladema/PlademaAddFolderForm'
@@ -80,7 +79,6 @@ class PlademaLobby extends React.Component {
                 fileName += parts[i] + ".";
             }
             fileName = fileName.substring(0,fileName.length-1);//quito el ultimo .
-            console.log("fileName: "+fileName);
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
@@ -128,14 +126,14 @@ class PlademaLobby extends React.Component {
         }; 
 
         const NotInitialMenuFolder = () => (
-            <ContextMenu  id='rightClickContextMenuNotInitialMenuFolder'>
+            <ContextMenu id='rightClickContextMenuNotInitialMenuFolder'>
                 <Item onClick = { onClickUploadFile }><IconFont className = "fa fa-upload"/> Upload File </Item>
                 <Item onClick = { onClickAddFolder }><IconFont className = "fa fa-plus"/> Create Folder </Item>
             </ContextMenu>
         );
 
         const NotInitialMenuFile = () => (
-            <ContextMenu  id='rightClickContextMenuNotInitialMenuFile'>
+            <ContextMenu id='rightClickContextMenuNotInitialMenuFile'>
                 <Item onClick = { onClickDownloadFile }><IconFont className = "fa fa-download"/> Download </Item>
                 <Item onClick = { onClickAddFolder }><IconFont className = "fa fa-plus"/> Create Folder </Item>
             </ContextMenu>
@@ -148,7 +146,6 @@ class PlademaLobby extends React.Component {
                     <TablePladema onMouseEnter = { this._hoverTableItem }/>
                 </ContextMenuProvider>
                 { menu }
-                <ModalContainer />
             </div> 
         );
     }

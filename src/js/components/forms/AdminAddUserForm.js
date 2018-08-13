@@ -1,11 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types'
 import TextFieldGroup from '../common/TextFieldGroup'
-import Dropdown from 'react-dropdown'
 import validator from 'validator'
-import 'react-dropdown/style.css'
 import classname from 'classnames'
-
+import { connect } from 'react-redux'
+import { addFlashMessage } from '../../actions/flashMessages';
+import { createUserRequest } from '../../actions/adminActions'
+import { setTableState } from '../../actions/tableActions';
 
 class AdminAddUserForm extends React.Component {
     constructor(props){
@@ -26,19 +26,31 @@ class AdminAddUserForm extends React.Component {
         this._isValid = this._isValid.bind(this);
         this._onClickCloseMessage = this._onClickCloseMessage.bind(this);
         this._cancelForm = this._cancelForm.bind(this);
-        this.callback = this.callback.bind(this);
+        this._confirmAddUser = this._confirmAddUser.bind(this);
     }
+
+    _confirmAddUser(newUser){
+        var _content = this.props.table.content;
+        _content.push(newUser);
+        this.props.dispatch(setTableState({
+            content: _content,
+        }));
+   }
 
     _submitForm(){
         if (this._isValid()){
-            var obj = {}
-            obj["email"] = this.state.email;
-            obj["password"] = this.state.password;
-            obj["category"] = parseInt(this.state.category);
-            this.props.createUserRequest(obj)
+            var obj = {};
+            const email = this.state.email;
+            const password = this.state.password;
+            const category = parseInt(this.state.category);
+            obj["email"] = email;
+            obj["password"] = password;
+            obj["category"] = category;
+            createUserRequest(obj)
             .then((response)=>{
                 this.setState({serverMessage : response.data.message, serverStatus:"OK"})
-                this.callback();
+                this.props.callback();
+                this._confirmAddUser(obj);
             })
             .catch((response)=>{
                 if (typeof response.response === 'undefined'){
@@ -46,8 +58,11 @@ class AdminAddUserForm extends React.Component {
                 } else {
                     this.setState({serverMessage : response.data.message, serverStatus:"BAD_STATUS"})
                 }
-                this.callback();
-            })
+                this.props.dispatch(addFlashMessage({
+                    type : "error",
+                    text : "addUserForm - error server or something"
+                }));
+            });
         }
     }
 
@@ -68,21 +83,14 @@ class AdminAddUserForm extends React.Component {
         return toReturn;
     }
 
-
     _onChange(e) {
-        this.setState({ [e.target.name]: e.target.value });
-        this._isValid();
+        this.setState({ [e.target.name]: e.target.value },()=>{
+            this._isValid();
+        });
     }
 
     _cancelForm(){
-        this.callback();
-    }
-
-    callback(){
-        const { callbackCreateOrCancel } = this.props;
-        if (callbackCreateOrCancel != null || typeof callbackCreateOrCancel !== 'undefined'){
-            callbackCreateOrCancel();
-        }    
+        this.props.callback();
     }
     
     _onClickCloseMessage(){
@@ -90,7 +98,6 @@ class AdminAddUserForm extends React.Component {
     }
 
     render(){
-        const { createUserRequest, addFlashMessage } = this.props;
         return (
             <div className="jumbotron">
                 <div className="middle">
@@ -100,20 +107,17 @@ class AdminAddUserForm extends React.Component {
                                                             <span>&times;</span>
                                                         </button>
                                                      </div>}
-                    <TextFieldGroup
-                        error = { this.state.errors.email }
-                        label="Email"
-                        onChange = { this._onChange }
-                        value = { this.state.email }
-                        field = "email" />
-                   <TextFieldGroup
-                        error = { this.state.errors.password }
-                        label = "Password"
-                        onChange = { this._onChange }
-                        value = { this.state.password }
-                        field = "password"
-                        type = "password" />
-                    
+                    <TextFieldGroup error = { this.state.errors.email }
+                                    label="Email"
+                                    onChange = { this._onChange }
+                                    value = { this.state.email }
+                                    field = "email" />
+                   <TextFieldGroup  error = { this.state.errors.password }
+                                    label = "Password"
+                                    onChange = { this._onChange }
+                                    value = { this.state.password }
+                                    field = "password"
+                                    type = "password" />
                     <fieldset>
                         <div className="form-group">
                             <label>Category</label>
@@ -133,10 +137,17 @@ class AdminAddUserForm extends React.Component {
     }
 }
 
-AdminAddUserForm.propTypes = {
-    createUserRequest : PropTypes.func.isRequired,
-    addFlashMessage : PropTypes.func.isRequired,
-    callbackModalAdminAddUser : PropTypes.func
+function mapStateToProps(state) {
+    return {
+        auth : state.auth,
+        table : state.table
+    }
 }
 
-export default AdminAddUserForm;
+function mapDispatchToProps(dispatch) {
+    return {
+      dispatch,
+    }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(AdminAddUserForm);

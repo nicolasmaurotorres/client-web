@@ -2,8 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types'
 import TextFieldGroup from '../common/TextFieldGroup'
 import validator from 'validator'
-import 'react-dropdown/style.css'
-
+import { connect } from 'react-redux';
+import { addFlashMessage } from '../../actions/flashMessages';
+import { _getPathAsArray, _nextNode } from '../../utils/tableFunctions';
+import { setCurrentLevel } from '../../actions/tableActions';
 
 class DoctorAddPacientForm extends React.Component {
     constructor(props){
@@ -19,25 +21,42 @@ class DoctorAddPacientForm extends React.Component {
         this._submitForm = this._submitForm.bind(this);
         this._onChange = this._onChange.bind(this);
         this._isValid = this._isValid.bind(this);
-        this._onClickCloseMessage = this._onClickCloseMessage.bind(this);
         this._cancelForm = this._cancelForm.bind(this);
+        this._onConfirmAddPacient = this._onConfirmAddPacient.bind(this);
     }
 
     componentWillMount(){
         this.setState({otherPacients : this.props.otherPacients});
     }
 
+    _onConfirmAddPacient(newPacient){
+        var path = _getPathAsArray(this.props.table.level.path);
+        var node = _nextNode(path,this.props.table.content);
+        node.SubFolders.push(newPacient);
+        this.props.dispatch(setCurrentLevel({
+            files : this.props.table.level.files,
+            folders : _getFoldersAsArray(node),
+            path: this.props.table.level.path,
+            position : this.props.table.level.position
+        }));
+    }
+
     _submitForm(){
         if (this._isValid()){
             var obj = {}
-            const { doctorAddPacient , callbackCreateOrCancel } = this.props;
+            const { callback } = this.props;
+            const name = this.state.name;
             obj["folder"] = this.state.name;
             doctorAddPacient(obj)
             .then((response)=>{
-                callbackCreateOrCancel(true);
+                this._onConfirmAddPacient(name);
+                callback(true);
             })
             .catch((response)=>{
-                callbackCreateOrCancel(false);
+                this.props.dispatch(addFlashMessage({
+                    type:"error",
+                    text:"network error - DoctorAddPacientForm - _submitForm"
+                }));
             });
         }
     }
@@ -105,9 +124,20 @@ class DoctorAddPacientForm extends React.Component {
 }
 
 DoctorAddPacientForm.propTypes = {
-    callbackCreateOrCancel : PropTypes.func.isRequired,
-    doctorAddPacient : PropTypes.func.isRequired,
-    otherPacients : PropTypes.object.isRequired
+    callback : PropTypes.func.isRequired,
 }
 
-export default DoctorAddPacientForm;
+function mapDispatchToProps(dispatch) {
+    return {
+     dispatch,
+   }
+};
+
+function mapStateToProps(state){
+    return {
+        table : state.table,
+        auth : state.auth
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(DoctorAddPacientForm);

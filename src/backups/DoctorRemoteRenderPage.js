@@ -1,6 +1,6 @@
 import React    from 'react'
 import FileBrowserWidget  from 'paraviewweb/src/React/Widgets/FileBrowserWidget';
-import RemoteRender from '../../renders/RemoteRender'
+import RemoteRender from '../js/renders/RemoteRender'
 
 class DoctorRemoteRenderPage extends React.Component {
     constructor(props){

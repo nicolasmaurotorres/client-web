@@ -2,6 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types'
 import TextFieldGroup from '../common/TextFieldGroup'
 import validator from 'validator'
+import { connect } from 'react-redux';
+import { _getPathAsString, _getFoldersAsArray } from '../../utils/tableFunctions';
+import { doctorRenameFolder } from '../../actions/doctorActions'
+import { setCurrentLevel } from '../../actions/tableActions';
+import { addFlashMessage } from '../../actions/flashMessages';
 
 class DoctorRenameFolderForm extends React.Component {
     constructor(props){
@@ -10,10 +15,7 @@ class DoctorRenameFolderForm extends React.Component {
         this.state = {
             errors: {},
             actualName : "",
-            name: "",
-            otherFolders : {},
-            otherFiles: {},
-            actualPath : ""
+            name: ""
         }
 
         /* bindings */
@@ -21,27 +23,61 @@ class DoctorRenameFolderForm extends React.Component {
         this._onChange = this._onChange.bind(this);
         this._isValid = this._isValid.bind(this);
         this._cancelForm = this._cancelForm.bind(this);
+        this._updateRenamedFolder = this._updateRenamedFolder.bind(this);
     }
 
     componentWillMount(){
-        const { otherFolders, otherFiles,folderToRename,actualPath } = this.props;
-        this.setState({otherFolders, otherFiles, actualPath, actualName : folderToRename, name : folderToRename});
+        const { folderToRename } = this.props;
+        this.setState({actualName : folderToRename,name : folderToRename});
+    }
+
+    _updateRenamedFolder(newFolderName,oldFolderName){
+        const { username } = this.props.auth.user;
+        var previousFolder = username+"/";
+        var split = oldFolderName.split("/");
+        for (var i = 0; i < split.length-1; i++){ // me paro en la carpeta que lo contiene al viejo nombre
+            previousFolder += split[i] + "/";
+        }
+        previousFolder = previousFolder.substring(0,previousFolder.length-1);  // quito el ultimo /
+        var nextNode = _nextNode(previousFolder,this.props.table.content);
+        var toRename = username+"/"+oldFolderName;
+        var newNameFolder = username+"/"+newFolderName;
+        var found = false;
+        var i = 0;
+        while (!found && i < nextNode.SubFolders.length){
+            if (nextNode.SubFolders[i].Folder === toRename){
+                nextNode.SubFolders[i].Folder = newNameFolder;
+                found = true;
+            } else {
+                i++;
+            }
+        }
+        this.props.dispatch(setCurrentLevel({
+            files : this.props.table.level.files,
+            folders : _getFoldersAsArray(nextNode),
+            path: this.props.table.level.path,
+            position : this.props.table.level.position
+        }))
     }
 
     _submitForm(){
         if (this._isValid()){
             var obj = {}
-            const { doctorRenameFolder , callbackRenameOrCancel } = this.props;
-            var newName = this.state.actualPath + this.state.name;
-            var oldName = this.state.actualPath + this.state.actualName;
+            var currentPath = _getPathAsString(this.props.table.level.path) +"/";
+            var newName = currentPath + this.state.name;
+            var oldName = currentPath + this.state.actualName;
             obj["newfolder"] = newName;
             obj["oldfolder"] = oldName;
             doctorRenameFolder(obj)
             .then((response)=>{
-                callbackRenameOrCancel(true,newName,oldName);
+                this._updateRenamedFolder(newName,oldName);
+                this.props.callback();
             })
             .catch((response)=>{
-                callbackRenameOrCancel(false);
+                this.props.dispatch(addFlashMessage({
+                    type:"error",
+                    text:"network error - DoctorRenameFolderForm - _submitForm"
+                }));
             });
         }
     }
@@ -85,11 +121,10 @@ class DoctorRenameFolderForm extends React.Component {
         this.setState({ [e.target.name]: e.target.value },()=>{
             this._isValid();
         });
-        
     }
 
     _cancelForm(){
-        this.props.callbackRenameOrCancel(false);
+        this.props.callback();
     }
     
     render(){
@@ -114,12 +149,21 @@ class DoctorRenameFolderForm extends React.Component {
 }
 
 DoctorRenameFolderForm.propTypes = {
-    callbackRenameOrCancel : PropTypes.func.isRequired,
-    doctorRenameFolder : PropTypes.func.isRequired,
-    addFlashMessage : PropTypes.func.isRequired,
-    otherFolders : PropTypes.object.isRequired,
-    otherFiles : PropTypes.object.isRequired,
+    callback : PropTypes.func.isRequired,
     folderToRename : PropTypes.string.isRequired,
 }
 
-export default DoctorRenameFolderForm;
+function mapDispatchToProps(dispatch) {
+    return {
+     dispatch,
+   }
+};
+
+function mapStateToProps(state){
+    return {
+        table : state.table,
+        auth : state.auth
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(DoctorRenameFolderForm);

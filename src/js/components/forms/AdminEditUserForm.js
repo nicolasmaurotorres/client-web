@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types'
 import TextFieldGroup from '../common/TextFieldGroup'
-import Dropdown from 'react-dropdown'
 import validator from 'validator'
-import 'react-dropdown/style.css'
 import classname from 'classnames'
-import { PropagateLoader } from 'react-spinners';
-
 import PasswordMask from '../common/PasswordMask';
+import { addFlashMessage } from '../../actions/flashMessages'
+import { editUserRequest } from '../../actions/adminActions'
+import { setTableState } from '../../actions/tableActions';
+import { connect } from 'react-redux'
 
 class AdminEditUserForm extends React.Component {
     constructor(props){
@@ -31,7 +31,7 @@ class AdminEditUserForm extends React.Component {
         this._isValid = this._isValid.bind(this);
         this._onClickCloseMessage = this._onClickCloseMessage.bind(this);
         this._cancelForm = this._cancelForm.bind(this);
-        this.callback = this.callback.bind(this);
+        this._onConfirmEdit = this._onConfirmEdit.bind(this);
     }
 
     componentWillMount(){
@@ -40,34 +40,54 @@ class AdminEditUserForm extends React.Component {
                         email : user.email, password: user.password, category : user.category });
     }
 
+    _onConfirmEdit(newData){
+        var users = this.props.table.content;
+        var found = false;
+        var i = 0;
+        while (!found && i < users.length){
+            if (users[i].email === newData.oldemail) {
+                users[i].email = (newData.newemail !== "") ? newData.newemail : users[i].email;
+                users[i].password = (newData.newpassword !== "") ? newData.newpassword : users[i].password;
+                users[i].category = (newData.newcategory !== -1) ? newData.newcategory : users[i].category;
+                found = true;
+            } else {
+                i++;
+            }
+        }
+        this.props.dispatch(setTableState({
+            content : users
+        }));
+    }
+
     _submitForm(){
         if (this._isValid()){
-            var obj = {};
-            obj["oldemail"] = this.state.oldEmail
-            obj["newemail"] = (this.state.email !== this.state.oldEmail) ? this.state.email : ""; // NO cambio el email
-            obj["newpassword"] = (this.state.password !== this.state.oldPassword) ? this.state.password  :  ""; // NO cambio la password
-            obj["newcategory"] = (this.state.category !== this.state.oldCategory) ? parseInt(this.state.category) : -1;
-            this.props.editUserRequest(obj)
+            const data = {
+                oldemail : this.state.oldEmail,
+                newemail : (this.state.email !== this.state.oldEmail) ? this.state.email : "",
+                newpassword : (this.state.password !== this.state.oldPassword) ? this.state.password  :  "",
+                newcategory : (this.state.category !== this.state.oldCategory) ? parseInt(this.state.category) : -1
+            };
+            editUserRequest(data)
             .then((response)=>{
                 this.setState({serverMessage : response.data.message, serverStatus:"OK"})
-                this.props.addFlashMessage({
+                this.props.dispatch(addFlashMessage({
                     type:"success",
                     text:"user edited successfully"
-                });
-                this.callback();
+                }));
+                this._onConfirmEdit(data);
+                this.props.callback();
             })
             .catch((response)=>{
-                this.props.addFlashMessage({
+                this.props.dispatch(addFlashMessage({
                     type:"error",
                     text:"cannot edit the user"
-                });
+                }));
                 if (typeof response.response === 'undefined'){
                     this.setState({serverMessage : "network error", serverStatus:"BAD_STATUS"})
                 } else {
                     this.setState({serverMessage : response.response.data.message, serverStatus:"BAD_STATUS"})
                 }
-                this.callback();
-            })
+            });
         }
     }
 
@@ -90,27 +110,20 @@ class AdminEditUserForm extends React.Component {
 
 
     _onChange(e) {
-        this.setState({ [e.target.name]: e.target.value });
-        this._isValid();
+        this.setState({ [e.target.name]: e.target.value },()=>{
+            this._isValid();
+        });
     }
 
     _cancelForm(){
-        this.callback();
+        this.props.callback();
     }
-
-    callback(){
-        const { callbackEditUser } = this.props;
-        if (callbackEditUser != null || typeof callbackEditUser !== 'undefined'){
-            callbackEditUser();
-        }    
-    }
-    
+   
     _onClickCloseMessage(){
         this.setState({serverMessage:"",serverStatus:""});
     }
 
     render(){
-        const { createUserRequest, addFlashMessage } = this.props;
         return (
             <div className="jumbotron">
                 <div className="middle">
@@ -152,11 +165,21 @@ class AdminEditUserForm extends React.Component {
 }
 
 AdminEditUserForm.propTypes = {
-    editUserRequest : PropTypes.func.isRequired,
-    addFlashMessage : PropTypes.func.isRequired,
-    callbackEditUser : PropTypes.func.isRequired,
-    user : PropTypes.object.isRequired,
-    
+    callback : PropTypes.func.isRequired,
+    user : PropTypes.object.isRequired, 
 }
 
-export default AdminEditUserForm;
+function mapStateToProps(state) {
+    return {
+        auth : state.auth,
+        table : state.table
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+      dispatch,
+    }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(AdminEditUserForm);

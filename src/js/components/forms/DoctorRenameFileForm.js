@@ -2,6 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types'
 import TextFieldGroup from '../common/TextFieldGroup'
 import validator from 'validator'
+import { connect } from 'react-redux';
+import { addFlashMessage } from '../../actions/flashMessages'
+import { doctorRenameFile } from '../../actions/doctorActions'
+import { _getPathAsString, _nextNode } from '../../utils/tableFunctions'
+import { setCurrentLevel } from '../../actions/tableActions';
 
 class DoctorRenameFileForm extends React.Component {
     constructor(props){
@@ -11,9 +16,6 @@ class DoctorRenameFileForm extends React.Component {
             errors: {},
             actualName : "",
             name: "",
-            otherFolders : {},
-            otherFiles: {},
-            actualPath : ""
         }
 
         /* bindings */
@@ -21,17 +23,33 @@ class DoctorRenameFileForm extends React.Component {
         this._onChange = this._onChange.bind(this);
         this._isValid = this._isValid.bind(this);
         this._cancelForm = this._cancelForm.bind(this);
+        this._updateTable = this._updateTable.bind(this);
     }
 
-    componentWillMount(){
-        const { otherFolders, otherFiles,fileToRename,actualPath } = this.props;
-        this.setState({otherFolders, otherFiles, actualPath, actualName : fileToRename, name : fileToRename});
+    _updateTable(newFileName,oldFileName){
+        const { username } = this.props.auth.user;
+        var actualPath = username + "/" + _getPathAsString(this.props.table.level.path);
+        var node = _nextNode(actualPath,this.props.table.content);
+        var found = false;
+        var arrFiles = node.Files;
+        for (var i = 0; i < arrFiles.length && !found; i++){
+            if (arrFiles.Files[i] === oldFileName){
+                arrFiles.Files[i] = newFileName;
+                found = true;
+            }
+        }
+        this.props.dispatch(setCurrentLevel({
+            files : arrFiles,
+            folders : this.props.table.level.folders,
+            path: this.props.table.level.path,
+            position : this.props.table.level.position
+        }));
     }
-
+    
     _submitForm(){
         if (this._isValid()){
             var obj = {}
-            const { doctorRenameFile , callbackRenameOrCancel,fileExtension} = this.props;
+            const { fileExtension } = this.props;
             var newName = this.state.name+ "."+ fileExtension;
             var oldName = this.state.actualName + "."+ fileExtension;
             obj["filenew"] =  newName;// le agrego la extension al renombrarlos
@@ -39,10 +57,14 @@ class DoctorRenameFileForm extends React.Component {
             obj["folder"] = this.state.actualPath;
             doctorRenameFile(obj)
             .then((response)=>{
-                callbackRenameOrCancel(true,newName,oldName);
+                this._updateTable(newName,oldName);
+                this.props.callback();
             })
             .catch((response)=>{
-                callbackRenameOrCancel(false);
+                this.props.dispatch(addFlashMessage({
+                    type:"error",
+                    text:"network error - DoctorRenameFileForm - _submitForm"
+                }));
             });
         }
     }
@@ -86,11 +108,10 @@ class DoctorRenameFileForm extends React.Component {
         this.setState({ [e.target.name]: e.target.value },()=>{
             this._isValid();
         });
-        
     }
 
     _cancelForm(){
-        this.props.callbackRenameOrCancel(false);
+        this.props.callback();
     }
     
     render(){
@@ -115,14 +136,22 @@ class DoctorRenameFileForm extends React.Component {
 }
 
 DoctorRenameFileForm.propTypes = {
-    callbackRenameOrCancel : PropTypes.func.isRequired,
-    doctorRenameFile : PropTypes.func.isRequired,
-    addFlashMessage : PropTypes.func.isRequired,
-    otherFolders : PropTypes.object.isRequired,
-    otherFiles : PropTypes.object.isRequired,
     fileToRename : PropTypes.string.isRequired,
-    actualPath : PropTypes.string.isRequired,
-    fileExtension : PropTypes.string.isRequired
+    fileExtension : PropTypes.string.isRequired,
+    callback : PropTypes.func.isRequired,
 }
 
-export default DoctorRenameFileForm;
+function mapDispatchToProps(dispatch) {
+    return {
+     dispatch,
+   }
+};
+
+function mapStateToProps(state){
+    return {
+        table : state.table,
+        auth : state.auth
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(DoctorRenameFileForm);
