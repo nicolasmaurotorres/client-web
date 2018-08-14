@@ -1,8 +1,9 @@
 import React from 'react';
-import TextFieldGroup from '../common/TextFieldGroup'
 import validator from 'validator'
 import classname from 'classnames'
 import { connect } from 'react-redux'
+import lodash from 'lodash'
+import TextFieldGroup from '../common/TextFieldGroup'
 import { addFlashMessage } from '../../actions/flashMessages';
 import { createUserRequest } from '../../actions/adminActions'
 import { setTableState } from '../../actions/tableActions';
@@ -30,8 +31,23 @@ class AdminAddUserForm extends React.Component {
     }
 
     _confirmAddUser(newUser){
+        debugger;
         var _content = this.props.table.content;
-        _content.push(newUser);
+        if (lodash.isEmpty(_content)){
+            _content[0] = newUser;    
+        } else {
+            debugger;
+            var aux = 0;
+            var max = -99999;
+            for(var prop in _content) {
+                aux = parseInt(prop);
+                if (aux > max){
+                    max = aux;
+                }
+            }
+            _content[max+1] = newUser;
+        }
+        
         this.props.dispatch(setTableState({
             content: _content,
         }));
@@ -49,15 +65,17 @@ class AdminAddUserForm extends React.Component {
             createUserRequest(obj)
             .then((response)=>{
                 this.setState({serverMessage : response.data.message, serverStatus:"OK"})
-                this.props.callback();
                 this._confirmAddUser(obj);
+                this._cancelForm();
             })
             .catch((response)=>{
+                debugger;
                 if (typeof response.response === 'undefined'){
                     this.setState({serverMessage : "network error", serverStatus:"BAD_STATUS"})
                 } else {
                     this.setState({serverMessage : response.data.message, serverStatus:"BAD_STATUS"})
                 }
+                debugger;
                 this.props.dispatch(addFlashMessage({
                     type : "error",
                     text : "addUserForm - error server or something"
@@ -90,7 +108,9 @@ class AdminAddUserForm extends React.Component {
     }
 
     _cancelForm(){
-        this.props.callback();
+        if (typeof this.props.callback !== 'undefined'){
+            this.props.callback();
+        }
     }
     
     _onClickCloseMessage(){

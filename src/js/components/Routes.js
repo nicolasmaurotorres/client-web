@@ -11,8 +11,7 @@ import AdminLobby from './lobbys/AdminLobby'
 import FlashMessagesList from './common/FlashMessagesList'
 import { authenticateDoctor, authenticatePladema, authenticateAdmin, loginControl }   from '../utils/authentications'
 import AdminViewUsersForm from '../components/forms/AdminViewUsersForm'
-//import AdminEditUserForm from '../components/forms/AdminEditUserForm'
-//import AdminAddUserForm from '../components/forms/AdminEditUserForm'
+import AdminAddUserForm from '../components/forms/AdminAddUserForm'
 import DoctorRemoteRenderPage from '../../backups/DoctorRemoteRenderPage'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import { ModalContainer }  from './common/Modal';
@@ -32,6 +31,7 @@ export default class Routes extends React.Component {
                         <Route exact path="/pladema" component = { authenticatePladema(PlademaLobby) } />
                         <Route exact path="/admin" component = { authenticateAdmin(AdminLobby) } />
                         <Route exact path="/admin/view" component = { authenticateAdmin(AdminViewUsersForm) } />
+                        <Route exact path="/admin/add" component = { authenticateAdmin(AdminAddUserForm) } />
                     </div>
                 </Router>
                 <ModalContainer />

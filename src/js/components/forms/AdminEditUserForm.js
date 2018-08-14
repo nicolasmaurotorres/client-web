@@ -75,7 +75,7 @@ class AdminEditUserForm extends React.Component {
                     text:"user edited successfully"
                 }));
                 this._onConfirmEdit(data);
-                this.props.callback();
+                this._cancelForm();
             })
             .catch((response)=>{
                 this.props.dispatch(addFlashMessage({
@@ -116,7 +116,9 @@ class AdminEditUserForm extends React.Component {
     }
 
     _cancelForm(){
-        this.props.callback();
+        if (typeof this.props.callback !== 'undefined'){
+            this.props.callback();
+        }
     }
    
     _onClickCloseMessage(){
@@ -165,7 +167,7 @@ class AdminEditUserForm extends React.Component {
 }
 
 AdminEditUserForm.propTypes = {
-    callback : PropTypes.func.isRequired,
+    callback : PropTypes.func,
     user : PropTypes.object.isRequired, 
 }
 
