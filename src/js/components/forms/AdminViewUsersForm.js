@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import uuid from 'uuid'
 import { BeatLoader } from 'react-spinners'
+import { connect } from 'react-redux'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.min.css' // css del click derecho
 import TableAdmin from '../common/TableAdmin'
@@ -9,10 +11,8 @@ import AdminAddUserForm from '../forms/AdminAddUserForm'
 import AdminEditUserForm from '../forms/AdminEditUserForm'
 import { openModal } from '../../actions/modalActions'
 import { addFlashMessage } from '../../actions/flashMessages'
-import { connect } from 'react-redux'
 import { viewUsersRequest } from '../../actions/adminActions'
 import { setTableState } from '../../actions/tableActions'
-import uuid from 'uuid'
 
 class AdminViewUsersForm extends React.Component {
     constructor(props){

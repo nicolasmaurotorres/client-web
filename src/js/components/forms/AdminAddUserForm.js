@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import lodash from 'lodash'
 import TextFieldGroup from '../common/TextFieldGroup'
 import { addFlashMessage } from '../../actions/flashMessages';
-import { createUserRequest } from '../../actions/adminActions'
+import { viewUsersRequest,createUserRequest } from '../../actions/adminActions'
 import { setTableState } from '../../actions/tableActions';
 
 class AdminAddUserForm extends React.Component {
@@ -30,6 +30,23 @@ class AdminAddUserForm extends React.Component {
         this._confirmAddUser = this._confirmAddUser.bind(this);
     }
 
+    componentWillMount(){
+        viewUsersRequest()
+        .then((response)=>{
+            var usersServer = response.data.users;
+            this.props.dispatch(setTableState({
+                content : usersServer,
+            }));
+        })
+        .catch((response)=>{
+            this.props.dispatch(addFlashMessage({
+                type:"error",
+                text:"cannot get the users from server"
+            }));
+        });
+    }
+
+
     _confirmAddUser(newUser){
         debugger;
         var _content = this.props.table.content;
@@ -45,7 +62,11 @@ class AdminAddUserForm extends React.Component {
                     max = aux;
                 }
             }
-            _content[max+1] = newUser;
+            _content[max+1] = {
+                category : newUser.category,
+                email : newUser.email,
+                password : newUser.password
+            };
         }
         
         this.props.dispatch(setTableState({
@@ -89,14 +110,25 @@ class AdminAddUserForm extends React.Component {
         var email = this.state.email;
         var password = this.state.password;
         var _errors = {};
+        debugger;
         if (!validator.isEmail(email)){
             toReturn = false;
             _errors["email"] = "you have to enter a valid email";
         }
-        if (validator.isEmpty(password)){
+        if (toReturn && validator.isEmpty(password)){
             toReturn = false;
             _errors["password"] = "the password cannot be empty";
         }
+        var _content = this.props.table.content;
+        for(var prop in _content) {
+            var aux = _content[prop];
+            if (aux.email === email){
+                toReturn = false;
+                _errors["email"] = "this email already exists!";
+                break;
+            }
+        }
+        
         this.setState( { errors : _errors });
         return toReturn;
     }
