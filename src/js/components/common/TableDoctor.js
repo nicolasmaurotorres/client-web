@@ -1,8 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types'
+import uuid from 'uuid';
 import { connect } from 'react-redux';
+import { IconFont } from 'react-contexify'
+
 import { setCurrentLevel } from '../../actions/tableActions'
 import { _nextNode, _getFilesAsArray, _getPathAsArray, _getFoldersAsArray } from '../../utils/tableFunctions';
+
 
 class TableDoctor extends React.Component {
     constructor(props){
@@ -32,8 +36,8 @@ class TableDoctor extends React.Component {
                 // estoy en el nivel inicial, cambio a una subcarpeta
                 var nextNode = null;
                 var found = false;
-                for (var i = 0; i < this.props.table.content.length && !found; i++) {
-                    var nextNode = _nextNode(path,this.props.table.content[i]); // busco la carpeta para abrirla
+                for (var i = 0; i < this.props.table.content.SubFolders.length && !found; i++) {
+                    var nextNode = _nextNode(path,this.props.table.content.SubFolders[i]); // busco la carpeta para abrirla
                     if (nextNode !== null){
                         found=true;
                     }
@@ -69,16 +73,13 @@ class TableDoctor extends React.Component {
     _handleClickPath(e){
         var target = e.target.innerText; // un item del path clickeado, vuelvo a esa carpeta
         var index = this.props.table.level.path.indexOf(target);
-        if (index === -1){ // hizo click en Home
+        debugger;
+        if (index === 0 || index === -1){ // hizo click en Home o en el email
             //click en el principio de todo, vuelvo al estado inicial.
-            var auxFolders = [];
-            this.props.table.content.forEach(function(elem){
-                auxFolders.push(elem.Folder);
-            });
             this.props.dispatch(setCurrentLevel({
-                path : [],
+                path : [this.props.auth.user.username],
                 files : [],
-                folders : auxFolders,
+                folders : _getFoldersAsArray(this.props.table.content),
                 position : 0
             }));
         } else {
@@ -89,8 +90,8 @@ class TableDoctor extends React.Component {
             nextTarget = nextTarget + target;
             var nextNode = null;
             var found = false;
-            for (var i = 0; i < this.props.table.content.length && !found; i++){
-                var nextNode = _nextNode(nextTarget,this.props.table.content[i]); // busco la carpeta para abrirla
+            for (var i = 0; i < this.props.table.content.SubFolders.length && !found; i++){
+                var nextNode = _nextNode(nextTarget,this.props.table.content.SubFolders[i]); // busco la carpeta para abrirla
                 if (nextNode !== null){
                     found = true;
                 }
@@ -105,13 +106,14 @@ class TableDoctor extends React.Component {
     }
 
     render(){
+
         var path = ["/",<label key = "Home" onClick = { this._handleClickPath } style={{cursor:"pointer"}}> Home </label>];
         this.props.table.level.path.forEach((item) => {
             if (item !== "/"){
                 path.push("/");
-                path.push(<label key = { item } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
+                path.push(<label key = { uuid.v4() } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
             } else {
-                path.push(<label key = { item } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
+                path.push(<label key = { uuid.v4() } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
             }
         });
 
@@ -131,9 +133,10 @@ class TableDoctor extends React.Component {
         });
 
         this.props.table.level.folders.forEach(function(elem){
-            var row = (<tr className = "table-secondary" key = { elem } id = { "folder-"+elem }>
-                        <td onClick = { handleOnClickTableItem } scope="row" name={ elem.Folder } onMouseEnter = { onMouseEnter }><IconFont className = "fa fa-folder-o"/> </td>
-                        <td onClick = { handleOnClickTableItem } onMouseEnter = { onMouseEnter }>{ elem }</td>
+            var folder = elem;
+            var row = (<tr className = "table-secondary" key = {elem } id = { "folder-"+folder }>
+                        <td onClick = { handleOnClickTableItem } scope="row" name={ folder } onMouseEnter = { onMouseEnter }><IconFont className = "fa fa-folder-o"/> </td>
+                        <td onClick = { handleOnClickTableItem } onMouseEnter = { onMouseEnter }>{ folder }</td>
                        </tr>
             );
             folders.push(row);
@@ -174,6 +177,7 @@ function mapDispatchToProps(dispatch) {
 function mapStateToProps(state){
     return {
         table : state.table,
+        auth: state.auth
     }
 }
 

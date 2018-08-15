@@ -4,11 +4,11 @@ import { connect } from 'react-redux'
 import uuid from 'uuid'
 import lodash from 'lodash' 
 
+import { setTableState, setCurrentLevel } from '../../actions/tableActions'
 import { doctorGetPacients, doctorRemovePacient, doctorRemoveFile, doctorRemoveFolder } from '../../actions/doctorActions'
 import { addFlashMessage } from '../../actions/flashMessages'
-import TableDoctor from '../common/TableDoctor'
-
 import { _getPathAsArray, _getPathAsString, _nextNode, _getFoldersAsArray } from '../../utils/tableFunctions';
+import TableDoctor from '../common/TableDoctor'
 import DoctorRenameFileForm from '../forms/DoctorRenameFileForm'
 import DoctorRenameFolderForm from '../forms/DoctorRenameFolderForm'
 import DoctorRenamePacientForm from '../forms/DoctorRenamePacientForm';
@@ -23,7 +23,6 @@ class DoctorLobby extends React.Component {
             idContextText : "rightClickContextMenuPacient", // right click context to show
         }
         // bindings
-        this._handleOnClickTableItem = this._handleOnClickTableItem.bind(this);
         this._onMouseEnterTableItem = this._onMouseEnterTableItem.bind(this);
         this._onConfirmDeleteFolder = this._onConfirmDeleteFolder.bind(this);
         this._onConfirmDeleteFile = this._onConfirmDeleteFile.bind(this);
@@ -39,19 +38,21 @@ class DoctorLobby extends React.Component {
             }));
             var auxFolders = [];
             rawResponse.SubFolders.forEach((item)=>{
-                auxFolders.push(item);
+                var parts = item.Folder.split("/");
+                auxFolders.push(parts[parts.length-1]);
             });
             this.props.dispatch(setCurrentLevel({
-                path : [this.props.auth.email],
+                path : [this.props.auth.user.username],
                 files : [],
                 folders : auxFolders,
                 position : 0
             }));
         })
         .catch((response)=>{
+            console.log(response.message);
             this.props.dispatch(addFlashMessage({
                 type:"error",
-                text:"error "+response.response.data.message
+                text:"error "+response.message
             }));
         });
     }
