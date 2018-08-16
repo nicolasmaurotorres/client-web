@@ -12,7 +12,6 @@ import { _getPathAsArray, _getPathAsString, _nextNode, _getFoldersAsArray } from
 import TableDoctor from '../common/TableDoctor'
 import DoctorRenameFileForm from '../forms/DoctorRenameFileForm'
 import DoctorRenameFolderForm from '../forms/DoctorRenameFolderForm'
-import DoctorRenamePacientForm from '../forms/DoctorRenamePacientForm';
 import DoctorAddPacientForm from '../forms/DoctorAddPacientForm';
 
 class DoctorLobby extends React.Component {
@@ -61,7 +60,7 @@ class DoctorLobby extends React.Component {
     _onMouseEnterTableItem(e){
         //cada vez que paso el mouse por encima de algo, cambio los menues que se muestran
         var parent = e.target.parentElement;
-        if (!this.state.initialLevel){
+        if (!this.props.table.level.position === 0){
             if (parent.id.includes("folder")){
                 this.setState({isFolder: true, idContextText:"rightClickContextMenuFolder"});
             } else {
@@ -295,15 +294,6 @@ class DoctorLobby extends React.Component {
                 <Item onClick = { onClickDeleteFolder }><IconFont className = "fa fa-trash"/> Delete </Item>
             </ContextMenu>
         );
-        // context menu del paciente
-        const onClickEditPacient = ({event, ref,data,dataFromProvider}) => {
-            var target = event.target.parentElement.children[1].innerText; // obtengo el nombre del paciente a editar
-            this.props.dispatch(openModal({
-                id: uuid.v4(),
-                type: 'custom',
-                content: <DoctorRenamePacientForm pacientToRename = { target } />,
-            }));
-        };
         const onClickDeletePacient = ({event, ref,data,dataFromProvider}) => {
             const parts = event.target.parentElement.id.split('-');
             var folderName = "";
@@ -331,15 +321,15 @@ class DoctorLobby extends React.Component {
         const MenuPacient = () => (
             <ContextMenu  id='rightClickContextMenuPacient'>
                 <Item onClick = { onClickAddPacient }><IconFont className = "fa fa-plus"/> Add </Item>
-                <Item onClick = { onClickEditPacient }><IconFont className = "fa fa-edit"/> Rename </Item>
+                <Item onClick = { onClickRenameFolder }><IconFont className = "fa fa-edit"/> Rename </Item>
                 <Item onClick = { onClickDeletePacient }><IconFont className = "fa fa-trash"/> Delete </Item>
             </ContextMenu>
         );
 
-        const menu =  (this.state.initialLevel) ? <MenuPacient/> : ( (this.state.isFolder) ? <MenuFolder/> : <MenuFile/> );
-        const addPacientButton = (this.state.initialLevel) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddPacient  }> Add pacient </botton> </div> : null;
-        const addFolderButton = (!this.state.initialLevel) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFolder }> Add Folder </botton>  </div> : null;
-        const addFileButton = (!this.state.initialLevel) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFile }> Add File </botton> </div>  : null;
+        const menu =  (this.props.table.level.position === 0) ? <MenuPacient/> : ( (this.state.isFolder) ? <MenuFolder/> : <MenuFile/> );
+        const addPacientButton = (this.props.table.level.position === 0) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddPacient  }> Add pacient </botton> </div> : null;
+        const addFolderButton = (!this.props.table.level.position === 0) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFolder }> Add Folder </botton>  </div> : null;
+        const addFileButton = (!this.props.table.level.position === 0) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFile }> Add File </botton> </div>  : null;
         const idMenu = this.state.idContextText;
         
         return (
