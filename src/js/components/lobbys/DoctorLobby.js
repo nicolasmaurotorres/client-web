@@ -5,6 +5,7 @@ import uuid from 'uuid'
 import lodash from 'lodash' 
 
 import { setTableState, setCurrentLevel } from '../../actions/tableActions'
+import { openModal } from '../../actions/modalActions'
 import { doctorGetPacients, doctorRemovePacient, doctorRemoveFile, doctorRemoveFolder } from '../../actions/doctorActions'
 import { addFlashMessage } from '../../actions/flashMessages'
 import { _getPathAsArray, _getPathAsString, _nextNode, _getFoldersAsArray } from '../../utils/tableFunctions';
@@ -136,8 +137,9 @@ class DoctorLobby extends React.Component {
 
     _onConfirmDeleteFolder(folderName){
         var obj = {}
-        var path = this._getCurrentPath();
+        var path = _getPathAsString();
         obj["folder"] = path+folderName;
+        debugger;
         doctorRemoveFolder(obj)
         .then((response)=>{ 
             var pathAsArray = _getPathAsArray(this.props.table.level.path);

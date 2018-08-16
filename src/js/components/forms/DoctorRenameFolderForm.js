@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import TextFieldGroup from '../common/TextFieldGroup'
 import validator from 'validator'
 import { connect } from 'react-redux';
-import { _getPathAsString, _getFoldersAsArray } from '../../utils/tableFunctions';
+import { _nextNode, _getPathAsString, _getFoldersAsArray, _getFilesAsObject, _getFoldersAsObject } from '../../utils/tableFunctions';
 import { doctorRenameFolder } from '../../actions/doctorActions'
 import { setCurrentLevel } from '../../actions/tableActions';
 import { addFlashMessage } from '../../actions/flashMessages';
@@ -32,16 +32,26 @@ class DoctorRenameFolderForm extends React.Component {
     }
 
     _updateRenamedFolder(newFolderName,oldFolderName){
+        debugger;
         const { username } = this.props.auth.user;
-        var previousFolder = username+"/";
-        var split = oldFolderName.split("/");
-        for (var i = 0; i < split.length-1; i++){ // me paro en la carpeta que lo contiene al viejo nombre
-            previousFolder += split[i] + "/";
+        var previousFolder = "", toRename="" , newNameFolder = "";
+        var nextNode = null;
+        if (this.props.table.level.position === 0){ //modifico el nombre de un paciente 
+            previousFolder = username;
+            nextNode = _nextNode(previousFolder,this.props.table.content);
+            toRename = username+oldFolderName;
+            newNameFolder = username+newFolderName;
+        } else {
+            previousFolder = username+"/";
+            var split = oldFolderName.split("/");
+            for (var i = 0; i < split.length-1; i++){ // me paro en la carpeta que lo contiene al viejo nombre
+                previousFolder += split[i] + "/";
+            }
+            previousFolder = previousFolder.substring(0,previousFolder.length-1);  // quito el ultimo /
+            nextNode = _nextNode(previousFolder,this.props.table.content);
+            toRename = username+"/"+oldFolderName;
+            newNameFolder = username+"/"+newFolderName;
         }
-        previousFolder = previousFolder.substring(0,previousFolder.length-1);  // quito el ultimo /
-        var nextNode = _nextNode(previousFolder,this.props.table.content);
-        var toRename = username+"/"+oldFolderName;
-        var newNameFolder = username+"/"+newFolderName;
         var found = false;
         var i = 0;
         while (!found && i < nextNode.SubFolders.length){
@@ -63,7 +73,8 @@ class DoctorRenameFolderForm extends React.Component {
     _submitForm(){
         if (this._isValid()){
             var obj = {}
-            var currentPath = _getPathAsString(this.props.table.level.path) +"/";
+            var currentPath = _getPathAsString(this.props.table.level.path,1) +"/";
+            debugger;
             var newName = currentPath + this.state.name;
             var oldName = currentPath + this.state.actualName;
             obj["newfolder"] = newName;
@@ -74,6 +85,7 @@ class DoctorRenameFolderForm extends React.Component {
                 this.props.callback();
             })
             .catch((response)=>{
+                debugger;
                 this.props.dispatch(addFlashMessage({
                     type:"error",
                     text:"network error - DoctorRenameFolderForm - _submitForm"
@@ -102,13 +114,13 @@ class DoctorRenameFolderForm extends React.Component {
             toReturn = false;
             _errors["name"] = "the name cannot be the same as the old one"
         }
-
-        if (toReturn && this.state.otherFiles[name] != null){
+        var files = _getFilesAsObject(this.props.table.level.files);
+        if (toReturn && files[name] != null){
             toReturn = false;
             _errors["name"] = "you already have a file with that name";
         }   
-        
-        if (toReturn && this.state.otherFolders[name] != null){
+        var folders = _getFoldersAsObject(this.props.table.level.folders);
+        if (toReturn && folders[name] != null){
             toReturn = false;
             _errors["name"] = "you already have a folder with that name";
         }   

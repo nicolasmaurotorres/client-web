@@ -106,7 +106,6 @@ class TableDoctor extends React.Component {
     }
 
     render(){
-
         var path = ["/",<label key = "Home" onClick = { this._handleClickPath } style={{cursor:"pointer"}}> Home </label>];
         this.props.table.level.path.forEach((item) => {
             if (item !== "/"){
