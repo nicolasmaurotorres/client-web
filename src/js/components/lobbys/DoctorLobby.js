@@ -6,13 +6,14 @@ import lodash from 'lodash'
 
 import { setTableState, setCurrentLevel } from '../../actions/tableActions'
 import { openModal } from '../../actions/modalActions'
-import { doctorGetPacients, doctorRemovePacient, doctorRemoveFile, doctorRemoveFolder } from '../../actions/doctorActions'
+import { doctorGetPacients, doctorRemovePacient, doctorRemoveFile, doctorRemoveFolder, doctorAddFile } from '../../actions/doctorActions'
 import { addFlashMessage } from '../../actions/flashMessages'
 import { _getPathAsArray, _getPathAsString, _nextNode, _getFoldersAsArray } from '../../utils/tableFunctions';
 import TableDoctor from '../common/TableDoctor'
 import DoctorRenameFileForm from '../forms/DoctorRenameFileForm'
 import DoctorRenameFolderForm from '../forms/DoctorRenameFolderForm'
-import DoctorAddPacientForm from '../forms/DoctorAddPacientForm';
+import DoctorAddFolderForm from '../forms/DoctorAddFolderForm';
+import DoctorAddFileForm from '../forms/DoctorAddFileForm';
 
 class DoctorLobby extends React.Component {
     constructor(props){
@@ -27,6 +28,8 @@ class DoctorLobby extends React.Component {
         this._onConfirmDeleteFolder = this._onConfirmDeleteFolder.bind(this);
         this._onConfirmDeleteFile = this._onConfirmDeleteFile.bind(this);
         this._onConfirmDeletePacient = this._onConfirmDeletePacient.bind(this);
+        this._onClickAddFile = this._onClickAddFile.bind(this);
+        this._onClickAddFolder = this._onClickAddFolder.bind(this);
     }
  
     componentWillMount(){
@@ -70,27 +73,6 @@ class DoctorLobby extends React.Component {
     }
 
     /* callbacks */
-    _callbackAddFolder(updateFolder,newFolder){
-        this.setState({showingModalAddFolder:false});
-        if (updateFolder){
-            var path = "";
-            var originalPath = "";
-            for (var i = 0 ;  i < this.state.path.length; i++){
-                path += this.state.path[i] + "/"
-            }
-            originalPath = path;
-            path = path.substring(0,path.length-1); // quito el ultimo "/"
-            var nextNode = this._nextNode(path,this.state.rawResponse);
-            var auxNode = {
-                Folder : originalPath + newFolder,
-                Files : [],
-                SubFolders : []
-            }
-            nextNode.SubFolders.push(auxNode);
-            this._updateTable(nextNode);
-        }
-    }
-
     _callbackAddFile(updateFolder,newFileName){
         this.setState({showingModalAddFile:false});
         if (updateFolder){
@@ -104,7 +86,23 @@ class DoctorLobby extends React.Component {
             this._updateTable(nextNode);
         }
     }
-    /*callbacks*/   
+    /* callbacks */
+
+    _onClickAddFile(){
+        this.props.dispatch(openModal({
+            id: uuid.v4(),
+            type: 'custom',
+            content: <DoctorAddFileForm />,
+        }));
+    } 
+    
+    _onClickAddFolder(){
+        this.props.dispatch(openModal({
+            id: uuid.v4(),
+            type: 'custom',
+            content: <DoctorAddFolderForm/>,
+        }));
+    } 
 
     _onConfirmDeleteFile(fileName){
         var obj = {}
@@ -315,7 +313,7 @@ class DoctorLobby extends React.Component {
             this.props.dispatch(openModal({
                 id: uuid.v4(),
                 type: 'custom',
-                content: <DoctorAddPacientForm/>,
+                content: <DoctorAddFolderForm/>,
             }));
         };
         const MenuPacient = () => (
@@ -327,15 +325,14 @@ class DoctorLobby extends React.Component {
         );
 
         const menu =  (this.props.table.level.position === 0) ? <MenuPacient/> : ( (this.state.isFolder) ? <MenuFolder/> : <MenuFile/> );
-        const addPacientButton = (this.props.table.level.position === 0) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddPacient  }> Add pacient </botton> </div> : null;
-        const addFolderButton = (!this.props.table.level.position === 0) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFolder }> Add Folder </botton>  </div> : null;
+        var nameButton = (this.props.table.level.position === 0) ? "Add pacient" : "Add Folder";
+        const addPacientButton = <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFolder  }> { nameButton }  </botton> </div>;
         const addFileButton = (!this.props.table.level.position === 0) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFile }> Add File </botton> </div>  : null;
         const idMenu = this.state.idContextText;
         
         return (
             <div className="jumbotron"> 
                 { addPacientButton }
-                { addFolderButton }
                 { addFileButton }
                 <ContextMenuProvider  id = { idMenu }>
                     <TableDoctor onMouseEnter = { this._onMouseEnterTableItem }/>

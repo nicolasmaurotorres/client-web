@@ -6,13 +6,6 @@ export function doctorGetPacients(){
     return axiosInstance.post("/doctor/get/files",obj);
 }
 
-export function doctorAddPacient(data){
-    return function action(dispatch){
-        data["token"] = localStorage.jwtToken;
-        return axiosInstance.post("/add/folder",data);
-     }
-}
-
 export function doctorRenamePacient(data){
     return function action(dispatch){
         data["token"] = localStorage.jwtToken;
@@ -26,10 +19,8 @@ export function doctorRemovePacient(data){
 }
 
 export function doctorAddFolder(data){
-    return function action(dispatch){
-        data["token"] = localStorage.jwtToken;
-        return axiosInstance.post("/add/folder",data);
-     }
+    data["token"] = localStorage.jwtToken;
+    return axiosInstance.post("/add/folder",data);
 }
 
 export function doctorAddFile(data){

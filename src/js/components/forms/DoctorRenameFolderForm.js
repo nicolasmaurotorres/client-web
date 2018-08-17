@@ -67,14 +67,13 @@ class DoctorRenameFolderForm extends React.Component {
             folders : _getFoldersAsArray(nextNode),
             path: this.props.table.level.path,
             position : this.props.table.level.position
-        }))
+        }));
     }
 
     _submitForm(){
         if (this._isValid()){
             var obj = {}
             var currentPath = _getPathAsString(this.props.table.level.path,1) +"/";
-            debugger;
             var newName = currentPath + this.state.name;
             var oldName = currentPath + this.state.actualName;
             obj["newfolder"] = newName;
@@ -85,7 +84,6 @@ class DoctorRenameFolderForm extends React.Component {
                 this.props.callback();
             })
             .catch((response)=>{
-                debugger;
                 this.props.dispatch(addFlashMessage({
                     type:"error",
                     text:"network error - DoctorRenameFolderForm - _submitForm"

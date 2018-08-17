@@ -1,7 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types'
-import TextFieldGroup from '../common/TextFieldGroup'
-import validator from 'validator'
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux'
+import validator from 'validator';
+import TextFieldGroup from '../common/TextFieldGroup';
+import { _getFilesAsObject, _getFoldersAsObject, _getPathAsString, _getFoldersAsArray } from '../../utils/tableFunctions';
+import { addFlashMessage } from '../../actions/flashMessages';
+import { doctorAddFolder } from '../../actions/doctorActions';
+import { _nextNode } from '../../utils/tableFunctions';
+import { setCurrentLevel } from '../../actions/tableActions';
 
 class DoctorAddFolderForm extends React.Component {
     constructor(props){
@@ -10,9 +16,6 @@ class DoctorAddFolderForm extends React.Component {
         this.state = {
             errors: {},
             name: "",
-            otherFiles : {},
-            otherFolders : {},
-            actualPath : ""
         }
 
         /* bindings */
@@ -20,25 +23,46 @@ class DoctorAddFolderForm extends React.Component {
         this._onChange = this._onChange.bind(this);
         this._isValid = this._isValid.bind(this);
         this._cancelForm = this._cancelForm.bind(this);
+        this._callbackAddFolder = this._callbackAddFolder.bind(this);
     }
 
-    componentWillMount(){
-        this.setState({ otherFiles : this.props.otherFiles, 
-                        otherFolders : this.props.otherFolders,
-                        actualPath : this.props.actualPath});
+    _callbackAddFolder(newFolder){
+        debugger;
+        var path = _getPathAsString(this.props.table.level.path);
+        var nextNode = _nextNode(path,this.props.table.content);
+        var auxNode = {
+            Folder : path+"/" + newFolder,
+            Files : [],
+            SubFolders : []
+        };
+        nextNode.SubFolders.push(auxNode);
+        this.props.dispatch(setCurrentLevel({
+            files : this.props.table.level.files,
+            folders : _getFoldersAsArray(nextNode),
+            path: this.props.table.level.path,
+            position : this.props.table.level.position
+        }));
     }
+    
 
     _submitForm(){
         if (this._isValid()){
-            var obj = {}
-            const { doctorAddFolder , callbackAddFolderOrCancel } = this.props;
-            obj["folder"] = this.state.actualPath + this.state.name;
+            const newFolder = this.state.name;
+            var obj = {
+                folder : (this.props.table.level.position === 0) ? newFolder : _getPathAsString(this.props.table.level.path,1) +"/"+ newFolder
+            };
+            debugger;
             doctorAddFolder(obj)
             .then((response)=>{
-                callbackAddFolderOrCancel(true,this.state.name);
+                this._callbackAddFolder(newFolder);
+                this.props.callback();
             })
             .catch((response)=>{
-                callbackAddFolderOrCancel(false);
+                debugger;
+                this.props.dispatch(addFlashMessage({
+                    type:"error",
+                    text:"network error - DoctorAddFolderForm - _submitForm"
+                }));
             });
         }
     }
@@ -53,22 +77,20 @@ class DoctorAddFolderForm extends React.Component {
             toReturn = false;
             _errors["name"] = "only can contains numbers and letters the name of the pacient";
         }
-        
         if (toReturn && validator.isEmpty(name)){
             toReturn = false;
             _errors["name"] = "the name cannot be empty";
         }   
-        
-        if (toReturn && this.state.otherFiles[name] != null){
+        var files =_getFilesAsObject(this.props.table.level.files);
+        if (toReturn && files[name] != null){
             toReturn = false;
             _errors["name"] = "you already have a file with that name";
         }  
-
-        if (toReturn && this.state.otherFolders[name] != null){
+        var folders = _getFoldersAsObject(this.props.table.level.folders);
+        if (toReturn && folders[name] != null){
             toReturn = false;
             _errors["name"] = "you already have a folder with that name";
         }                                        
-        
         this.setState( { errors : _errors });
         return toReturn;
     }
@@ -82,7 +104,7 @@ class DoctorAddFolderForm extends React.Component {
     }
 
     _cancelForm(){
-        this.props.callbackAddFolderOrCancel();
+        this.props.callback();
     }
     
     render(){
@@ -107,11 +129,21 @@ class DoctorAddFolderForm extends React.Component {
 }
 
 DoctorAddFolderForm.propTypes = {
-    callbackAddFolderOrCancel : PropTypes.func.isRequired,
-    doctorAddFolder : PropTypes.func.isRequired,
-    otherFiles : PropTypes.object.isRequired,
-    otherFolders : PropTypes.object.isRequired,
-    actualPath : PropTypes.string.isRequired,
+    callback : PropTypes.func.isRequired,
 }
 
-export default DoctorAddFolderForm;
+function mapStateToProps(state) {
+    return {
+        auth : state.auth,
+        table : state.table
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+      dispatch,
+    }
+};
+
+
+export default connect(mapStateToProps,mapDispatchToProps)(DoctorAddFolderForm);
