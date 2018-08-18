@@ -88,13 +88,14 @@ class DoctorLobby extends React.Component {
     } 
 
     _onConfirmDeleteFile(fileName){
-        var obj = {}
-        var path = _getPathAsString(this.props.table.level.path);
-        obj["file"] = path+"/"+fileName;
+        debugger;
+        var obj = {
+            file : _getPathAsString(this.props.table.level.path,1) + "/" + fileName
+        };
         doctorRemoveFile(obj)
-        .then((response)=>{                         
-            var content = this.props.table.content;
-            var node = _nextNode(currentPath,content);
+        .then((response)=>{        
+            debugger;                 
+            var node = _nextNode(_getPathAsString(this.props.table.level.path),this.props.table.content);
             node.Files = lodash.pull(node.Files,fileName); // quito el fileName
             this.props.dispatch(setCurrentLevel({
                 path : this.props.table.level.path,
@@ -108,6 +109,7 @@ class DoctorLobby extends React.Component {
             }));
         })
         .catch((response)=>{
+            debugger;
             this.props.dispatch(addFlashMessage({
                 type:"error",
                 text:"can't delete the file "+fileName
@@ -160,6 +162,7 @@ class DoctorLobby extends React.Component {
             console.log("on click upgrade file");
         };
         const onClickRenameFile = ({event, ref,data,dataFromProvider}) => {
+            debugger;
             var fileToRename = event.target.parentElement.id.split("-");
             var fileToRename = fileToRename[1]+"."+fileToRename[2]; // le agrego el punto al archivo, aunque solo muestre el nombre
             var fileSplited = this.state.fileToRename.split(".");

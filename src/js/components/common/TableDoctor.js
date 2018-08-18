@@ -121,11 +121,16 @@ class TableDoctor extends React.Component {
         var handleOnClickTableItem = this._handleOnClickTableItem;
 
         this.props.table.level.files.forEach(function(elem){
+            debugger;
             var parts = elem.split(".");
             var extention = parts[parts.length-1]; // me quedo con la extencion
-            var row = ( <tr className = "table-secondary" key = { elem } id = { "file-"+elem+"-"+extention }>
-                            <td onClick = { handleOnClickTableItem } scope="row" name={ elem } onMouseEnter = { onMouseEnter }><IconFont className = "fa fa-file-text-o"/> </td>
-                            <td onClick = { handleOnClickTableItem } onMouseEnter = { onMouseEnter }>{ elem }</td>
+            var nameFile = "";
+            for (var i = 0; i < parts.length-1; i++){
+                nameFile += parts[i];
+            }
+            var row = ( <tr className = "table-secondary" key = { elem } id = { "file-"+nameFile+"-"+extention }>
+                            <td onClick = { handleOnClickTableItem } scope="row" name={ nameFile } onMouseEnter = { onMouseEnter }><IconFont className = "fa fa-file-text-o"/> </td>
+                            <td onClick = { handleOnClickTableItem } onMouseEnter = { onMouseEnter }>{ nameFile }</td>
                         </tr>);
             files.push(row);
         });
