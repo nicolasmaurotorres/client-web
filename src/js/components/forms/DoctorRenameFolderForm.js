@@ -32,7 +32,6 @@ class DoctorRenameFolderForm extends React.Component {
     }
 
     _updateRenamedFolder(newFolderName,oldFolderName){
-        debugger;
         const { username } = this.props.auth.user;
         var previousFolder = "", toRename="" , newNameFolder = "";
         var nextNode = null;

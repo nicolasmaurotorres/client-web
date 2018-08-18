@@ -120,7 +120,6 @@ class DoctorLobby extends React.Component {
         var obj = {}
         var path = _getPathAsString();
         obj["folder"] = path+folderName;
-        debugger;
         doctorRemoveFolder(obj)
         .then((response)=>{ 
             var pathAsArray = _getPathAsArray(this.props.table.level.path);

@@ -87,7 +87,6 @@ class PlademaLobby extends React.Component {
             link.click();
         })
         .catch((response)=>{
-            debugger;
             console.log("se rompio la cafetera ameo");
         });
     }

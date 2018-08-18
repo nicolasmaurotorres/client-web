@@ -27,7 +27,6 @@ class DoctorAddFolderForm extends React.Component {
     }
 
     _callbackAddFolder(newFolder){
-        debugger;
         var path = _getPathAsString(this.props.table.level.path);
         var nextNode = _nextNode(path,this.props.table.content);
         var auxNode = {
@@ -50,14 +49,12 @@ class DoctorAddFolderForm extends React.Component {
             var obj = {
                 folder : (this.props.table.level.position === 0) ? newFolder : _getPathAsString(this.props.table.level.path,1) +"/"+ newFolder
             };
-            debugger;
             doctorAddFolder(obj)
             .then((response)=>{
                 this._callbackAddFolder(newFolder);
                 this.props.callback();
             })
             .catch((response)=>{
-                debugger;
                 this.props.dispatch(addFlashMessage({
                     type:"error",
                     text:"network error - DoctorAddFolderForm - _submitForm"
