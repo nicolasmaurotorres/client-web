@@ -1,6 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types'
-import classnames from 'classnames'
+import PropTypes from 'prop-types';
+import classnames from 'classnames';
+import { setCurrentLevel } from '../../actions/tableActions';
+import { _nextNode, _getFilesAsObject, _getFoldersAsObject, _getPathAsString } from '../../utils/tableFunctions'
+import { addFlashMessage } from '../../actions/flashMessages';
+import { connect } from 'react-redux';
+import { doctorAddFile } from '../../actions/doctorActions'
 
 class DoctorAddFileForm extends React.Component {
     constructor(props){
@@ -9,9 +14,7 @@ class DoctorAddFileForm extends React.Component {
         this.state = {
             errors: {},
             file: null,
-            otherFolders : [],
-            otherFiles : [],
-            actualPath:""
+            name : ""
         }
 
         /* bindings */
@@ -19,29 +22,37 @@ class DoctorAddFileForm extends React.Component {
         this._handleFileSelect = this._handleFileSelect.bind(this);
         this._isValid = this._isValid.bind(this);
         this._cancelForm = this._cancelForm.bind(this);
+        this._callbackAddFile = this._callbackAddFile.bind(this);
     }
-
-    componentWillMount(){
-        this.setState({otherFiles : this.props.otherFiles,
-                      otherFolders : this.props.otherFolders,
-                      actualPath : this.props.actualPath});
+  
+    _callbackAddFile(newFileName){
+        var path = _getPathAsString(this.props.table.level.path);
+        var nextNode = _nextNode(path,this.props.table.content);
+        nextNode.Files.push(newFileName);
+        this.props.dispatch(setCurrentLevel({
+            files : nextNode.Files,
+            folders : this.props.table.level.folders,
+            path: this.props.table.level.path,
+            position : this.props.table.level.position
+        }));
     }
 
     _submitForm(){
         if (this._isValid()){
-            var obj = {}
-            const { doctorAddFile, callbackAddOrCancel } = this.props;
-            const { file, actualPath }  = this.state;
             var formData = new FormData();
-            var name = file.name;
-            formData.append("file", file);
-            formData.append("folder", actualPath)
+            const nameFile = this.state.file.name;
+            formData.append("file", this.state.file);
+            formData.append("folder", _getPathAsString(this.props.table.level.path,1));
             doctorAddFile(formData)
             .then((response)=>{
-                callbackAddOrCancel(true,name);
+                this.props.callback();
+                this._callbackAddFile(nameFile);
             })
             .catch((response)=>{
-                callbackAddOrCancel(false);
+                this.props.dispatch(addFlashMessage({
+                    type:"error",
+                    text:"cant add file form error"
+                }));
             });
         }
     }
@@ -49,7 +60,6 @@ class DoctorAddFileForm extends React.Component {
     _isValid(){
         var toReturn = true;
         var _errors = {};
-
         if (this.state.file === null){
             toReturn = false;
             _errors["file"] = "you have to select a file to send";   
@@ -63,17 +73,16 @@ class DoctorAddFileForm extends React.Component {
             toReturn = false;
             _errors["file"] = "only files with vtk extention are allowed";
         }*/
-        
-        if (toReturn && this.state.otherFiles[file] != null){
+        var otherFiles = _getFilesAsObject(this.props.table.level.files);
+        if (toReturn && otherFiles[file] != null){
             toReturn = false;
             _errors["file"] = "you already have a file with that name";
         }
-
-        if (toReturn && this.state.otherFolders[file] != null){
+        var otherFolders = _getFoldersAsObject(this.props.table.level.folders);
+        if (toReturn && otherFolders[file] != null){
             toReturn = false;
             _errors["file"] = "you already have a folder with that name";
         }
-
         this.setState( { errors : _errors });
         return toReturn;
     }
@@ -86,7 +95,7 @@ class DoctorAddFileForm extends React.Component {
     }
 
     _cancelForm(){
-        this.props.callbackAddOrCancel(false);
+        this.props.callback();
     }
       
     render(){
@@ -109,11 +118,18 @@ class DoctorAddFileForm extends React.Component {
 }
 
 DoctorAddFileForm.propTypes = {
-    callbackAddOrCancel : PropTypes.func.isRequired,
-    doctorAddFile : PropTypes.func.isRequired,
-    otherFiles : PropTypes.object.isRequired,
-    otherFolders : PropTypes.object.isRequired,
-    actualPath : PropTypes.string.isRequired,
+    callback : PropTypes.func.isRequired,
 }    
+function mapStateToProps(state) {
+    return {
+        auth : state.auth,
+        table : state.table
+    }
+}
 
-export default DoctorAddFileForm;
+function mapDispatchToProps(dispatch) {
+    return {
+      dispatch,
+    }
+};
+export default connect(mapStateToProps,mapDispatchToProps)(DoctorAddFileForm);

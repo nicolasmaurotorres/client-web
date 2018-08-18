@@ -73,7 +73,6 @@ class TableDoctor extends React.Component {
     _handleClickPath(e){
         var target = e.target.innerText; // un item del path clickeado, vuelvo a esa carpeta
         var index = this.props.table.level.path.indexOf(target);
-        debugger;
         if (index === 0 || index === -1){ // hizo click en Home o en el email
             //click en el principio de todo, vuelvo al estado inicial.
             this.props.dispatch(setCurrentLevel({

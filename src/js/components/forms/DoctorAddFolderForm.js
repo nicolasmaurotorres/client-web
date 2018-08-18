@@ -42,8 +42,7 @@ class DoctorAddFolderForm extends React.Component {
             path: this.props.table.level.path,
             position : this.props.table.level.position
         }));
-    }
-    
+    }    
 
     _submitForm(){
         if (this._isValid()){

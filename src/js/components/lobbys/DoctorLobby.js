@@ -72,22 +72,6 @@ class DoctorLobby extends React.Component {
         }
     }
 
-    /* callbacks */
-    _callbackAddFile(updateFolder,newFileName){
-        this.setState({showingModalAddFile:false});
-        if (updateFolder){
-            var path = "";
-            for (var i = 0 ;  i < this.state.path.length; i++){
-                path += this.state.path[i] + "/"
-            }
-            path = path.substring(0,path.length-1); // quito el ultimo "/"
-            var nextNode = this._nextNode(path,this.state.rawResponse);
-            nextNode.Files.push(newFileName);
-            this._updateTable(nextNode);
-        }
-    }
-    /* callbacks */
-
     _onClickAddFile(){
         this.props.dispatch(openModal({
             id: uuid.v4(),
@@ -327,7 +311,7 @@ class DoctorLobby extends React.Component {
         const menu =  (this.props.table.level.position === 0) ? <MenuPacient/> : ( (this.state.isFolder) ? <MenuFolder/> : <MenuFile/> );
         var nameButton = (this.props.table.level.position === 0) ? "Add pacient" : "Add Folder";
         const addPacientButton = <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFolder  }> { nameButton }  </botton> </div>;
-        const addFileButton = (!this.props.table.level.position === 0) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFile }> Add File </botton> </div>  : null;
+        const addFileButton = (this.props.table.level.position > 0) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFile }> Add File </botton> </div>  : null;
         const idMenu = this.state.idContextText;
         
         return (

@@ -48,12 +48,10 @@ class AdminAddUserForm extends React.Component {
 
 
     _confirmAddUser(newUser){
-        debugger;
         var _content = this.props.table.content;
         if (lodash.isEmpty(_content)){
             _content[0] = newUser;    
         } else {
-            debugger;
             var aux = 0;
             var max = -99999;
             for(var prop in _content) {
@@ -90,13 +88,11 @@ class AdminAddUserForm extends React.Component {
                 this._cancelForm();
             })
             .catch((response)=>{
-                debugger;
                 if (typeof response.response === 'undefined'){
                     this.setState({serverMessage : "network error", serverStatus:"BAD_STATUS"})
                 } else {
                     this.setState({serverMessage : response.data.message, serverStatus:"BAD_STATUS"})
                 }
-                debugger;
                 this.props.dispatch(addFlashMessage({
                     type : "error",
                     text : "addUserForm - error server or something"
@@ -110,7 +106,6 @@ class AdminAddUserForm extends React.Component {
         var email = this.state.email;
         var password = this.state.password;
         var _errors = {};
-        debugger;
         if (!validator.isEmail(email)){
             toReturn = false;
             _errors["email"] = "you have to enter a valid email";
