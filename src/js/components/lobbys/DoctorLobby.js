@@ -27,7 +27,6 @@ class DoctorLobby extends React.Component {
         this._onMouseEnterTableItem = this._onMouseEnterTableItem.bind(this);
         this._onConfirmDeleteFolder = this._onConfirmDeleteFolder.bind(this);
         this._onConfirmDeleteFile = this._onConfirmDeleteFile.bind(this);
-        this._onConfirmDeletePacient = this._onConfirmDeletePacient.bind(this);
         this._onClickAddFile = this._onClickAddFile.bind(this);
         this._onClickAddFolder = this._onClickAddFolder.bind(this);
     }
@@ -63,7 +62,7 @@ class DoctorLobby extends React.Component {
     _onMouseEnterTableItem(e){
         //cada vez que paso el mouse por encima de algo, cambio los menues que se muestran
         var parent = e.target.parentElement;
-        if (!this.props.table.level.position === 0){
+        if (!(this.props.table.level.position === 0)){
             if (parent.id.includes("folder")){
                 this.setState({isFolder: true, idContextText:"rightClickContextMenuFolder"});
             } else {
@@ -117,17 +116,20 @@ class DoctorLobby extends React.Component {
     }
 
     _onConfirmDeleteFolder(folderName){
-        var obj = {}
-        var path = _getPathAsString();
-        obj["folder"] = path+folderName;
+        const baseLevel = this.props.table.level.position === 0; 
+        var obj = {
+            folder : (baseLevel) ? folderName : _getPathAsString(this.props.table.level.path,1) + "/" + folderName
+        }
         doctorRemoveFolder(obj)
-        .then((response)=>{ 
-            var pathAsArray = _getPathAsArray(this.props.table.level.path);
-            pathAsArray = pathAsArray.slice(0,pathAsArray.length-1); // me paro una carpeta antes
-            var path = _getPathAsString(pathAsArray);
+        .then((response)=>{
+            var path = _getPathAsString(this.props.table.level.path);
             var currentNode = _nextNode(path,this.props.table.content);
-            var i = 0;
-            currentNode.SubFolders = lodash.pull(currentNode.SubFolders,folderName);
+            for (var prop in currentNode.SubFolders){
+                if (currentNode.SubFolders[prop].Folder === path+"/"+folderName){
+                    delete currentNode.SubFolders[prop];
+                    break;
+                }
+            }            
             this.props.dispatch(setCurrentLevel({
                 path : this.props.table.level.path,
                 files :  this.props.table.level.files,
@@ -144,33 +146,6 @@ class DoctorLobby extends React.Component {
                 type:"error",
                 text:"network error or server error _onConfirmDeleteFolder"
             }));
-        });
-    }
-
-    _onConfirmDeletePacient(folderName){
-        var obj = {}
-        obj["folder"] = folderName;
-        doctorRemovePacient(obj)
-        .then((response)=>{// actualizo los usuarios
-            var pathAsArray = _getPathAsArray(this.props.table.level.path);
-            pathAsArray = pathAsArray.slice(0,pathAsArray.length-1); // me paro una carpeta antes
-            var path = _getPathAsString(pathAsArray);
-            var currentNode = _nextNode(path,this.props.table.content);
-            var i = 0;
-            currentNode.SubFolders = lodash.pull(currentNode.SubFolders,folderName);
-            this.props.dispatch(openModal({
-                path : this.props.table.level.path,
-                files : this.props.table.level.files,
-                folders : _getFoldersAsArray(currentNode),
-                position :  this.props.table.level.position
-            }));
-            this.props.dispatch(addFlashMessage({
-                type:"success",
-                text:"pacient "+folderName+" removed"
-            }));
-        })
-        .catch((response)=>{
-
         });
     }
  
@@ -288,7 +263,7 @@ class DoctorLobby extends React.Component {
                     type: 'confirmation',
                     text: 'Are you sure to delete this pacient?',
                     onClose: null,
-                    onConfirm: () => this._onConfirmDeletePacient(folderName),
+                    onConfirm: () => this._onConfirmDeleteFolder(folderName),
                 }));
             }
         };
