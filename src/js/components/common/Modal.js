@@ -35,7 +35,7 @@ class Modal extends React.Component {
               <div className="text">{ text }</div>
               <div className="buttons">
                   <button className="modal-button" onClick={() => this.onConfirm()}>Confirm</button>
-                  <button className="modal-button" onClick={() => this.onClose()}>Close</button>
+                  <button className="close-notification" onClick={() => this.onClose()}>Close</button>
               </div>
               </div>
           </div>
@@ -47,7 +47,7 @@ class Modal extends React.Component {
             <div className="modal-wrapper" style={{zIndex: (zIndex+1)*10}}>
               <div className="modal">
               { React.cloneElement(content,{ callback : this.onClose }) }
-                <button className="close" onClick={() => this.onClose()}>&times;</button>
+                <button className="close-notification" onClick={() => this.onClose()}>&times;</button>
               </div>
             </div>
           );
