@@ -61,6 +61,7 @@ class DoctorLobby extends React.Component {
   
     _onMouseEnterTableItem(e){
         //cada vez que paso el mouse por encima de algo, cambio los menues que se muestran
+        debugger;
         var parent = e.target.parentElement;
         if (!(this.props.table.level.position === 0)){
             if (parent.id.includes("folder")){
@@ -68,6 +69,8 @@ class DoctorLobby extends React.Component {
             } else {
                 this.setState({isFolder: false, idContextText:"rightClickContextMenuFile"});
             }
+        } else {
+            this.setState({isFolder: true, idContextText:"rightClickContextMenuPacient"});
         }
     }
 
@@ -198,10 +201,10 @@ class DoctorLobby extends React.Component {
         const MenuFile = () => (
             <ContextMenu  id='rightClickContextMenuFile'>
                 <Item onClick = { onClickRenderFile }><IconFont className = "fa fa-play"/> Render </Item>
-                <Item onClick = { onClickUpgradeFile }><IconFont className = "fa fa-arrow-circle-o-up"/> Upgrade </Item>
+                {/*<Item onClick = { onClickUpgradeFile }><IconFont className = "fa fa-arrow-circle-o-up"/> Upgrade </Item>*/}
                 <Item onClick = { onClickRenameFile }><IconFont className = "fa fa-edit"/> Rename </Item>
-                <Item onClick = { onClickCopyFile }><IconFont className = "fa fa-copy"/> Copy </Item>
-                <Item onClick = { onClickPasteFile }><IconFont className = "fa fa-paste"/> Paste </Item>
+                {/*<Item onClick = { onClickCopyFile }><IconFont className = "fa fa-copy"/> Copy </Item>
+                <Item onClick = { onClickPasteFile }><IconFont className = "fa fa-paste"/> Paste </Item>*/}
                 <Item onClick = { onClickDeleteFile }><IconFont className = "fa fa-trash"/> Delete </Item>
             </ContextMenu>
         );
@@ -242,8 +245,8 @@ class DoctorLobby extends React.Component {
         const MenuFolder = () => (
             <ContextMenu  id='rightClickContextMenuFolder'>
                 <Item onClick = { onClickRenameFolder }><IconFont className = "fa fa-edit"/> Rename </Item>
-                <Item onClick = { onClickCopyFolder }><IconFont className = "fa fa-copy"/> Copy </Item>
-                <Item onClick = { onClickPasteFolder }><IconFont className = "fa fa-paste"/> Paste </Item>
+                {/*<Item onClick = { onClickCopyFolder }><IconFont className = "fa fa-copy"/> Copy </Item>
+                <Item onClick = { onClickPasteFolder }><IconFont className = "fa fa-paste"/> Paste </Item>*/}
                 <Item onClick = { onClickDeleteFolder }><IconFont className = "fa fa-trash"/> Delete </Item>
             </ContextMenu>
         );
