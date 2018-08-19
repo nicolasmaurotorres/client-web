@@ -121,7 +121,6 @@ class TableDoctor extends React.Component {
         var handleOnClickTableItem = this._handleOnClickTableItem;
 
         this.props.table.level.files.forEach(function(elem){
-            debugger;
             var parts = elem.split(".");
             var extention = parts[parts.length-1]; // me quedo con la extencion
             var nameFile = "";

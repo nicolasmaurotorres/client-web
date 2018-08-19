@@ -88,13 +88,11 @@ class DoctorLobby extends React.Component {
     } 
 
     _onConfirmDeleteFile(fileName){
-        debugger;
         var obj = {
             file : _getPathAsString(this.props.table.level.path,1) + "/" + fileName
         };
         doctorRemoveFile(obj)
         .then((response)=>{        
-            debugger;                 
             var node = _nextNode(_getPathAsString(this.props.table.level.path),this.props.table.content);
             node.Files = lodash.pull(node.Files,fileName); // quito el fileName
             this.props.dispatch(setCurrentLevel({
@@ -109,7 +107,6 @@ class DoctorLobby extends React.Component {
             }));
         })
         .catch((response)=>{
-            debugger;
             this.props.dispatch(addFlashMessage({
                 type:"error",
                 text:"can't delete the file "+fileName
@@ -162,12 +159,9 @@ class DoctorLobby extends React.Component {
             console.log("on click upgrade file");
         };
         const onClickRenameFile = ({event, ref,data,dataFromProvider}) => {
-            debugger;
-            var fileToRename = event.target.parentElement.id.split("-");
-            var fileToRename = fileToRename[1]+"."+fileToRename[2]; // le agrego el punto al archivo, aunque solo muestre el nombre
-            var fileSplited = this.state.fileToRename.split(".");
-            var fileToRename = fileSplited[0]; // solo el nombre del archivo
-            var fileExt = fileSplited[1]; // extencion del archivo, el usuario final no puede cambiar la extencion del archivo, solo el nombre
+            var parts = event.target.parentElement.id.split("-");
+            var fileToRename = parts[1]; // le agrego el punto al archivo, aunque solo muestre el nombre
+            var fileExt = parts[2]; // extencion del archivo, el usuario final no puede cambiar la extencion del archivo, solo el nombre
             this.props.dispatch(openModal({
                 id: uuid.v4(),
                 type: 'custom',

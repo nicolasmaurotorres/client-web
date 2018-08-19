@@ -5,7 +5,7 @@ import validator from 'validator'
 import { connect } from 'react-redux';
 import { addFlashMessage } from '../../actions/flashMessages'
 import { doctorRenameFile } from '../../actions/doctorActions'
-import { _getPathAsString, _nextNode } from '../../utils/tableFunctions'
+import { _getPathAsString, _nextNode, _getFoldersAsObject } from '../../utils/tableFunctions'
 import { setCurrentLevel } from '../../actions/tableActions';
 
 class DoctorRenameFileForm extends React.Component {
@@ -26,20 +26,23 @@ class DoctorRenameFileForm extends React.Component {
         this._updateTable = this._updateTable.bind(this);
     }
 
+    componentWillMount(){
+        this.setState({actualName:this.props.fileToRename, name:this.props.fileToRename});
+    }
+
     _updateTable(newFileName,oldFileName){
-        const { username } = this.props.auth.user;
-        var actualPath = username + "/" + _getPathAsString(this.props.table.level.path);
+        debugger;
+        var actualPath = _getPathAsString(this.props.table.level.path);
         var node = _nextNode(actualPath,this.props.table.content);
         var found = false;
-        var arrFiles = node.Files;
-        for (var i = 0; i < arrFiles.length && !found; i++){
-            if (arrFiles.Files[i] === oldFileName){
-                arrFiles.Files[i] = newFileName;
+        for (var i = 0; i < node.Files.length && !found; i++){
+            if (node.Files[i] === oldFileName){
+                node.Files[i] = newFileName;
                 found = true;
             }
         }
         this.props.dispatch(setCurrentLevel({
-            files : arrFiles,
+            files : node.Files,
             folders : this.props.table.level.folders,
             path: this.props.table.level.path,
             position : this.props.table.level.position
@@ -54,13 +57,16 @@ class DoctorRenameFileForm extends React.Component {
             var oldName = this.state.actualName + "."+ fileExtension;
             obj["filenew"] =  newName;// le agrego la extension al renombrarlos
             obj["fileold"] = oldName;
-            obj["folder"] = this.state.actualPath;
+            obj["folder"] = _getPathAsString(this.props.table.level.path,1);
+            debugger;
             doctorRenameFile(obj)
             .then((response)=>{
+                debugger;
                 this._updateTable(newName,oldName);
                 this.props.callback();
             })
             .catch((response)=>{
+                debugger;
                 this.props.dispatch(addFlashMessage({
                     type:"error",
                     text:"network error - DoctorRenameFileForm - _submitForm"
@@ -87,19 +93,26 @@ class DoctorRenameFileForm extends React.Component {
         
         if (toReturn && this.state.actualName === name){
             toReturn = false;
-            _errors["name"] = "the name cannot be the same as the old one"
+            _errors["name"] = "the new name cannot be the same as the old one"
         }
-
-        if (toReturn && this.state.otherFiles[name] != null){
+        var otherFiles = {};
+        for (var i = 0; i < this.props.table.level.files.length ; i++){
+            var parts = this.props.table.level.files[i].split(".");
+            var otherFileName = "";
+            for (var i = 0; i < parts.length - 1; i++){
+                otherFileName += parts[i];
+            }
+            otherFiles[otherFileName] = i;
+        }
+        if (toReturn && otherFiles[name] != null){
             toReturn = false;
             _errors["name"] = "you already have a file with that name";
         }   
-        
-        if (toReturn && this.state.otherFolders[name] != null){
+        var otherFolders = _getFoldersAsObject(this.props.table.level.folders);
+        if (toReturn && otherFolders[name] != null){
             toReturn = false;
             _errors["name"] = "you already have a folder with that name";
         }   
-
         this.setState( { errors : _errors });
         return toReturn;
     }

@@ -53,13 +53,9 @@ export function _getFilesAsArray(nodo) {
     return auxFiles;
 }
 
-export function _getPathAsString(path,startFrom){
+export function _getPathAsString(path,startFrom = 0){
     var toReturn = "";
-    var index = 0;
-    if (typeof startFrom !== 'undefined'){
-        index = startFrom;
-    }
-    for(; index < path.length; index++){
+    for( var index = startFrom; index < path.length; index++){
         toReturn = toReturn + path[index] + "/";
     }
     toReturn = toReturn.substring(0,toReturn.length-1); // quito el ultimo /
