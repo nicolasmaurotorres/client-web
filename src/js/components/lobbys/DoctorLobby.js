@@ -61,7 +61,6 @@ class DoctorLobby extends React.Component {
   
     _onMouseEnterTableItem(e){
         //cada vez que paso el mouse por encima de algo, cambio los menues que se muestran
-        debugger;
         var parent = e.target.parentElement;
         if (!(this.props.table.level.position === 0)){
             if (parent.id.includes("folder")){

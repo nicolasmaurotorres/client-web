@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { IconFont } from 'react-contexify'
 
 import { setCurrentLevel } from '../../actions/tableActions'
-import { _nextNode, _getFilesAsArray, _getPathAsArray, _getFoldersAsArray } from '../../utils/tableFunctions';
+import { _nextNode, _getFilesAsArray, _getPathAsArray, _getFoldersAsArray, _getPathAsString } from '../../utils/tableFunctions';
 
 
 class TableDoctor extends React.Component {
@@ -25,48 +25,19 @@ class TableDoctor extends React.Component {
             nameTarget = nameTarget + idArray[i] + "-";
         }
         nameTarget = nameTarget.substr(0,nameTarget.length - 1); // quito el ultimo "-"
-        // tengo que armar el path
-        var path = "";
-        for (var i = 0; i < this.props.table.level.path.length; i++){//arranco en 1 para no poner el primer /
-            path = path + this.props.table.level.path[i] + "/";
-        }
-        path = path + nameTarget;
+        var path = _getPathAsString(this.props.table.level.path) +"/"+ nameTarget;
         switch (idArray[0]){
             case "folder":{
                 // estoy en el nivel inicial, cambio a una subcarpeta
-                var nextNode = null;
-                var found = false;
-                for (var i = 0; i < this.props.table.content.SubFolders.length && !found; i++) {
-                    var nextNode = _nextNode(path,this.props.table.content.SubFolders[i]); // busco la carpeta para abrirla
-                    if (nextNode !== null){
-                        found=true;
-                    }
-                }
-                if (nextNode === null){
-                    // significa que hizo click en Home del path, tengo que cargarlo de 0
-                    var auxFolders = [];
-                    this.props.table.content.forEach(function(elem){
-                        auxFolders.push(elem.Folder);
-                    });
-                    this.props.dispatch(setCurrentLevel({
-                        path : [],
-                        files : [],
-                        folders : auxFolders,
-                        position : 0
-                    }));
-                } else {
-                    this.props.dispatch(setCurrentLevel({
-                        path : _getPathAsArray(nextNode),
-                        files : _getFilesAsArray(nextNode),
-                        folders : _getFoldersAsArray(nextNode),
-                        position : this.props.table.level.position+1
-                    }));
-                }
+                var nextNode = _nextNode(path,this.props.table.content); // busco la carpeta para abrirla
+                this.props.dispatch(setCurrentLevel({
+                    path : _getPathAsArray(nextNode),
+                    files : _getFilesAsArray(nextNode),
+                    folders : _getFoldersAsArray(nextNode),
+                    position : this.props.table.level.position + 1
+                }));
                 break;
             }
-            case "file":
-                console.log("en teoria no tendria que haber ningun archivo sin paciente!");
-                break;
         }
     }
     
