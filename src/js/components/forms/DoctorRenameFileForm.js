@@ -31,7 +31,6 @@ class DoctorRenameFileForm extends React.Component {
     }
 
     _updateTable(newFileName,oldFileName){
-        debugger;
         var actualPath = _getPathAsString(this.props.table.level.path);
         var node = _nextNode(actualPath,this.props.table.content);
         var found = false;
@@ -58,15 +57,12 @@ class DoctorRenameFileForm extends React.Component {
             obj["filenew"] =  newName;// le agrego la extension al renombrarlos
             obj["fileold"] = oldName;
             obj["folder"] = _getPathAsString(this.props.table.level.path,1);
-            debugger;
             doctorRenameFile(obj)
             .then((response)=>{
-                debugger;
                 this._updateTable(newName,oldName);
                 this.props.callback();
             })
             .catch((response)=>{
-                debugger;
                 this.props.dispatch(addFlashMessage({
                     type:"error",
                     text:"network error - DoctorRenameFileForm - _submitForm"
@@ -80,6 +76,7 @@ class DoctorRenameFileForm extends React.Component {
         var name = this.state.name;
         name = name.trim();
         var _errors = {};
+        debugger;
         var res = name.match(/^[a-zA-Z0-9 _]+$/i); // solo letras y numeros 
         if (res === null){
             toReturn = false;
@@ -99,8 +96,8 @@ class DoctorRenameFileForm extends React.Component {
         for (var i = 0; i < this.props.table.level.files.length ; i++){
             var parts = this.props.table.level.files[i].split(".");
             var otherFileName = "";
-            for (var i = 0; i < parts.length - 1; i++){
-                otherFileName += parts[i];
+            for (var j = 0; j < parts.length - 1; j++){
+                otherFileName += parts[j];
             }
             otherFiles[otherFileName] = i;
         }
