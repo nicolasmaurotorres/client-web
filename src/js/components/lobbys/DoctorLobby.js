@@ -3,6 +3,7 @@ import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify
 import { connect } from 'react-redux'
 import uuid from 'uuid'
 import lodash from 'lodash' 
+import PropTypes from 'prop-types'
 
 import { setTableState, setCurrentLevel } from '../../actions/tableActions'
 import { openModal } from '../../actions/modalActions'
@@ -154,7 +155,17 @@ class DoctorLobby extends React.Component {
         // context menu del archivo adentro de un paciente
         const onClickRenderFile = ({event, ref,data,dataFromProvider}) => {
             //TODO: hacer renderizarlo
-            console.log("on click render file");
+            //this.context.router.history.push("/doctor/render");
+            var parts = event.target.parentElement.id.split("-");
+            var fileName = "";
+            for (var i = 1; i < parts.length-1 ; i++){
+                fileName += parts[i];
+            }
+            fileName = _getPathAsString(this.props.table.level.path)+"/"+fileName+"."+parts[parts.length-1]; // agrego la extencion y el path al archivo a renderizar
+            this.context.router.history.push({
+                pathname: '/doctor/render',
+                state: { file: fileName  }
+              });
         };
         const onClickUpgradeFile = ({event, ref,data,dataFromProvider}) => {
             //TODO: avisar que se subio el archivo
@@ -312,5 +323,9 @@ function mapDispatchToProps(dispatch) {
       dispatch,
     }
 };
+
+DoctorLobby.contextTypes = {
+    router : PropTypes.object.isRequired
+}
 
 export default connect(mapStateToProps,mapDispatchToProps)(DoctorLobby);

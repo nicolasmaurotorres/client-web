@@ -12,7 +12,7 @@ import FlashMessagesList from './common/FlashMessagesList'
 import { authenticateDoctor, authenticatePladema, authenticateAdmin, loginControl }   from '../utils/authentications'
 import AdminViewUsersForm from '../components/forms/AdminViewUsersForm'
 import AdminAddUserForm from '../components/forms/AdminAddUserForm'
-import DoctorRemoteRenderPage from '../../backups/DoctorRemoteRenderPage'
+import DoctorRemoteRenderPage from './pages/DoctorRemoteRenderPage'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import { ModalContainer }  from './common/Modal';
 

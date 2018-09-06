@@ -76,7 +76,6 @@ class DoctorRenameFileForm extends React.Component {
         var name = this.state.name;
         name = name.trim();
         var _errors = {};
-        debugger;
         var res = name.match(/^[a-zA-Z0-9 _]+$/i); // solo letras y numeros 
         if (res === null){
             toReturn = false;

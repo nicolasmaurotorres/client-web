@@ -1,11 +1,11 @@
 module.exports = [
     {
-        test: /\.svg$/,
-        loader: 'svg-sprite-loader',
-        /*options: {   **** this option is deprecated from this loader **** 
-            runtimeCompat = true 
-        },*/
-        exclude: /fonts/,        
+      test: /\.svg$/,
+      loader: 'svg-sprite-loader',
+      options: {  
+        runtimeCompat : true 
+      },
+      exclude: /fonts/,        
     },
     {
         test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
@@ -15,29 +15,31 @@ module.exports = [
             mimetype: 'application/font-woff'
         }
     },
-    {   // de prueba
+    {//linea original /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+      test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+      loader: 'url-loader',
+      options: {
+          limit: 60000,
+          mimetype: 'application/font-woff'
+      },
+      include: /fonts/
+    },
+    {
+      test: /\.(png|jpg)$/,
+      loader: 'url-loader',
+      options: {
+          limit: 8192,
+      }
+    },
+    /*{   // linea original : /\.(woff|ttf|eot|svg)(\?v=[a-z0-9]\.[a-z0-9]\.[a-z0-9])?$/, 
         test: /\.(woff|ttf|eot|svg)(\?v=[a-z0-9]\.[a-z0-9]\.[a-z0-9])?$/, 
         loader: 'url-loader',
         options: {
           limit : 100000
         } 
-    },
-    {
-        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'url-loader',
-        options: {
-            limit: 60000,
-            mimetype: 'application/font-woff'
-        },
-        include: /fonts/
-    },
-    {
-        test: /\.(png|jpg)$/,
-        loader: 'url-loader',
-        options: {
-            limit: 8192,
-        }
-    },
+    },*/
+    
+   
     {
         test: /\.css$/,
         use: [
@@ -92,9 +94,9 @@ module.exports = [
       {
         test: /\.isvg$/,
         loader: 'html-loader',
-       /* options : {
-            attrs= [false],
-        }*/
+        options : {
+            attrs:false
+        }
       },
       {
         test: /\.js$/,
