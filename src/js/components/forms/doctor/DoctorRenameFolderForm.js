@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types'
-import TextFieldGroup from '../common/TextFieldGroup'
+import TextFieldGroup from '../../common/TextFieldGroup'
 import validator from 'validator'
 import { connect } from 'react-redux';
-import { _nextNode, _getPathAsString, _getFoldersAsArray, _getFilesAsObject, _getFoldersAsObject } from '../../utils/tableFunctions';
-import { doctorRenameFolder } from '../../actions/doctorActions'
-import { setCurrentLevel } from '../../actions/tableActions';
-import { addFlashMessage } from '../../actions/flashMessages';
+import { _nextNode, _getPathAsString, _getFoldersAsArray, _getFilesAsObject, _getFoldersAsObject } from '../../../utils/tableFunctions';
+import { doctorRenameFolder } from '../../../actions/doctorActions'
+import { setCurrentLevel } from '../../../actions/tableActions';
+import { addFlashMessage } from '../../../actions/flashMessages';
 
 class DoctorRenameFolderForm extends React.Component {
     constructor(props){

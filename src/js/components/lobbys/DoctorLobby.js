@@ -11,10 +11,10 @@ import { doctorGetPacients, doctorRemovePacient, doctorRemoveFile, doctorRemoveF
 import { addFlashMessage } from '../../actions/flashMessages'
 import { _getPathAsArray, _getPathAsString, _nextNode, _getFoldersAsArray } from '../../utils/tableFunctions';
 import TableDoctor from '../common/TableDoctor'
-import DoctorRenameFileForm from '../forms/DoctorRenameFileForm'
-import DoctorRenameFolderForm from '../forms/DoctorRenameFolderForm'
-import DoctorAddFolderForm from '../forms/DoctorAddFolderForm';
-import DoctorAddFileForm from '../forms/DoctorAddFileForm';
+import DoctorRenameFileForm from '../forms/doctor/DoctorRenameFileForm'
+import DoctorRenameFolderForm from '../forms/doctor/DoctorRenameFolderForm'
+import DoctorAddFolderForm from '../forms/doctor/DoctorAddFolderForm';
+import DoctorAddFileForm from '../forms/doctor/DoctorAddFileForm';
 
 class DoctorLobby extends React.Component {
     constructor(props){

@@ -5,14 +5,14 @@ import { BeatLoader } from 'react-spinners'
 import { connect } from 'react-redux'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.min.css' // css del click derecho
-import TableAdmin from '../common/TableAdmin'
-import { deleteUserRequest } from '../../actions/adminActions'
-import AdminAddUserForm from '../forms/AdminAddUserForm'
-import AdminEditUserForm from '../forms/AdminEditUserForm'
-import { openModal } from '../../actions/modalActions'
-import { addFlashMessage } from '../../actions/flashMessages'
-import { viewUsersRequest } from '../../actions/adminActions'
-import { setTableState } from '../../actions/tableActions'
+import TableAdmin from '../../common/TableAdmin'
+import { deleteUserRequest } from '../../../actions/adminActions'
+import AdminAddUserForm from './AdminAddUserForm'
+import AdminEditUserForm from './AdminEditUserForm'
+import { openModal } from '../../../actions/modalActions'
+import { addFlashMessage } from '../../../actions/flashMessages'
+import { viewUsersRequest } from '../../../actions/adminActions'
+import { setTableState } from '../../../actions/tableActions'
 
 class AdminViewUsersForm extends React.Component {
     constructor(props){

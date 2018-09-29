@@ -1,15 +1,14 @@
 import React from 'react';
-import PropTypes from 'prop-types'
-import TextFieldGroup from '../common/TextFieldGroup'
 import validator from 'validator'
 import classname from 'classnames'
-import PasswordMask from '../common/PasswordMask';
-import { addFlashMessage } from '../../actions/flashMessages'
-import { editUserRequest } from '../../actions/adminActions'
-import { setTableState } from '../../actions/tableActions';
 import { connect } from 'react-redux'
+import lodash from 'lodash'
+import TextFieldGroup from '../../common/TextFieldGroup'
+import { addFlashMessage } from '../../../actions/flashMessages';
+import { viewUsersRequest,createUserRequest } from '../../../actions/adminActions'
+import { setTableState } from '../../../actions/tableActions';
 
-class AdminEditUserForm extends React.Component {
+class AdminAddUserForm extends React.Component {
     constructor(props){
         super(props);
 
@@ -17,12 +16,9 @@ class AdminEditUserForm extends React.Component {
             errors: {},
             email: "",
             password: "",
-            category: 0, //default doctor
-            oldEmail: "",
-            oldCategory: "",
-            oldPassword: "",
             serverMessage: "",
-            serverStatus: "",
+            serverStatus:"",
+            category: 0 //default doctor
         }
 
         /* bindings */
@@ -31,62 +27,76 @@ class AdminEditUserForm extends React.Component {
         this._isValid = this._isValid.bind(this);
         this._onClickCloseMessage = this._onClickCloseMessage.bind(this);
         this._cancelForm = this._cancelForm.bind(this);
-        this._onConfirmEdit = this._onConfirmEdit.bind(this);
+        this._confirmAddUser = this._confirmAddUser.bind(this);
     }
 
     componentWillMount(){
-        const { user } = this.props;
-        this.setState({ oldEmail: user.email, oldCategory: user.category, oldPassword : user.password, 
-                        email : user.email, password: user.password, category : user.category });
+        viewUsersRequest()
+        .then((response)=>{
+            var usersServer = response.data.users;
+            this.props.dispatch(setTableState({
+                content : usersServer,
+            }));
+        })
+        .catch((response)=>{
+            this.props.dispatch(addFlashMessage({
+                type:"error",
+                text:"cannot get the users from server"
+            }));
+        });
     }
 
-    _onConfirmEdit(newData){
-        var users = this.props.table.content;
-        var found = false;
-        var i = 0;
-        while (!found && i < users.length){
-            if (users[i].email === newData.oldemail) {
-                users[i].email = (newData.newemail !== "") ? newData.newemail : users[i].email;
-                users[i].password = (newData.newpassword !== "") ? newData.newpassword : users[i].password;
-                users[i].category = (newData.newcategory !== -1) ? newData.newcategory : users[i].category;
-                found = true;
-            } else {
-                i++;
+
+    _confirmAddUser(newUser){
+        var _content = this.props.table.content;
+        if (lodash.isEmpty(_content)){
+            _content[0] = newUser;    
+        } else {
+            var aux = 0;
+            var max = -99999;
+            for(var prop in _content) {
+                aux = parseInt(prop);
+                if (aux > max){
+                    max = aux;
+                }
             }
+            _content[max+1] = {
+                category : newUser.category,
+                email : newUser.email,
+                password : newUser.password
+            };
         }
+        
         this.props.dispatch(setTableState({
-            content : users
+            content: _content,
         }));
-    }
+   }
 
     _submitForm(){
         if (this._isValid()){
-            const data = {
-                oldemail : this.state.oldEmail,
-                newemail : (this.state.email !== this.state.oldEmail) ? this.state.email : "",
-                newpassword : (this.state.password !== this.state.oldPassword) ? this.state.password  :  "",
-                newcategory : (this.state.category !== this.state.oldCategory) ? parseInt(this.state.category) : -1
-            };
-            editUserRequest(data)
+            var obj = {};
+            const email = this.state.email;
+            const password = this.state.password;
+            const category = parseInt(this.state.category);
+            obj["email"] = email;
+            obj["password"] = password;
+            obj["category"] = category;
+            createUserRequest(obj)
             .then((response)=>{
                 this.setState({serverMessage : response.data.message, serverStatus:"OK"})
-                this.props.dispatch(addFlashMessage({
-                    type:"success",
-                    text:"user edited successfully"
-                }));
-                this._onConfirmEdit(data);
+                this._confirmAddUser(obj);
                 this._cancelForm();
             })
             .catch((response)=>{
-                this.props.dispatch(addFlashMessage({
-                    type:"error",
-                    text:"cannot edit the user"
-                }));
                 if (typeof response.response === 'undefined'){
                     this.setState({serverMessage : "network error", serverStatus:"BAD_STATUS"})
                 } else {
-                    this.setState({serverMessage : response.response.data.message, serverStatus:"BAD_STATUS"})
+                    this.setState({serverMessage : response.data.message, serverStatus:"BAD_STATUS"})
                 }
+                this.props.dispatch(addFlashMessage({
+                    type : "error",
+                    text : "addUserForm - error server or something"
+                }));
             });
         }
     }
@@ -100,14 +110,23 @@ class AdminEditUserForm extends React.Component {
             toReturn = false;
             _errors["email"] = "you have to enter a valid email";
         }
-        if (validator.isEmpty(password)){
+        if (toReturn && validator.isEmpty(password)){
             toReturn = false;
             _errors["password"] = "the password cannot be empty";
         }
+        var _content = this.props.table.content;
+        for(var prop in _content) {
+            var aux = _content[prop];
+            if (aux.email === email){
+                toReturn = false;
+                _errors["email"] = "this email already exists!";
+                break;
+            }
+        }
+        
         this.setState( { errors : _errors });
         return toReturn;
     }
-
 
     _onChange(e) {
         this.setState({ [e.target.name]: e.target.value },()=>{
@@ -120,7 +139,7 @@ class AdminEditUserForm extends React.Component {
             this.props.callback();
         }
     }
-   
+    
     _onClickCloseMessage(){
         this.setState({serverMessage:"",serverStatus:""});
     }
@@ -135,40 +154,34 @@ class AdminEditUserForm extends React.Component {
                                                             <span>&times;</span>
                                                         </button>
                                                      </div>}
-                    <TextFieldGroup name = "email"
-                        error = { this.state.errors.email }
-                        label="Email"
-                        onChange = { this._onChange }
-                        value = { this.state.email }
-                        field = "email" />
-                      
-                    <PasswordMask name = "password"
-                                  value = { this.state.oldPassword }
-                                  showStrongPassword = { true }
-                                  showTitle = { true }
-                                  onChange = { this._onChange } />
+                    <TextFieldGroup error = { this.state.errors.email }
+                                    label="Email"
+                                    onChange = { this._onChange }
+                                    value = { this.state.email }
+                                    field = "email" />
+                   <TextFieldGroup  error = { this.state.errors.password }
+                                    label = "Password"
+                                    onChange = { this._onChange }
+                                    value = { this.state.password }
+                                    field = "password"
+                                    type = "password" />
                     <fieldset>
                         <div className="form-group">
                             <label>Category</label>
-                            <select name="category" value={this.state.category} onChange = { this._onChange } className="custom-select">
+                            <select name="category" onChange={this._onChange } className="custom-select">
                                 <option value="0">Doctor</option>
                                 <option value="1">Pladema</option>
                             </select>
                         </div>
                     </fieldset>
                     <div className="form-group">
-                        <button onClick={ this._submitForm } className="btn btn-primary btn-lg"> Change </button>
+                        <button onClick={ this._submitForm } className="btn btn-primary btn-lg"> Create </button>
                         <button onClick={ this._cancelForm } className="btn btn-danger btn-lg marginButton"> Cancel </button>
                     </div>
                 </div>
             </div>
         );
     }
-}
-
-AdminEditUserForm.propTypes = {
-    callback : PropTypes.func,
-    user : PropTypes.object.isRequired, 
 }
 
 function mapStateToProps(state) {
@@ -184,4 +197,4 @@ function mapDispatchToProps(dispatch) {
     }
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(AdminEditUserForm);
+export default connect(mapStateToProps,mapDispatchToProps)(AdminAddUserForm);

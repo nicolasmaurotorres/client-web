@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import { setCurrentLevel } from '../../actions/tableActions';
-import { _nextNode, _getFilesAsObject, _getFoldersAsObject, _getPathAsString } from '../../utils/tableFunctions'
-import { addFlashMessage } from '../../actions/flashMessages';
+import { setCurrentLevel } from '../../../actions/tableActions';
+import { _nextNode, _getFilesAsObject, _getFoldersAsObject, _getPathAsString } from '../../../utils/tableFunctions'
+import { addFlashMessage } from '../../../actions/flashMessages';
 import { connect } from 'react-redux';
-import { doctorAddFile } from '../../actions/doctorActions'
+import { doctorAddFile } from '../../../actions/doctorActions'
 
 class DoctorAddFileForm extends React.Component {
     constructor(props){
