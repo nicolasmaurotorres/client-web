@@ -24,13 +24,13 @@ class WidgetColorWrapper extends React.Component {
     render(){
         return (
             <div>
-                <ColorByWidget  source={source}
+        {/*    <ColorByWidget  source={source}
                                 representation={representation}
                                 scalarBar={scalarBar}
                                 presets={presets}
                                 onChange={this.onChange}
                                 hidePointControl
-                                useGaussian/>
+                                useGaussian/>*/}
             </div>
         );
     }

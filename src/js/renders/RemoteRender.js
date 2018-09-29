@@ -1,39 +1,148 @@
 import React from 'react'
 import PropTypes from 'prop-types';
-import SmartConnect       from 'paraviewweb/src/IO/WebSocket/SmartConnect'; 
-//import SmartConnect  from 'wslink/src/SmartConnect'
-//import WebsocketConnection from 'wslink/src/WebsocketConnection';
+import SmartConnect  from 'paraviewweb/src/IO/WebSocket/SmartConnect'; 
 import RemoteRenderer     from 'paraviewweb/src/NativeUI/Canvas/RemoteRenderer'; 
 import SizeHelper         from 'paraviewweb/src/Common/Misc/SizeHelper';
 import ParaViewWebClient  from 'paraviewweb/src/IO/WebSocket/ParaViewWebClient';
-import WidgetControlWrapper from '../components/common/WidgetColorWrapper';
+import WidgetColorWrapper from '../components/common/WidgetColorWrapper';
 
 class RemoteRender extends React.Component {
     constructor(props){
       super(props);
       this.state = {
-        resetCamara : false
+        resetCamara : false,
+        valid : false,
       }
 
-      this.smartConnect = null;
+      this.SmartConnect = null;
       this.pvwClient = null;
       this.renderer = null;
       this.container = null;
       this.viewId = null;
+      this.proxyId = null;
+      this.pathFileToOpen = null;
       /*bindings*/
       this._resetCamara = this._resetCamara.bind(this);
     }
 
     _resetCamara(){
-      debugger;
-      //
+      /*/
+      TODO: ESTE CODIGO ANDA BIEN, SOLO COMENTADO PARA HACER PRUEBAS
       this.pvwClient.ViewPort.resetCamera(this.viewId).then((response)=>{
         debugger;
         var pepe = response;
       });
+      this.pvwClient.ProxyManager.create(this.proxyId)
+      .then((response)=>{
+        debugger;
+        var pepe = response;
+      })
+      .catch((response)=>{
+        debugger;
+        var pepe = response;
+      });
+      */
+      this.pvwClient.ColorManager.getCurrentScalarRange(this.viewId)
+      .then((response)=>{
+        debugger;
+        var pepe = response;
+      })
+      .catch((response)=>{
+        debugger;
+        var pepe = response;
+      });/*
+      this.pvwClient.ColorManager.setScalarBarVisibilities(this.viewId)
+      .then((response)=>{
+        debugger;
+        var pepe = response;
+      })
+      .catch((response)=>{
+        debugger;
+        var pepe = response;
+      });
+      this.pvwClient.ColorManager.getScalarBarVisibilities(this.viewId)
+      .then((response)=>{
+        debugger;
+        var pepe = response;
+      })
+      .catch((response)=>{
+        debugger;
+        var pepe = response;
+      });*/
+     /* this.pvwClient.ProxyManager.get(this.viewId,true)
+      .then((response)=>{
+        debugger;
+        var pepe = response;*/
+this.pvwClient.ColorManager.listColorMapNames()
+	.then((response) => {
+		this.pvwClient.ColorManager.selectColorMap(this.viewId, response[0])
+			.then((response) => {
+				var pepe = response;
+			})
+			.catch((response) => {
+				debugger;
+				var pepe = response;
+			});
+	})
+	.catch(() => {
+		debugger;
+		var pepe = response;
+	});
+/*
+          this.pvwClient.ColorManager.listColorMapImages()
+          .then((response)=>{
+            debugger; 
+            var pepe = response;
+          })
+          .catch((response)=>{
+            debugger;
+            var pepe = response;
+            // "'vtkPVServerManagerCorePython.vtkSMSourceProxy' object has no attribute 'LookupTable'"
+          });
+     /* });
+      .catch((response)=>{
+        debugger;
+        var pepe = response;
+      });
+      })
+      .catch((response)=>{
+        debugger;
+        var pepe = response;
+      });
+      /*
+      this.pvwClient.ColorManager.listColorMapImages()
+      .then((response)=>{
+        debugger; // obtengo las imagenes de los colores 
+        var pepe = response;
+      })
+      .catch((response)=>{
+        debugger;
+        var pepe = response;
+      });*/
+      /*this.pvwClient.ProxyManager.availableSources()
+      .then((response)=>{
+        debugger;
+        var pepe = response;
+      })
+      .catch((response)=>{
+        debugger;
+        var pepe = response;
+      });
+      /*this.pvwClient.ProxyManager.availableFilters()
+      .then((response)=>{
+        debugger;
+        var pepe = response;
+      })
+      .catch((response)=>{
+        debugger;
+        var pepe = response;
+      });*/
+      
     }
 
     componentWillMount(){
+      var _this = this;
+      _this.pathFileToOpen = this.props.file;
       const config = {
         sessionManagerURL : 'http://localhost:8080/paraview', // fijo
         node: 1024, // no tengo puta idea que es 
@@ -41,8 +150,8 @@ class RemoteRender extends React.Component {
         secret: 'katglrt54#%dfg', // podria no estar pero bue...
         user: 'sebastien.jourdain', // podria no estar pero bue...
         password: 'ousdfbdxldfgh', // podria no estar pero bue...
-        filetoopen : this.props.file // path del archivo en la carpeta /data
         //sessionURL : "ws://localhost:8080/ws",
+        //sessionURL : "http://localhost:8080/paraview" // PRUEBA 
         //app: 'Visualizer'
       }
       const styleDiv = {
@@ -51,22 +160,32 @@ class RemoteRender extends React.Component {
         overflow:'hidden', 
         position:'relative'
       };
-      var _this = this;
       _this.container = (<div id="contentRendered" style={styleDiv}></div>);
-      _this.smartConnect = new SmartConnect(config);
-      _this.smartConnect.onConnectionReady((connection) => {
-      console.log("on connection ready message");
-        _this.pvwClient = ParaViewWebClient.createClient(connection, ['MouseHandler', 'ViewPort', 'ViewPortImageDelivery', 'ColorManager','ProxyManager']);
-        _this.renderer = new RemoteRenderer(_this.pvwClient);
-        _this.pvwClient.ProxyManager.list().then(function (response) {
-          debugger;
-          _this.viewId = response.view; // obtengo el view id y lo guardo
-        });
-        _this.renderer.showRenderStats(true);
-        _this.renderer.setContainer(document.getElementById('contentRendered'));
-        _this.renderer.onImageReady((callback) => {
-        
-          console.log('We are good');
+      _this.SmartConnect = new SmartConnect(config);
+      _this.SmartConnect.onConnectionReady((connection) => {
+        _this.proxyId = _this.SmartConnect.config.id;
+        console.log("on connection ready message");
+          _this.pvwClient = ParaViewWebClient.createClient(connection, ['MouseHandler', 'ViewPort', 'ViewPortImageDelivery', 'ColorManager','ProxyManager']);
+          _this.renderer = new RemoteRenderer(_this.pvwClient);
+         _this.pvwClient.ProxyManager.open(_this.pathFileToOpen)
+	.then(function (response) {
+		if (response.success) {
+			_this.viewId = response.id; // save view id 
+			_this.setState({
+				valid: true
+			});
+		} else {
+			//TODO: show error message
+		}
+	})
+          .catch((response)=>{
+            debugger;
+            var pepe = response;
+          });
+          _this.renderer.showRenderStats(true);
+          _this.renderer.setContainer(document.getElementById('contentRendered'));
+          _this.renderer.onImageReady((callback) => {
+            console.log('We are good');
           });
           window.renderer = _this.renderer;
           SizeHelper.onSizeChange(() => {
@@ -74,22 +193,22 @@ class RemoteRender extends React.Component {
           });
           SizeHelper.startListening();
       });
-        _this.smartConnect.onConnectionClose((callback) => {
-          debugger;
-          console.log("on connection close message");
-        });
-        _this.smartConnect.onConnectionError((callback) => {
+      _this.SmartConnect.onConnectionClose((callback) => {
+        debugger;
+        console.log("on connection close message");
+      });
+      _this.SmartConnect.onConnectionError((callback) => {
         debugger;
         console.log("on connection error message");
       });
-      _this.smartConnect.connect();
+      _this.SmartConnect.connect();
     }
 
     render(){
       const container = this.container;
       return (
        <div>
-         <WidgetControlWrapper/>
+         <WidgetColorWrapper/>
          <button onClick={ this._resetCamara }>RESETEAR CAMARA </button>
          { container }
        </div>
