@@ -14,7 +14,6 @@ import { render }         from 'react-dom';
 document.body.style.padding = '0';
 document.body.style.margin = '0';
 // filebrowserwidget config
-//debugger;
 //document.getElementById('filecontent').style.height = '';
 function onAction(type, files, aaa) {
   console.log(type, files, aaa);

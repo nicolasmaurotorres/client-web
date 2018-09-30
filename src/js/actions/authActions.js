@@ -2,7 +2,6 @@ import axiosInstance from '../utils/axiosInstance'
 import { SET_CURRENT_USER } from './types';
 
 export function setCurrentUser(user) {
-    debugger;
     return {
         type : SET_CURRENT_USER,
         user
