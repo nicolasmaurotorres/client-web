@@ -10,16 +10,16 @@ import { deleteUserRequest } from '../../../actions/adminActions'
 import AdminAddUserForm from './AdminAddUserForm'
 import AdminEditUserForm from './AdminEditUserForm'
 import { openModal } from '../../../actions/modalActions'
-import { addFlashMessage } from '../../../actions/flashMessages'
+import { addFlashMessage } from '../../../actions/flashMessagesActions'
 import { viewUsersRequest } from '../../../actions/adminActions'
 import { setTableState } from '../../../actions/tableActions'
+import { setSpinnerState } from '../../../actions/spinnerActions';
 
 class AdminViewUsersForm extends React.Component {
     constructor(props){
         super(props);
         
         this.state = {
-            loading: false,
             errors: null,
             editedUser : {}
         }
@@ -29,27 +29,36 @@ class AdminViewUsersForm extends React.Component {
     }
 
     componentWillMount(){
-        this.setState({ loading : true });
+        this.props.dispatch(setSpinnerState({
+            state:true
+        }));
         viewUsersRequest()
         .then((response)=>{
             var usersServer = response.data.users;
             this.props.dispatch(setTableState({
                 content : usersServer,
             }));
-            this.setState({loading: false})
+            this.props.dispatch(setSpinnerState({
+                state:false
+            }));
         })
         .catch((response)=>{
             this.props.dispatch(addFlashMessage({
                 type:"error",
                 text:"cannot get the users from server"
             }));
-            this.setState({ loading : false });
+            this.props.dispatch(setSpinnerState({
+                state:false
+            }));
         });
     }
     
     _confirmDeleteUser(email){
         var obj = {}
         obj["email"] = email;
+        this.props.dispatch(setSpinnerState({
+            state:true
+        }));
         deleteUserRequest(obj)
         .then((response)=>{                         // actualizo los usuarios
             this.props.dispatch(addFlashMessage({
@@ -61,11 +70,17 @@ class AdminViewUsersForm extends React.Component {
             this.props.dispatch(setTableState({
                 content: arr
             }));
+            this.props.dispatch(setSpinnerState({
+                state:false
+            }));
         })
         .catch((response)=>{
             this.props.dispatch(addFlashMessage({
                 type:"error",
                 text:"pacient "+folderName+" removed"
+            }));
+            this.props.dispatch(setSpinnerState({
+                state:false
             }));
         });
     }
@@ -119,21 +134,14 @@ class AdminViewUsersForm extends React.Component {
                 <Item onClick = { onClickDelete }><IconFont className = "fa fa-trash"/> Delete </Item>
             </ContextMenu>
         );
-
-         if (this.state.loading){
-            return (
-                <BeatLoader color =  { '#2FA4E7' } loading = { this.state.loading }/>
-            );
-         } else {
-            return (
-                    <div className="bs-docs-section">
-                        <ContextMenuProvider id = "rightClickContextMenu" >
-                            <TableAdmin />
-                        </ContextMenuProvider>
-                        <MenuFile/>
-                    </div>
-            );
-        }
+        return (
+            <div className="bs-docs-section">
+                <ContextMenuProvider id = "rightClickContextMenu" >
+                    <TableAdmin />
+                </ContextMenuProvider>
+                <MenuFile/>
+            </div>
+        );
     }
 }
 

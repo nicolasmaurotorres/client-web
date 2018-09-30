@@ -1,9 +1,13 @@
 import React from 'react'
-import { BeatLoader } from 'react-spinners'
 import PropTypes from 'prop-types'
 import validator from 'validator'
-
+import jwt from 'jsonwebtoken';
+import {setSpinnerState} from '../../actions/spinnerActions'
 import TextFieldGroup from '../common/TextFieldGroup'
+import { userLoginRequest,setCurrentUser } from '../../actions/authActions'
+import { addFlashMessage } from '../../actions/flashMessagesActions'
+import setAuthorizationInfo from '../../utils/setAuthorizationInfo';
+import { connect } from 'react-redux';
 
 class LoginForm extends React.Component {
     constructor(){
@@ -12,7 +16,6 @@ class LoginForm extends React.Component {
         this.state = {
             email: "",
             password:"",
-            loading : false,
             errors : {}
         };
         // Bindings
@@ -47,12 +50,44 @@ class LoginForm extends React.Component {
     _submitForm(e){
         e.preventDefault(); 
         if (this._isValid()){
-            this.setState({loading:true});
+            this.props.dispatch(setSpinnerState({
+                state:true
+            }));
             var obj = {}
             obj["email"] = this.state.email;
             obj["password"] = this.state.password;
-            this.props.userLoginRequest(obj,this);
-        }
+            userLoginRequest(obj)
+                .then((response) => { 
+                    this.props.dispatch(setSpinnerState({
+                        state:false
+                    }));
+                    this.props.dispatch(addFlashMessage({
+                        type:"success",
+                        text:"login success"
+                    }));
+                    const token = response.data.message;
+                    const category = response.data.category;
+                    setAuthorizationInfo(token);
+                    this.props.dispatch(setCurrentUser(jwt.decode(token)));
+                    switch (category) {
+                        case 0: // doctor
+                            this.context.router.history.push("/doctor");
+                            break;
+                        case 1: // pladema
+                            this.context.router.history.push("/pladema");
+                            break;
+                        case 2: // admin
+                            this.context.router.history.push("/admin");
+                            break; 
+                    };
+                })
+                .catch((error) => {
+                    var e = error.message;
+                    var _errors = this.state.errors;
+                    _errors['submit'] = e;
+                    this.setState({errors:_errors});
+                });
+        };
     }
 
     _onClickCloseError(){
@@ -60,13 +95,6 @@ class LoginForm extends React.Component {
     }
 
     render(){
-        if (this.state.loading){
-            return (
-                <div className="centerComponent">
-                    <BeatLoader color =  {'#2FA4E7'} loading = { this.state.loading }/>
-                </div>
-            );
-        } else 
         return (
             <div >
                 <h1 className="text-center">Login </h1>
@@ -99,13 +127,20 @@ class LoginForm extends React.Component {
     }
 };
 
-LoginForm.PropTypes  = {
-    userLoginRequest: PropTypes.func.isRequired,
-    addFlashMessage : PropTypes.func.isRequired
-}
-
 LoginForm.contextTypes = {
     router : PropTypes.object.isRequired
 }
 
-export default LoginForm;
+function mapStateToProps(state) {
+    return {
+        loading : state.loading
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+      dispatch,
+    }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(LoginForm);

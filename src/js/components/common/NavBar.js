@@ -3,16 +3,20 @@ import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
 import { userLogoutRequest } from '../../actions/authActions'
+import setAuthorizationInfo from '../../utils/setAuthorizationInfo'
+import { setCurrentUser } from '../../actions/authActions'
 
 class NavBar extends React.Component {
     constructor(props){
         super(props);
-
+        /* bindings */
         this._onClickLogout = this._onClickLogout.bind(this);
     }
 
     _onClickLogout(e){
-        this.props.userLogoutRequest();
+        userLogoutRequest();
+        setAuthorizationInfo(false);
+        this.props.dispatch(setCurrentUser({}));
     }
 
     render(){
@@ -51,4 +55,11 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps,{ userLogoutRequest })(NavBar);
+function mapDispatchToProps(dispatch) {
+    return {
+      dispatch,
+    }
+};
+
+
+export default connect(mapStateToProps,mapDispatchToProps)(NavBar);

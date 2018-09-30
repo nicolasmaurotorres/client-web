@@ -1,11 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { BeatLoader } from 'react-spinners'
+
 class LoadingSpinner extends React.Component {
     render(){
         if (this.props.loading){
             return (
-                <div>
-                  <h1>HOLA soy un LOADINSPINNER</h1>
+                <div className="centerComponent">
+                   <BeatLoader color =  {'#2FA4E7'} loading = { this.props.loading }/>
                 </div>
             );
         } else {
@@ -16,16 +18,8 @@ class LoadingSpinner extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        auth : state.auth,
-        table : state.table,
-        loading : state.loading
+        loading : state.spinner.loading
     }
 }
 
-function mapDispatchToProps(dispatch) {
-    return {
-      dispatch,
-    }
-};
-
-export default connect(mapStateToProps,mapDispatchToProps)(LoadingSpinner);
+export default connect(mapStateToProps,null)(LoadingSpinner);

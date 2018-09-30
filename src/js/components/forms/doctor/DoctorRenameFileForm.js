@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import TextFieldGroup from '../../common/TextFieldGroup'
 import validator from 'validator'
 import { connect } from 'react-redux';
-import { addFlashMessage } from '../../../actions/flashMessages'
+import { addFlashMessage } from '../../../actions/flashMessagesActions'
 import { doctorRenameFile } from '../../../actions/doctorActions'
 import { _getPathAsString, _nextNode, _getFoldersAsObject } from '../../../utils/tableFunctions'
 import { setCurrentLevel } from '../../../actions/tableActions';

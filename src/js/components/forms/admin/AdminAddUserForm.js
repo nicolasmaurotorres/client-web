@@ -4,7 +4,7 @@ import classname from 'classnames'
 import { connect } from 'react-redux'
 import lodash from 'lodash'
 import TextFieldGroup from '../../common/TextFieldGroup'
-import { addFlashMessage } from '../../../actions/flashMessages';
+import { addFlashMessage } from '../../../actions/flashMessagesActions';
 import { viewUsersRequest,createUserRequest } from '../../../actions/adminActions'
 import { setTableState } from '../../../actions/tableActions';
 

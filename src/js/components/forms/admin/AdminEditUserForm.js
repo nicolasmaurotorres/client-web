@@ -4,7 +4,7 @@ import TextFieldGroup from '../../common/TextFieldGroup'
 import validator from 'validator'
 import classname from 'classnames'
 import PasswordMask from '../../common/PasswordMask';
-import { addFlashMessage } from '../../../actions/flashMessages'
+import { addFlashMessage } from '../../../actions/flashMessagesActions'
 import { editUserRequest } from '../../../actions/adminActions'
 import { setTableState } from '../../../actions/tableActions';
 import { connect } from 'react-redux'

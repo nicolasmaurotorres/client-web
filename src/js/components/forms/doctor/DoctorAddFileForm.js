@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { setCurrentLevel } from '../../../actions/tableActions';
 import { _nextNode, _getFilesAsObject, _getFoldersAsObject, _getPathAsString } from '../../../utils/tableFunctions'
-import { addFlashMessage } from '../../../actions/flashMessages';
+import { addFlashMessage } from '../../../actions/flashMessagesActions';
 import { connect } from 'react-redux';
 import { doctorAddFile } from '../../../actions/doctorActions'
 

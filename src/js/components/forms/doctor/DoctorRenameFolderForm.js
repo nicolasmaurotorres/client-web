@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { _nextNode, _getPathAsString, _getFoldersAsArray, _getFilesAsObject, _getFoldersAsObject } from '../../../utils/tableFunctions';
 import { doctorRenameFolder } from '../../../actions/doctorActions'
 import { setCurrentLevel } from '../../../actions/tableActions';
-import { addFlashMessage } from '../../../actions/flashMessages';
+import { addFlashMessage } from '../../../actions/flashMessagesActions';
 
 class DoctorRenameFolderForm extends React.Component {
     constructor(props){

@@ -1,5 +1,3 @@
-import axiosInstance from './axiosInstance'
-
 export default function setAuthorizationInfo(token){
     if(token){
         localStorage.setItem('jwtToken',token);

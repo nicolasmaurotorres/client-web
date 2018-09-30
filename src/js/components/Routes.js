@@ -3,7 +3,7 @@ import { Route } from 'react-router-dom'
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import Home from './common/Home'
-import LoginPage from './pages/LoginPage' 
+import LoginForm from '../components/forms/LoginForm' 
 import NavBar from './common/NavBar'
 import DoctorLobby from './lobbys/DoctorLobby'
 import PlademaLobby from './lobbys/PlademaLobby'
@@ -25,7 +25,7 @@ export default class Routes extends React.Component {
                     <div>
                         <Route path="/" component = { NavBar } />
                         <Route path="/" component = { FlashMessagesList  } />
-                        <Route exact path="/login" component = { loginControl(LoginPage) }/>  
+                        <Route exact path="/login" component = { loginControl(LoginForm) }/>  
                         <Route exact path="/doctor" component = { authenticateDoctor(DoctorLobby) } />
                         <Route exact path="/doctor/render" component = { authenticateDoctor(DoctorRemoteRenderPage) } />
                         <Route exact path="/pladema" component = { authenticatePladema(PlademaLobby) } />

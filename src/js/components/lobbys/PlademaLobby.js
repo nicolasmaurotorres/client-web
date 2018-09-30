@@ -6,7 +6,7 @@ import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify
 import { openModal } from '../../actions/modalActions'
 import { plademaGetAllFolders, plademaGetFile } from '../../actions/plademaActions'
 import { setTableState, setCurrentLevel } from '../../actions/tableActions'
-import { addFlashMessage } from '../../actions/flashMessages'
+import { addFlashMessage } from '../../actions/flashMessagesActions'
 
 import TablePladema from '../common/TablePladema'
 import PlademaAddFolderForm from '../forms/pladema/PlademaAddFolderForm'

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import validator from 'validator';
 import TextFieldGroup from '../../common/TextFieldGroup';
 import { _getFilesAsObject, _getFoldersAsObject, _getPathAsString, _getFoldersAsArray } from '../../../utils/tableFunctions';
-import { addFlashMessage } from '../../../actions/flashMessages';
+import { addFlashMessage } from '../../../actions/flashMessagesActions';
 import { doctorAddFolder } from '../../../actions/doctorActions';
 import { _nextNode } from '../../../utils/tableFunctions';
 import { setCurrentLevel } from '../../../actions/tableActions';

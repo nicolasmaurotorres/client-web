@@ -1,4 +1,4 @@
-import {SET_SPINNER_STATE} from './types'
+import { SET_SPINNER_STATE } from './types'
 
 export function setSpinnerState(obj){
     return {

@@ -7,8 +7,8 @@ import PropTypes from 'prop-types'
 
 import { setTableState, setCurrentLevel } from '../../actions/tableActions'
 import { openModal } from '../../actions/modalActions'
-import { doctorGetPacients, doctorRemovePacient, doctorRemoveFile, doctorRemoveFolder, doctorAddFile } from '../../actions/doctorActions'
-import { addFlashMessage } from '../../actions/flashMessages'
+import { doctorGetPacients, doctorRemoveFile, doctorRemoveFolder } from '../../actions/doctorActions'
+import { addFlashMessage } from '../../actions/flashMessagesActions'
 import { _getPathAsArray, _getPathAsString, _nextNode, _getFoldersAsArray } from '../../utils/tableFunctions';
 import TableDoctor from '../common/TableDoctor'
 import DoctorRenameFileForm from '../forms/doctor/DoctorRenameFileForm'
