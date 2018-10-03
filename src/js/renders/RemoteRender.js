@@ -8,6 +8,7 @@ import ParaViewWebClient  from 'paraviewweb/src/IO/WebSocket/ParaViewWebClient';
 import WidgetColorWrapper from '../components/common/WidgetColorWrapper';
 import { setSpinnerState } from '../actions/spinnerActions'
 import { addFlashMessage } from '../actions/flashMessagesActions';
+import { renderConfig } from '../config/renderConfig'
 
 class RemoteRender extends React.Component {
     constructor(props){
@@ -103,6 +104,32 @@ class RemoteRender extends React.Component {
         
       
 	    /*})
+      this.pvwClient.ColorManager.listColorMapNames()
+	    .then((_response) => {
+        debugger;
+
+        *//*
+        if (this.indexColor < this.colorPalette.length){
+          const palette = this.colorPalette[this.indexColor];
+          this.pvwClient.ColorManager.selectColorMap(this.repId, palette)
+  		    	.then((response) => {
+              debugger;
+              this.props.dispatch(addFlashMessage({
+                type:"success",
+                text: palette+" successfully loaded"
+              }));
+			      })
+			      .catch((response) => {
+              this.props.dispatch(addFlashMessage({
+                type:"error",
+                text: palette+" not loaded"
+              }));
+            });
+          this.indexColor = this.indexColor + 1;
+        }
+        */
+      
+	    /*})
 	    .catch(() => {
 		    debugger;
 		    var pepe = response;
@@ -172,6 +199,17 @@ class RemoteRender extends React.Component {
           _this.rgbPoints = response;
         });*/
     }
+      var _this = this;*/
+      this.pvwClient.ColorManager.getScalarBarVisibilities(this.repId)
+        .then((response)=>{
+          debugger;
+          var pepe = response;  
+        })
+        .catch((response)=>{
+          debugger;
+          var pepe = response;
+        });
+    }
 
     _setOpacity(){
       this.pvwClient.ColorManager.setSurfaceOpacity(this.repId,this.state.opacity)
@@ -186,17 +224,7 @@ class RemoteRender extends React.Component {
       _this.props.dispatch(setSpinnerState({
         state:true
       }));
-      const config = {
-        sessionManagerURL : 'http://localhost:8080/paraview', // fijo
-        node: 1024, // no tengo puta idea que es 
-        application: 'visualizer', // fijo - visualizer
-        secret: 'katglrt54#%dfg', // podria no estar pero bue...
-        user: 'sebastien.jourdain', // podria no estar pero bue...
-        password: 'ousdfbdxldfgh', // podria no estar pero bue...
-        //sessionURL : "ws://localhost:8080/ws",
-        //sessionURL : "http://localhost:8080/paraview" // PRUEBA 
-        //app: 'Visualizer'
-      }
+      const config = renderConfig;
       const styleDiv = {
         width:'800px',
         height:'600px', 
