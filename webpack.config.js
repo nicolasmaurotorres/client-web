@@ -1,7 +1,7 @@
 const path = require('path'); // We are using node's native package 'path'  https://nodejs.org/api/path.html
 const HtmlWebpackPlugin = require('html-webpack-plugin'); 
 const ExtractTextPlugin = require('extract-text-webpack-plugin'); 
-const ParaViewWebLoaders = require('./loaders.paraviewweb.webpack-2.js'); // paraviewweb loader
+//const ParaViewWebLoaders = require('./loaders.paraviewweb.webpack-2.js'); // paraviewweb loader
 
 // Constant with our paths
 const paths = {
@@ -55,12 +55,44 @@ module.exports = {
           options : 'MyWebApp'
         }]
       },
-    ].concat(ParaViewWebLoaders),
-  },
-  resolve: {
-    extensions: ['.js', '.jsx'],
-    alias : {
-      PVWStyle : path.resolve('./node_modules/paraviewweb/style'),
-    },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        options: {
+            presets: ['env','react']
+        }
+      },
+      {
+        test: /\.css$/,
+        use: [
+          require.resolve('style-loader'),
+          {
+            loader: require.resolve('css-loader'),
+            options: {
+              importLoaders: 1,
+            },
+          },
+          {
+            loader: require.resolve('postcss-loader'),
+            options: {
+              config: {
+                path: __dirname + "/postcss.config.js"
+              }
+            }
+          },
+        ],
+      },
+      {
+        test: /\.scss$/,
+        use: [{
+            loader: "style-loader" // creates style nodes from JS strings
+        }, {
+            loader: "css-loader" // translates CSS into CommonJS
+        }, {
+            loader: "sass-loader" // compiles Sass to CSS
+        }]
+      },
+    ]
   },
 };
