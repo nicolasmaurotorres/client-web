@@ -1,11 +1,11 @@
 const renderConfig = {
-    sessionManagerURL : 'http://localhost:8080/paraview', // fix
+    sessionManagerURL : 'http://localhost:8080/paraview', // fix data
     node: 1024, // i dont know what is this
-    application: 'visualizer', // fix - visualizer
-    secret: 'katglrt54#%dfg', // it could bepodria no estar pero bue...
-    user: 'sebastien.jourdain', // podria no estar pero bue...
-    password: 'ousdfbdxldfgh', // podria no estar pero bue...
-    //sessionURL : "ws://localhost:8080/ws",
-    //sessionURL : "http://localhost:8080/paraview" // PRUEBA 
-    //app: 'Visualizer'
+    application: 'visualizer', // fix data - visualizer
+    secret: 'katglrt54#%dfg', // it could not be this but...
+    user: 'sebastien.jourdain', // it could not be this but...
+    password: 'ousdfbdxldfgh', // it could not be this but...
+    //sessionURL : "ws://localhost:8080/ws",  // test
+    //sessionURL : "http://localhost:8080/paraview" // test
+    //app: 'Visualizer' // test
   }
