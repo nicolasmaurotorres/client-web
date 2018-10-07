@@ -82,7 +82,31 @@ class RemoteRender extends React.Component {
       });
       this.pvwClient.ColorManager.listColorMapNames()
 	    .then((_response) => {
-        debugger;
+        debugger;*/
+if (this.indexColor < this.colorPalette.length){
+          const palette = this.colorPalette[this.indexColor];
+          this.pvwClient.ColorManager.selectColorMap(this.repId, palette)
+          .then((response) => {
+            debugger;
+            this.props.dispatch(addFlashMessage({
+              type:"success",
+              text: palette+" successfully loaded"
+            }));
+          })
+          .catch((response) => {
+            this.props.dispatch(addFlashMessage({
+              type:"error",
+              text: palette+" not loaded"
+            }));
+          });
+        this.indexColor = this.indexColor + 1;
+      }
+      
+    
+    /*})
+    this.pvwClient.ColorManager.listColorMapNames()
+    .then((_response) => {
+      debugger;
 
         *//*
         if (this.indexColor < this.colorPalette.length){

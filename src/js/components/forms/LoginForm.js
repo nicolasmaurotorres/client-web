@@ -86,6 +86,9 @@ class LoginForm extends React.Component {
                     var _errors = this.state.errors;
                     _errors['submit'] = e;
                     this.setState({errors:_errors});
+                    this.props.dispatch(setSpinnerState({
+                        state:false
+                    }));
                 });
         };
     }

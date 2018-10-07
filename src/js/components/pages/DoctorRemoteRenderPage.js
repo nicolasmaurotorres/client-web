@@ -1,5 +1,5 @@
 import React    from 'react'
-import RemoteRender from '../../renders/RemoteRender'
+import VisualizerServerRender from '../../renders/VisualizerServerRender'
 
 class DoctorRemoteRenderPage extends React.Component {
     constructor(props){
@@ -17,7 +17,7 @@ class DoctorRemoteRenderPage extends React.Component {
     render(){
         {/*TODO: agregar componentes para modificar el remote render*/}
        return ( 
-            <RemoteRender file = { this.state.file }/>
+            <VisualizerServerRender file = { this.state.file }/>
         );
     }
 }
