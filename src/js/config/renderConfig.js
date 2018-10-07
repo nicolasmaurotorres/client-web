@@ -1,4 +1,4 @@
-const renderConfig = {
+export const renderConfig = {
     sessionManagerURL : 'http://localhost:8080/paraview', // fix data
     node: 1024, // i dont know what is this
     application: 'visualizer', // fix data - visualizer
