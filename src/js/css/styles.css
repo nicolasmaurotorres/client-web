@@ -75,8 +75,8 @@
 }
 
 .middle{
-    margin-right:20%;
-    margin-left: 20%;
+    margin-right:25%;
+    margin-left: 25%;
 }
  
 /**/
@@ -148,4 +148,10 @@
   align-items: center;
 }
 
-  
+.fullscreen{
+  height: 100%;
+}
+
+.above-all{
+  z-index: 100;
+}

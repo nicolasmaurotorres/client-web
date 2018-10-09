@@ -299,7 +299,7 @@ class DoctorLobby extends React.Component {
         const idMenu = this.state.idContextText;
         
         return (
-            <div className="jumbotron"> 
+            <div className="jumbotron fullscreen"> 
                 { addPacientButton }
                 { addFileButton }
                 <ContextMenuProvider  id = { idMenu }>

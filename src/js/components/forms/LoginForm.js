@@ -99,7 +99,7 @@ class LoginForm extends React.Component {
 
     render(){
         return (
-            <div >
+            <div className="jumbotron fullscreen">
                 <h1 className="text-center">Login </h1>
                 { this.state.errors.submit && <div className="alert alert-danger"> 
                                                     { this.state.errors.submit }
@@ -107,23 +107,26 @@ class LoginForm extends React.Component {
                                                         <span>&times;</span>
                                                     </button>
                                                 </div>}
-                <TextFieldGroup
-                   error = { this.state.errors.email }
-                   label="Email"
-                   onChange = { this._onChange }
-                   value = { this.state.email }
-                   field = "email"
-                />
-                <TextFieldGroup
-                  error = { this.state.errors.password }
-                  label = "Password"
-                  onChange = { this._onChange }
-                  value = { this.state.password }
-                  field = "password"
-                  type = "password"
-                />
-                <div className="form-group">
-                    <button onClick = { this._submitForm } className="btn btn-primary btn-lg"> Login </button>
+                <div className="middle">
+                    <TextFieldGroup
+                    error = { this.state.errors.email }
+                    label="Email"
+                    onChange = { this._onChange }
+                    value = { this.state.email }
+                    field = "email"
+                    className = "centered"
+                    />
+                    <TextFieldGroup
+                    error = { this.state.errors.password }
+                    label = "Password"
+                    onChange = { this._onChange }
+                    value = { this.state.password }
+                    field = "password"
+                    type = "password"
+                    />
+                    <div className="form-group">
+                        <button onClick = { this._submitForm } className="btn btn-primary btn-lg"> Login </button>
+                    </div>
                 </div>
             </div>
         );
