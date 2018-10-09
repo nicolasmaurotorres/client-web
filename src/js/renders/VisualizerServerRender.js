@@ -11,6 +11,7 @@ class VisualizerServerRender extends React.Component {
             file : ""
         }
         console.log(Visualizer);
+        console.log(renderConfig);
     }
 
     render(){
