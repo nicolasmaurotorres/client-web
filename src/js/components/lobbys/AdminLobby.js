@@ -17,7 +17,7 @@ class AdminLobby extends React.Component {
     render(){
         return (
         <div className="jumbotron rows-admin fullscreen">
-            <div className="centered">
+            <div className="center-cards">
                 <div className="card text-white bg-info mb-3 row-card-admin" onClick = { this._onClick } id="view">
                     <div className="card-header" id="view">View</div>
                     <div className="card-body" id="view">

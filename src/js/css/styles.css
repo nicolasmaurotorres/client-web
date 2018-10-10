@@ -155,3 +155,9 @@
 .above-all{
   z-index: 100;
 }
+
+.center-cards{
+  margin-left: 30%;
+  display: flex;
+  height: fit-content;
+}
