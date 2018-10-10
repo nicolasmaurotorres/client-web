@@ -35,7 +35,7 @@ class Modal extends React.Component {
               <div className="text">{ text }</div>
               <div className="buttons">
                   <button className="modal-button" onClick={() => this.onConfirm()}>Confirm</button>
-                  <button className="close-notification" onClick={() => this.onClose()}>Close</button>
+                  <button className="close-notification" onClick={() => this.onClose()}>&times;</button>
               </div>
               </div>
           </div>

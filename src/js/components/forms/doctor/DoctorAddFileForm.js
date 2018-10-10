@@ -6,6 +6,7 @@ import { _nextNode, _getFilesAsObject, _getFoldersAsObject, _getPathAsString } f
 import { addFlashMessage } from '../../../actions/flashMessagesActions';
 import { connect } from 'react-redux';
 import { doctorAddFile } from '../../../actions/doctorActions'
+import { setSpinnerState } from '../../../actions/spinnerActions';
 
 class DoctorAddFileForm extends React.Component {
     constructor(props){
@@ -39,6 +40,10 @@ class DoctorAddFileForm extends React.Component {
 
     _submitForm(){
         if (this._isValid()){
+            debugger;
+            this.props.dispatch(setSpinnerState({
+                state : true
+            }));
             var formData = new FormData();
             const nameFile = this.state.file.name;
             formData.append("file", this.state.file);
@@ -47,11 +52,17 @@ class DoctorAddFileForm extends React.Component {
             .then((response)=>{
                 this.props.callback();
                 this._callbackAddFile(nameFile);
+                this.props.dispatch(setSpinnerState({
+                    state : false
+                }));
             })
             .catch((response)=>{
                 this.props.dispatch(addFlashMessage({
                     type:"error",
                     text:"cant add file form error"
+                }));
+                this.props.dispatch(setSpinnerState({
+                    state : false
                 }));
             });
         }
@@ -101,7 +112,7 @@ class DoctorAddFileForm extends React.Component {
     render(){
         var error = this.state.errors.file;
         return (
-            <div className="jumbotron">
+            <div className="jumbotron margins">
                 <div className="middle">
                     <h1>File Upload</h1>
                     <input type="file" name="file" onChange = { this._handleFileSelect } />

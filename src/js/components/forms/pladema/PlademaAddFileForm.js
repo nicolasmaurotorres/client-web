@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { plademaAddFile } from '../../../actions/plademaActions'
 import { _nextNode, _getFoldersAsObject, _getFilesAsObject, _getPathAsString } from '../../../utils/tableFunctions';
 import { setTableState, setCurrentLevel } from '../../../actions/tableActions';
+import { setSpinnerState } from '../../../actions/spinnerActions';
 
 class PlademaAddFileForm extends React.Component {
     constructor(props){
@@ -40,13 +41,22 @@ class PlademaAddFileForm extends React.Component {
             var formData = new FormData();
             var name = file.name;
             formData.append("file", file);
-            formData.append("folder", path)
+            formData.append("folder", path);
+            this.props.dispatch(setSpinnerState({
+                state:true
+            }));
             plademaAddFile(formData)
             .then((response)=>{
+                this.props.dispatch(setSpinnerState({
+                    state:false
+                }));
                 callback();
                 this._callbackAddFile(name);
             })
             .catch((response)=>{
+                this.props.dispatch(setSpinnerState({
+                    state:false
+                }));
                 callback();
             });
         }

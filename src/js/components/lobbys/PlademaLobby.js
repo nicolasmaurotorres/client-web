@@ -12,6 +12,7 @@ import TablePladema from '../common/TablePladema'
 import PlademaAddFolderForm from '../forms/pladema/PlademaAddFolderForm'
 import PlademaAddFileForm from '../forms/pladema/PlademaAddFileForm'
 import { _getPathAsString } from '../../utils/tableFunctions';
+import { setSpinnerState } from '../../actions/spinnerActions';
 
 class PlademaLobby extends React.Component {
     constructor(props) {
@@ -71,6 +72,9 @@ class PlademaLobby extends React.Component {
         var path = _getPathAsString(this.props.table.level.path);
         var obj = {};
         obj["file"] = path+"/"+nameFile;
+        this.props.dispatch(setSpinnerState({
+            state : true
+        }));
         plademaGetFile(obj)
         .then((response)=>{ 
             var fileName = "";
@@ -85,9 +89,18 @@ class PlademaLobby extends React.Component {
             link.setAttribute('download', fileName+".zip");
             document.body.appendChild(link);
             link.click();
+            this.props.dispatch(setSpinnerState({
+                state : false
+            }));
         })
         .catch((response)=>{
-            console.log("se rompio la cafetera ameo");
+            this.props.dispatch(addFlashMessage({
+                type:"error",
+                text:"network error downloading file"
+            }));
+            this.props.dispatch(setSpinnerState({
+                state : false
+            }));
         });
     }
 
