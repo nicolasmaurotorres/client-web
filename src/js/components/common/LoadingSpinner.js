@@ -5,7 +5,6 @@ import { BeatLoader } from 'react-spinners'
 class LoadingSpinner extends React.Component {
     render(){
         if (this.props.loading){
-            debugger;
             return (
                 <div className="centerComponent above-all">
                    <BeatLoader color =  {'#2FA4E7'} loading = { this.props.loading }/>

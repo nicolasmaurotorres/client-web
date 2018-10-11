@@ -158,13 +158,16 @@ class DoctorLobby extends React.Component {
             //this.context.router.history.push("/doctor/render");
             var parts = event.target.parentElement.id.split("-");
             var fileName = "";
-            for (var i = 1; i < parts.length-1 ; i++){
+            for (var i = 1; i < parts.length-1 ; i++){ 
                 fileName += parts[i];
             }
-            fileName = _getPathAsString(this.props.table.level.path)+"/"+fileName+"."+parts[parts.length-1]; // agrego la extencion y el path al archivo a renderizar
+            debugger;
+            var dataDir = "/"+this.props.auth.user.username;
+            fileName = "/"+_getPathAsString(this.props.table.level.path,1)+"/"+fileName+"."+parts[parts.length-1]; // agrego la extencion y el path al archivo a renderizar, sin el nombre del del email
             this.context.router.history.push({
                 pathname: '/doctor/render',
-                state: { file: fileName  }
+                state: { dataFile  : fileName,
+                        dataDir }
               });
         };
         const onClickUpgradeFile = ({event, ref,data,dataFromProvider}) => {

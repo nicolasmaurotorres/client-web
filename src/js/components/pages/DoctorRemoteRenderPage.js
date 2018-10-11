@@ -6,18 +6,21 @@ class DoctorRemoteRenderPage extends React.Component {
         super(props);
 
         this.state = {
-            file : ""
+            dataFile : "",
+            dataDir : ""
         }
     }
 
     componentWillMount(){
-        this.setState({file:this.props.history.location.state.file});
+        debugger;
+        this.setState({ dataFile : this.props.history.location.state.dataFile,
+                        dataDir : this.props.history.location.state.dataDir  });
     }
 
     render(){
         {/*TODO: agregar componentes para modificar el remote render*/}
        return ( 
-            <VisualizerServerRender file = { this.state.file }/>
+            <VisualizerServerRender dataFile = { this.state.dataFile } dataDir = { this.state.dataDir }/>
         );
     }
 }

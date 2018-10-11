@@ -1,17 +1,22 @@
 import 'normalize.css';
 import React from 'react'
+import PropTypes from 'prop-types'
 import 'pvw-visualizer/dist/Visualizer'
 import { renderConfig } from '../config/renderConfig'
 
 class VisualizerServerRender extends React.Component {
     constructor(props){
         super(props);
+        console.log({visualizer : Visualizer});
+    }
 
-        this.state = {
-            file : ""
-        }
-        console.log(Visualizer);
-        console.log(renderConfig);
+    componentDidMount(){
+        const { dataDir, dataFile } = this.props;
+        var config = renderConfig;
+        config['dataDir'] = config['dataDir']+ dataDir;
+        config['dataFile'] = dataFile;
+        Visualizer.connect(renderConfig);
+        Visualizer.autoStopServer(10);
     }
 
     render(){
@@ -19,11 +24,11 @@ class VisualizerServerRender extends React.Component {
             <div className='content'></div>  
         );
     }
-
-    componentDidMount(){
-        Visualizer.connect(renderConfig);
-        Visualizer.autoStopServer(10);
-    }
 }
+
+VisualizerServerRender.PropTypes = {
+    dataDir : PropTypes.string.isRequired,
+    dataFile : PropTypes.string.isRequired
+} 
 
 export default VisualizerServerRender;

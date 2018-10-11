@@ -149,7 +149,7 @@ class PlademaAddFileForm extends React.Component {
     }
 }
 
-PlademaAddFileForm.propTypes = {
+PlademaAddFileForm.PropTypes = {
     callback : PropTypes.func.isRequired,
 }    
 
