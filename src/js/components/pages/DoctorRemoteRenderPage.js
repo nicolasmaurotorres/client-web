@@ -12,7 +12,6 @@ class DoctorRemoteRenderPage extends React.Component {
     }
 
     componentWillMount(){
-        debugger;
         this.setState({ dataFile : this.props.history.location.state.dataFile,
                         dataDir : this.props.history.location.state.dataDir  });
     }

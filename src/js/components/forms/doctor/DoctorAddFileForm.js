@@ -40,7 +40,6 @@ class DoctorAddFileForm extends React.Component {
 
     _submitForm(){
         if (this._isValid()){
-            debugger;
             this.props.dispatch(setSpinnerState({
                 state : true
             }));
