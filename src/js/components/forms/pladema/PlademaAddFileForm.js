@@ -74,11 +74,11 @@ class PlademaAddFileForm extends React.Component {
             var parts = file.split(".");
             var ext = parts[parts.length - 1] ; // me quedo con la extension
         }
-        //TODO: sacado temporalmente
-        /*if (ext !== "vtk"){
+        
+        if (ext !== "vtk"){
             toReturn = false;
             _errors["file"] = "only files with vtk extention are allowed";
-        }*/
+        }
         
         if (toReturn && this.state.files[file] != null){
             toReturn = false;

@@ -24,6 +24,8 @@ class PlademaLobby extends React.Component {
         /* bindings */
         this._hoverTableItem = this._hoverTableItem.bind(this);
         this._onConfirmDownloadFile = this._onConfirmDownloadFile.bind(this);
+        this._onClickAddFile = this._onClickAddFile.bind(this);
+        this._onClickAddFolder = this._onClickAddFolder.bind(this);
     }
 
     componentWillMount() {
@@ -104,6 +106,24 @@ class PlademaLobby extends React.Component {
         });
     }
 
+    _onClickAddFile(event){
+        event.preventDefault();
+        this.props.dispatch(openModal({
+            id: uuid.v4(),
+            type: 'custom',
+            content: <PlademaAddFileForm/>,
+        }));
+    }
+
+    _onClickAddFolder(event){
+        event.preventDefault();
+        this.props.dispatch(openModal({
+            id: uuid.v4(),
+            type: 'custom',
+            content: <PlademaAddFolderForm/>,
+        }));
+    }
+
     render() {
         const onClickAddFolder = ({event, ref,data,dataFromProvider}) => {
             this.props.dispatch(openModal({
@@ -152,8 +172,12 @@ class PlademaLobby extends React.Component {
         );
         const idMenu = this.state.idContextText;
         const menu = (this.props.table.level.position < 2) ? null : ((this.state.isFolder) ? <NotInitialMenuFolder />: <NotInitialMenuFile />)
+        const addFolderButton =  (this.props.table.level.position < 2) ? null : <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFolder  }> Add Folder </botton> </div>;
+        const addFileButton = (this.props.table.level.position < 2) ? null : <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFile }> Add File </botton> </div>;
         return (
-            <div>
+            <div className="jumbotron fullscreen">
+                { addFolderButton }
+                { addFileButton }
                 <ContextMenuProvider  id = { idMenu }>
                     <TablePladema onMouseEnter = { this._hoverTableItem }/>
                 </ContextMenuProvider>

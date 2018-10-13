@@ -76,13 +76,14 @@ class DoctorAddFileForm extends React.Component {
         } else { 
             var file = this.state.file.name;
             var parts = file.split(".");
-            var ext = parts[parts.length - 1] ; // me quedo con la extension
+            var ext = parts[parts.length - 1] ; // keep with the extention
         }
-        //TODO: sacado temporalmente
-        /*if (ext !== "vtk"){
+
+        if (ext !== "vtk"){
             toReturn = false;
             _errors["file"] = "only files with vtk extention are allowed";
-        }*/
+        }
+
         var otherFiles = _getFilesAsObject(this.props.table.level.files);
         if (toReturn && otherFiles[file] != null){
             toReturn = false;
