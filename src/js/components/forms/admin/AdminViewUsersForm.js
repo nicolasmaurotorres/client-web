@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import shortid from 'shortid'
-import { BeatLoader } from 'react-spinners'
 import { connect } from 'react-redux'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.min.css' // css del click derecho
