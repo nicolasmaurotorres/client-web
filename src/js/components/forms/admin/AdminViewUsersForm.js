@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import uuid from 'uuid'
+import shortid from 'shortid'
 import { BeatLoader } from 'react-spinners'
 import { connect } from 'react-redux'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
@@ -14,6 +14,7 @@ import { addFlashMessage } from '../../../actions/flashMessagesActions'
 import { viewUsersRequest } from '../../../actions/adminActions'
 import { setTableState } from '../../../actions/tableActions'
 import { setSpinnerState } from '../../../actions/spinnerActions';
+
 
 class AdminViewUsersForm extends React.Component {
     constructor(props){
@@ -90,7 +91,7 @@ class AdminViewUsersForm extends React.Component {
             const email = event.target.parentElement.id;
             if (email !== ''){
                 this.props.dispatch(openModal({
-                    id: uuid.v4(),
+                    id: shortid.generate(),
                     type: 'confirmation',
                     text: 'Are you sure to delete this user?',
                     onClose: null,
@@ -101,7 +102,7 @@ class AdminViewUsersForm extends React.Component {
 
         const onClickAdd = ({event, ref,data,dataFromProvider}) => {
             this.props.dispatch(openModal({
-                id: uuid.v4(),
+                id: shortid.generate(),
                 type: 'custom',
                 content: <AdminAddUserForm />,
             }));
@@ -119,7 +120,7 @@ class AdminViewUsersForm extends React.Component {
                     obj["password"] = password;
                     obj["category"] = category;
                     this.props.dispatch(openModal({
-                        id: uuid.v4(),
+                        id: shortid.generate(),
                         type: 'custom',
                         content: <AdminEditUserForm user = { obj } />,
                     }));

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types'
-import uuid from 'uuid';
+import shortid from 'shortid';
 import { connect } from 'react-redux';
 import { IconFont } from 'react-contexify'
 
@@ -80,9 +80,9 @@ class TableDoctor extends React.Component {
         this.props.table.level.path.forEach((item) => {
             if (item !== "/"){
                 path.push("/");
-                path.push(<label key = { uuid.v4() } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
+                path.push(<label key = { shortid.generate() } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
             } else {
-                path.push(<label key = { uuid.v4() } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
+                path.push(<label key = { shortid.generate() } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
             }
         });
 

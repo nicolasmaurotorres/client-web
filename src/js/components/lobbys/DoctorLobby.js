@@ -1,10 +1,9 @@
 import React    from 'react'
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
 import { connect } from 'react-redux'
-import uuid from 'uuid'
 import lodash from 'lodash' 
 import PropTypes from 'prop-types'
-
+import shortid from 'shortid'
 import { setTableState, setCurrentLevel } from '../../actions/tableActions'
 import { openModal } from '../../actions/modalActions'
 import { doctorGetPacients, doctorRemoveFile, doctorRemoveFolder } from '../../actions/doctorActions'
@@ -76,7 +75,7 @@ class DoctorLobby extends React.Component {
 
     _onClickAddFile(){
         this.props.dispatch(openModal({
-            id: uuid.v4(),
+            id: shortid.generate(),
             type: 'custom',
             content: <DoctorAddFileForm />,
         }));
@@ -84,7 +83,7 @@ class DoctorLobby extends React.Component {
     
     _onClickAddFolder(){
         this.props.dispatch(openModal({
-            id: uuid.v4(),
+            id: shortid.generate(),
             type: 'custom',
             content: <DoctorAddFolderForm/>,
         }));
@@ -178,7 +177,7 @@ class DoctorLobby extends React.Component {
             var fileToRename = parts[1]; // le agrego el punto al archivo, aunque solo muestre el nombre
             var fileExt = parts[2]; // extencion del archivo, el usuario final no puede cambiar la extencion del archivo, solo el nombre
             this.props.dispatch(openModal({
-                id: uuid.v4(),
+                id: shortid.generate(),
                 type: 'custom',
                 content: <DoctorRenameFileForm fileToRename = { fileToRename } fileExtension = { fileExt } />,
             }));
@@ -201,7 +200,7 @@ class DoctorLobby extends React.Component {
             fileName = fileName+"."+parts[parts.length-1]; // agrego la extencion
             if (fileName !== ''){
                 this.props.dispatch(openModal({
-                    id: uuid.v4(),
+                    id: shortid.generate(),
                     type: 'confirmation',
                     text: 'Are you sure to delete this file?',
                     onClose: null,
@@ -224,7 +223,7 @@ class DoctorLobby extends React.Component {
         const onClickRenameFolder = ({event, ref,data,dataFromProvider}) => {
             var folder = event.target.parentElement.children[1].innerText; // obtengo el nombre de la carpeta a editar
             this.props.dispatch(openModal({
-                id: uuid.v4(),
+                id: shortid.generate(),
                 type: 'custom',
                 content: <DoctorRenameFolderForm folderToRename = { folder } />,
             }));
@@ -246,7 +245,7 @@ class DoctorLobby extends React.Component {
             folderName = folderName.substring(0, folderName.length-1); // elimino el ultimo "-"
             if (folderName !== ''){
                 this.props.dispatch(openModal({
-                    id: uuid.v4(),
+                    id: shortid.generate(),
                     type: 'confirmation',
                     text: 'Are you sure to delete this folder?',
                     onClose: null,
@@ -271,7 +270,7 @@ class DoctorLobby extends React.Component {
             folderName = folderName.substring(0, folderName.length-1); // elimino el ultimo "-"
             if (folderName !== ''){
                 this.props.dispatch(openModal({
-                    id: uuid.v4(),
+                    id: shortid.generate(),
                     type: 'confirmation',
                     text: 'Are you sure to delete this pacient?',
                     onClose: null,
@@ -281,7 +280,7 @@ class DoctorLobby extends React.Component {
         };
         const onClickAddPacient = ({event, ref,data,dataFromProvider}) => {
             this.props.dispatch(openModal({
-                id: uuid.v4(),
+                id: shortid.generate(),
                 type: 'custom',
                 content: <DoctorAddFolderForm/>,
             }));

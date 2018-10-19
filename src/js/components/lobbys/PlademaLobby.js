@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux';
-import uuid from 'uuid'
+import shortid from 'shortid';
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
 
 import { openModal } from '../../actions/modalActions'
@@ -109,7 +109,7 @@ class PlademaLobby extends React.Component {
     _onClickAddFile(event){
         event.preventDefault();
         this.props.dispatch(openModal({
-            id: uuid.v4(),
+            id: shortid.generate(),
             type: 'custom',
             content: <PlademaAddFileForm/>,
         }));
@@ -118,7 +118,7 @@ class PlademaLobby extends React.Component {
     _onClickAddFolder(event){
         event.preventDefault();
         this.props.dispatch(openModal({
-            id: uuid.v4(),
+            id: shortid.generate(),
             type: 'custom',
             content: <PlademaAddFolderForm/>,
         }));
@@ -127,7 +127,7 @@ class PlademaLobby extends React.Component {
     render() {
         const onClickAddFolder = ({event, ref,data,dataFromProvider}) => {
             this.props.dispatch(openModal({
-                id: uuid.v4(),
+                id: shortid.generate(),
                 type: 'custom',
                 content: <PlademaAddFolderForm/>,
             }));
@@ -135,7 +135,7 @@ class PlademaLobby extends React.Component {
 
         const onClickUploadFile = ({event, ref,data,dataFromProvider}) => {
             this.props.dispatch(openModal({
-                id: uuid.v4(),
+                id: shortid.generate(),
                 type: 'custom',
                 content: <PlademaAddFileForm/>,
             }));
@@ -149,7 +149,7 @@ class PlademaLobby extends React.Component {
             }
             fileName = fileName.substring(0,fileName.length-1); // quito el ultimo -
             this.props.dispatch(openModal({
-                id: uuid.v4(),
+                id: shortid.generate(),
                 type: 'confirmation',
                 text: 'Are you sure to download this file?',
                 onClose: null,
