@@ -15,6 +15,7 @@ import AdminAddUserForm from '../components/forms/admin/AdminAddUserForm'
 import DoctorRemoteRenderPage from './pages/DoctorRemoteRenderPage'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import { ModalContainer }  from './common/Modal';
+import LocalRender from '../renders/LocalRender'
 
 export default class Routes extends React.Component {
     render(){
@@ -28,6 +29,7 @@ export default class Routes extends React.Component {
                         <Route exact path="/login" component = { loginControl(LoginForm) }/>  
                         <Route exact path="/doctor" component = { authenticateDoctor(DoctorLobby) } />
                         <Route exact path="/doctor/render" component = { authenticateDoctor(DoctorRemoteRenderPage) } />
+                        <Route exact path="/local" component = { LocalRender } />
                         <Route exact path="/pladema" component = { authenticatePladema(PlademaLobby) } />
                         <Route exact path="/admin" component = { authenticateAdmin(AdminLobby) } />
                         <Route exact path="/admin/view" component = { authenticateAdmin(AdminViewUsersForm) } />

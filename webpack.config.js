@@ -93,6 +93,10 @@ module.exports = {
             loader: "sass-loader" // compiles Sass to CSS
         }]
       },
+      {
+        test: /\.glsl$/,
+        loader: 'webpack-glsl-loader'
+      }
     ]
   },
 };
