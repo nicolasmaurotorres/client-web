@@ -1,7 +1,7 @@
 import React    from 'react'
 import VisualizerServerRender from '../../renders/VisualizerServerRender'
 
-class DoctorRemoteRenderPage extends React.Component {
+class SpecialistRemoteRenderPage extends React.Component {
     constructor(props){
         super(props);
 
@@ -24,4 +24,4 @@ class DoctorRemoteRenderPage extends React.Component {
     }
 }
 
-export default DoctorRemoteRenderPage;
+export default SpecialistRemoteRenderPage;

@@ -17,7 +17,7 @@ class AdminEditUserForm extends React.Component {
             errors: {},
             email: "",
             password: "",
-            category: 0, //default doctor
+            category: 0, //default specialist
             oldEmail: "",
             oldCategory: "",
             oldPassword: "",
@@ -151,8 +151,8 @@ class AdminEditUserForm extends React.Component {
                         <div className="form-group">
                             <label>Category</label>
                             <select name="category" value={this.state.category} onChange = { this._onChange } className="custom-select">
-                                <option value="0">Doctor</option>
-                                <option value="1">Pladema</option>
+                                <option value="0">Specialist</option>
+                                <option value="1">Technician</option>
                             </select>
                         </div>
                     </fieldset>

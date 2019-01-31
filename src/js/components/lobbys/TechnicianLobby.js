@@ -4,17 +4,17 @@ import shortid from 'shortid';
 import { ContextMenu, Item, ContextMenuProvider,IconFont } from 'react-contexify'
 
 import { openModal } from '../../actions/modalActions'
-import { plademaGetAllFolders, plademaGetFile } from '../../actions/plademaActions'
+import { technicianGetAllFolders, technicianGetFile } from '../../actions/technicianActions'
 import { setTableState, setCurrentLevel } from '../../actions/tableActions'
 import { addFlashMessage } from '../../actions/flashMessagesActions'
 
-import TablePladema from '../common/TablePladema'
-import PlademaAddFolderForm from '../forms/pladema/PlademaAddFolderForm'
-import PlademaAddFileForm from '../forms/pladema/PlademaAddFileForm'
+import TableTechnician from '../common/TableTechnician'
+import TechnicianAddFolderForm from '../forms/technician/TechnicianAddFolderForm'
+import TechnicianAddFileForm from '../forms/technician/TechnicianAddFileForm'
 import { _getPathAsString } from '../../utils/tableFunctions';
 import { setSpinnerState } from '../../actions/spinnerActions';
 
-class PlademaLobby extends React.Component {
+class TechnicianLobby extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -32,7 +32,7 @@ class PlademaLobby extends React.Component {
         var params = {
             emails:[]
         };
-        plademaGetAllFolders(params)
+        technicianGetAllFolders(params)
         .then((response)=>{
             var rawResponse = response.data.folders;
             var auxFolders = [];
@@ -77,7 +77,7 @@ class PlademaLobby extends React.Component {
         this.props.dispatch(setSpinnerState({
             state : true
         }));
-        plademaGetFile(obj)
+        technicianGetFile(obj)
         .then((response)=>{ 
             var fileName = "";
             var parts = nameFile.split(".");
@@ -111,7 +111,7 @@ class PlademaLobby extends React.Component {
         this.props.dispatch(openModal({
             id: shortid.generate(),
             type: 'custom',
-            content: <PlademaAddFileForm/>,
+            content: <TechnicianAddFileForm/>,
         }));
     }
 
@@ -120,7 +120,7 @@ class PlademaLobby extends React.Component {
         this.props.dispatch(openModal({
             id: shortid.generate(),
             type: 'custom',
-            content: <PlademaAddFolderForm/>,
+            content: <TechnicianAddFolderForm/>,
         }));
     }
 
@@ -129,7 +129,7 @@ class PlademaLobby extends React.Component {
             this.props.dispatch(openModal({
                 id: shortid.generate(),
                 type: 'custom',
-                content: <PlademaAddFolderForm/>,
+                content: <TechnicianAddFolderForm/>,
             }));
         }; 
 
@@ -137,7 +137,7 @@ class PlademaLobby extends React.Component {
             this.props.dispatch(openModal({
                 id: shortid.generate(),
                 type: 'custom',
-                content: <PlademaAddFileForm/>,
+                content: <TechnicianAddFileForm/>,
             }));
         }; 
         
@@ -179,7 +179,7 @@ class PlademaLobby extends React.Component {
                 { addFolderButton }
                 { addFileButton }
                 <ContextMenuProvider  id = { idMenu }>
-                    <TablePladema onMouseEnter = { this._hoverTableItem }/>
+                    <TableTechnician onMouseEnter = { this._hoverTableItem }/>
                 </ContextMenuProvider>
                 { menu }
             </div> 
@@ -199,4 +199,4 @@ function mapStateToProps(state){
     }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(PlademaLobby);
+export default connect(mapStateToProps,mapDispatchToProps)(TechnicianLobby);

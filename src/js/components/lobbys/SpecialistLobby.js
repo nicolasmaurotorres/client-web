@@ -6,16 +6,16 @@ import PropTypes from 'prop-types'
 import shortid from 'shortid'
 import { setTableState, setCurrentLevel } from '../../actions/tableActions'
 import { openModal } from '../../actions/modalActions'
-import { doctorGetPacients, doctorRemoveFile, doctorRemoveFolder } from '../../actions/doctorActions'
+import { specialistGetPacients, specialistRemoveFile, specialistRemoveFolder } from '../../actions/specialistActions'
 import { addFlashMessage } from '../../actions/flashMessagesActions'
 import { _getPathAsArray, _getPathAsString, _nextNode, _getFoldersAsArray } from '../../utils/tableFunctions';
-import TableDoctor from '../common/TableDoctor'
-import DoctorRenameFileForm from '../forms/doctor/DoctorRenameFileForm'
-import DoctorRenameFolderForm from '../forms/doctor/DoctorRenameFolderForm'
-import DoctorAddFolderForm from '../forms/doctor/DoctorAddFolderForm';
-import DoctorAddFileForm from '../forms/doctor/DoctorAddFileForm';
+import TableSpecialist from '../common/TableSpecialist'
+import SpecialistRenameFileForm from '../forms/specialist/SpecialistRenameFileForm'
+import SpecialistRenameFolderForm from '../forms/specialist/SpecialistRenameFolderForm'
+import SpecialistAddFolderForm from '../forms/specialist/SpecialistAddFolderForm';
+import SpecialistAddFileForm from '../forms/specialist/SpecialistAddFileForm';
 
-class DoctorLobby extends React.Component {
+class SpecialistLobby extends React.Component {
     constructor(props){
         super(props);
         
@@ -32,7 +32,7 @@ class DoctorLobby extends React.Component {
     }
  
     componentWillMount(){
-        doctorGetPacients()
+        specialistGetPacients()
         .then((response)=>{
             var rawResponse = response.data.folders;
             this.props.dispatch(setTableState({
@@ -77,7 +77,7 @@ class DoctorLobby extends React.Component {
         this.props.dispatch(openModal({
             id: shortid.generate(),
             type: 'custom',
-            content: <DoctorAddFileForm />,
+            content: <SpecialistAddFileForm />,
         }));
     } 
     
@@ -85,7 +85,7 @@ class DoctorLobby extends React.Component {
         this.props.dispatch(openModal({
             id: shortid.generate(),
             type: 'custom',
-            content: <DoctorAddFolderForm/>,
+            content: <SpecialistAddFolderForm/>,
         }));
     } 
 
@@ -93,7 +93,7 @@ class DoctorLobby extends React.Component {
         var obj = {
             file : _getPathAsString(this.props.table.level.path,1) + "/" + fileName
         };
-        doctorRemoveFile(obj)
+        specialistRemoveFile(obj)
         .then((response)=>{        
             var node = _nextNode(_getPathAsString(this.props.table.level.path),this.props.table.content);
             node.Files = lodash.pull(node.Files,fileName); // quito el fileName
@@ -121,7 +121,7 @@ class DoctorLobby extends React.Component {
         var obj = {
             folder : (baseLevel) ? folderName : _getPathAsString(this.props.table.level.path,1) + "/" + folderName
         }
-        doctorRemoveFolder(obj)
+        specialistRemoveFolder(obj)
         .then((response)=>{
             var path = _getPathAsString(this.props.table.level.path);
             var currentNode = _nextNode(path,this.props.table.content);
@@ -153,8 +153,6 @@ class DoctorLobby extends React.Component {
     render(){
         // context menu del archivo adentro de un paciente
         const onClickRenderFile = ({event, ref,data,dataFromProvider}) => {
-            //TODO: hacer renderizarlo
-            //this.context.router.history.push("/doctor/render");
             var parts = event.target.parentElement.id.split("-");
             var fileName = "";
             for (var i = 1; i < parts.length-1 ; i++){ 
@@ -163,7 +161,7 @@ class DoctorLobby extends React.Component {
             var dataDir = "/"+this.props.auth.user.username;
             fileName = "/"+_getPathAsString(this.props.table.level.path,1)+"/"+fileName+"."+parts[parts.length-1]; // agrego la extencion y el path al archivo a renderizar, sin el nombre del del email
             this.context.router.history.push({
-                pathname: '/doctor/render',
+                pathname: '/specialist/render',
                 state: { dataFile  : fileName,
                         dataDir }
               });
@@ -179,7 +177,7 @@ class DoctorLobby extends React.Component {
             this.props.dispatch(openModal({
                 id: shortid.generate(),
                 type: 'custom',
-                content: <DoctorRenameFileForm fileToRename = { fileToRename } fileExtension = { fileExt } />,
+                content: <SpecialistRenameFileForm fileToRename = { fileToRename } fileExtension = { fileExt } />,
             }));
         };
         const onClickCopyFile = ({event, ref,data,dataFromProvider}) => {
@@ -225,7 +223,7 @@ class DoctorLobby extends React.Component {
             this.props.dispatch(openModal({
                 id: shortid.generate(),
                 type: 'custom',
-                content: <DoctorRenameFolderForm folderToRename = { folder } />,
+                content: <SpecialistRenameFolderForm folderToRename = { folder } />,
             }));
         };
         const onClickCopyFolder = ({event, ref,data,dataFromProvider}) => {
@@ -282,7 +280,7 @@ class DoctorLobby extends React.Component {
             this.props.dispatch(openModal({
                 id: shortid.generate(),
                 type: 'custom',
-                content: <DoctorAddFolderForm/>,
+                content: <SpecialistAddFolderForm/>,
             }));
         };
         const MenuPacient = () => (
@@ -304,7 +302,7 @@ class DoctorLobby extends React.Component {
                 { addPacientButton }
                 { addFileButton }
                 <ContextMenuProvider  id = { idMenu }>
-                    <TableDoctor onMouseEnter = { this._onMouseEnterTableItem }/>
+                    <TableSpecialist onMouseEnter = { this._onMouseEnterTableItem }/>
                 </ContextMenuProvider>
                 { menu }
             </div>
@@ -325,8 +323,8 @@ function mapDispatchToProps(dispatch) {
     }
 };
 
-DoctorLobby.contextTypes = {
+SpecialistLobby.contextTypes = {
     router : PropTypes.object.isRequired
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(DoctorLobby);
+export default connect(mapStateToProps,mapDispatchToProps)(SpecialistLobby);

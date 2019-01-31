@@ -5,11 +5,11 @@ import validator from 'validator';
 import TextFieldGroup from '../../common/TextFieldGroup';
 import { _getFilesAsObject, _getFoldersAsObject, _getPathAsString, _getFoldersAsArray } from '../../../utils/tableFunctions';
 import { addFlashMessage } from '../../../actions/flashMessagesActions';
-import { doctorAddFolder } from '../../../actions/doctorActions';
+import { specialistAddFolder } from '../../../actions/specialistActions';
 import { _nextNode } from '../../../utils/tableFunctions';
 import { setCurrentLevel } from '../../../actions/tableActions';
 
-class DoctorAddFolderForm extends React.Component {
+class SpecialistAddFolderForm extends React.Component {
     constructor(props){
         super(props);
 
@@ -49,7 +49,7 @@ class DoctorAddFolderForm extends React.Component {
             var obj = {
                 folder : (this.props.table.level.position === 0) ? newFolder : _getPathAsString(this.props.table.level.path,1) +"/"+ newFolder
             };
-            doctorAddFolder(obj)
+            specialistAddFolder(obj)
             .then((response)=>{
                 this._callbackAddFolder(newFolder);
                 this.props.callback();
@@ -57,7 +57,7 @@ class DoctorAddFolderForm extends React.Component {
             .catch((response)=>{
                 this.props.dispatch(addFlashMessage({
                     type:"error",
-                    text:"network error - DoctorAddFolderForm - _submitForm"
+                    text:"network error - specialistAddFolderForm - _submitForm"
                 }));
             });
         }
@@ -124,7 +124,7 @@ class DoctorAddFolderForm extends React.Component {
     }
 }
 
-DoctorAddFolderForm.propTypes = {
+SpecialistAddFolderForm.propTypes = {
     callback : PropTypes.func.isRequired,
 }
 
@@ -142,4 +142,4 @@ function mapDispatchToProps(dispatch) {
 };
 
 
-export default connect(mapStateToProps,mapDispatchToProps)(DoctorAddFolderForm);
+export default connect(mapStateToProps,mapDispatchToProps)(SpecialistAddFolderForm);

@@ -1,11 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types'
-import { IconFont } from 'react-contexify'
+import shortid from 'shortid';
 import { connect } from 'react-redux';
-import { setCurrentLevel } from '../../actions/tableActions'
-import { _nextNode, _getFilesAsArray, _getPathAsArray, _getFoldersAsArray } from '../../utils/tableFunctions';
+import { IconFont } from 'react-contexify'
 
-class TablePladema extends React.Component {
+import { setCurrentLevel } from '../../actions/tableActions'
+import { _nextNode, _getFilesAsArray, _getPathAsArray, _getFoldersAsArray, _getPathAsString } from '../../utils/tableFunctions';
+
+
+class TableSpecialist extends React.Component {
     constructor(props){
         super(props);
 
@@ -22,64 +25,31 @@ class TablePladema extends React.Component {
             nameTarget = nameTarget + idArray[i] + "-";
         }
         nameTarget = nameTarget.substr(0,nameTarget.length - 1); // quito el ultimo "-"
-        // tengo que armar el path
-        var path = "";
-        for (var i = 0; i < this.props.table.level.path.length; i++){//arranco en 1 para no poner el primer /
-            path = path + this.props.table.level.path[i] + "/";
-        }
-        path = path + nameTarget;
+        var path = _getPathAsString(this.props.table.level.path) +"/"+ nameTarget;
         switch (idArray[0]){
             case "folder":{
                 // estoy en el nivel inicial, cambio a una subcarpeta
-                var nextNode = null;
-                var found = false;
-                for (var i = 0; i < this.props.table.content.length && !found; i++) {
-                    var nextNode = _nextNode(path,this.props.table.content[i]); // busco la carpeta para abrirla
-                    if (nextNode !== null){
-                        found=true;
-                    }
-                }
-                if (nextNode === null){
-                    // significa que hizo click en Home del path, tengo que cargarlo de 0
-                    var auxFolders = [];
-                    this.props.table.content.forEach(function(elem){
-                        auxFolders.push(elem.Folder);
-                    });
-                    this.props.dispatch(setCurrentLevel({
-                        path : [],
-                        files : [],
-                        folders : auxFolders,
-                        position : 0
-                    }));
-                } else {
-                    this.props.dispatch(setCurrentLevel({
-                        path : _getPathAsArray(nextNode),
-                        files : _getFilesAsArray(nextNode),
-                        folders : _getFoldersAsArray(nextNode),
-                        position : this.props.table.level.position+1
-                    }));
-                }
+                var nextNode = _nextNode(path,this.props.table.content); // busco la carpeta para abrirla
+                this.props.dispatch(setCurrentLevel({
+                    path : _getPathAsArray(nextNode),
+                    files : _getFilesAsArray(nextNode),
+                    folders : _getFoldersAsArray(nextNode),
+                    position : this.props.table.level.position + 1
+                }));
                 break;
             }
-            case "file":
-                console.log("en teoria no tendria que haber ningun archivo sin paciente!");
-                break;
         }
-    }    
-
+    }
+    
     _handleClickPath(e){
         var target = e.target.innerText; // un item del path clickeado, vuelvo a esa carpeta
         var index = this.props.table.level.path.indexOf(target);
-        if (index === -1){ // hizo click en Home
+        if (index === 0 || index === -1){ // hizo click en Home o en el email
             //click en el principio de todo, vuelvo al estado inicial.
-            var auxFolders = [];
-            this.props.table.content.forEach(function(elem){
-                auxFolders.push(elem.Folder);
-            });
             this.props.dispatch(setCurrentLevel({
-                path : [],
+                path : [this.props.auth.user.username],
                 files : [],
-                folders : auxFolders,
+                folders : _getFoldersAsArray(this.props.table.content),
                 position : 0
             }));
         } else {
@@ -90,8 +60,8 @@ class TablePladema extends React.Component {
             nextTarget = nextTarget + target;
             var nextNode = null;
             var found = false;
-            for (var i = 0; i < this.props.table.content.length && !found; i++){
-                var nextNode = _nextNode(nextTarget,this.props.table.content[i]); // busco la carpeta para abrirla
+            for (var i = 0; i < this.props.table.content.SubFolders.length && !found; i++){
+                var nextNode = _nextNode(nextTarget,this.props.table.content.SubFolders[i]); // busco la carpeta para abrirla
                 if (nextNode !== null){
                     found = true;
                 }
@@ -104,15 +74,15 @@ class TablePladema extends React.Component {
             }));
         }
     }
-    
+
     render(){
         var path = ["/",<label key = "Home" onClick = { this._handleClickPath } style={{cursor:"pointer"}}> Home </label>];
         this.props.table.level.path.forEach((item) => {
             if (item !== "/"){
                 path.push("/");
-                path.push(<label key = { item } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
+                path.push(<label key = { shortid.generate() } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
             } else {
-                path.push(<label key = { item } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
+                path.push(<label key = { shortid.generate() } onClick = { this._handleClickPath } style={{cursor:"pointer"}}>{ item }</label>);
             }
         });
 
@@ -124,22 +94,27 @@ class TablePladema extends React.Component {
         this.props.table.level.files.forEach(function(elem){
             var parts = elem.split(".");
             var extention = parts[parts.length-1]; // me quedo con la extencion
-            var row = ( <tr className = "table-secondary" key = { elem } id = { "file-"+elem+"-"+extention }>
-                            <td onClick = { handleOnClickTableItem } scope="row" name={ elem } onMouseEnter = { onMouseEnter }><IconFont className = "fa fa-file-text-o"/> </td>
-                            <td onClick = { handleOnClickTableItem } onMouseEnter = { onMouseEnter }>{ elem }</td>
+            var nameFile = "";
+            for (var i = 0; i < parts.length-1; i++){
+                nameFile += parts[i];
+            }
+            var row = ( <tr className = "table-secondary" key = { elem } id = { "file-"+nameFile+"-"+extention }>
+                            <td onClick = { handleOnClickTableItem } scope="row" name={ nameFile } onMouseEnter = { onMouseEnter }><IconFont className = "fa fa-file-text-o"/> </td>
+                            <td onClick = { handleOnClickTableItem } onMouseEnter = { onMouseEnter }>{ nameFile }</td>
                         </tr>);
             files.push(row);
         });
 
         this.props.table.level.folders.forEach(function(elem){
-            var row = (<tr className = "table-secondary" key = { elem } id = { "folder-"+elem }>
-                        <td onClick = { handleOnClickTableItem } scope="row" name={ elem.Folder } onMouseEnter = { onMouseEnter }><IconFont className = "fa fa-folder-o"/> </td>
-                        <td onClick = { handleOnClickTableItem } onMouseEnter = { onMouseEnter }>{ elem }</td>
+            var folder = elem;
+            var row = (<tr className = "table-secondary" key = {elem } id = { "folder-"+folder }>
+                        <td onClick = { handleOnClickTableItem } scope="row" name={ folder } onMouseEnter = { onMouseEnter }><IconFont className = "fa fa-folder-o"/> </td>
+                        <td onClick = { handleOnClickTableItem } onMouseEnter = { onMouseEnter }>{ folder }</td>
                        </tr>
             );
             folders.push(row);
         });
-        
+
         return (
             <div>
                 <div> { path } </div>
@@ -162,7 +137,7 @@ class TablePladema extends React.Component {
     }
 }
 
-TablePladema.PropTypes = {
+TableSpecialist.PropTypes = {
     onMouseEnter : PropTypes.func.isRequired,
 }
 
@@ -175,7 +150,8 @@ function mapDispatchToProps(dispatch) {
 function mapStateToProps(state){
     return {
         table : state.table,
+        auth: state.auth
     }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(TablePladema);
+export default connect(mapStateToProps,mapDispatchToProps)(TableSpecialist);

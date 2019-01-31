@@ -1,23 +1,23 @@
 import axiosInstance from '../utils/axiosInstance'
 
-export function plademaGetAllFolders(param){
+export function technicianGetAllFolders(param){
     param["token"] = localStorage.jwtToken;
-    return axiosInstance.post("/pladema/search/files",param);
+    return axiosInstance.post("/technician/search/files",param);
 }
 
-export function plademaAddFolder(data){
+export function technicianAddFolder(data){
     data["token"] = localStorage.jwtToken;
     return axiosInstance.post("/add/folder",data);
 }
 
-export function plademaAddFile(data){
+export function technicianAddFile(data){
     data.append("token",localStorage.jwtToken);
     return axiosInstance.post("/add/file",data);
 }
 
-export function plademaGetFile(data){
+export function technicianGetFile(data){
     data["token"] = localStorage.jwtToken;
-    return axiosInstance.post("/pladema/get/file",data,{
+    return axiosInstance.post("/technician/get/file",data,{
         responseType : 'arraybuffer'
     });
 }

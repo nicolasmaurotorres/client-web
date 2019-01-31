@@ -18,7 +18,7 @@ class AdminAddUserForm extends React.Component {
             password: "",
             serverMessage: "",
             serverStatus:"",
-            category: 0 //default doctor
+            category: 0 //default specialist
         }
 
         /* bindings */
@@ -169,8 +169,8 @@ class AdminAddUserForm extends React.Component {
                         <div className="form-group">
                             <label>Category</label>
                             <select name="category" onChange={this._onChange } className="custom-select">
-                                <option value="0">Doctor</option>
-                                <option value="1">Pladema</option>
+                                <option value="0">Specialist</option>
+                                <option value="1">Technician</option>
                             </select>
                         </div>
                     </fieldset>

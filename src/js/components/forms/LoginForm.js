@@ -70,11 +70,11 @@ class LoginForm extends React.Component {
                     setAuthorizationInfo(token);
                     this.props.dispatch(setCurrentUser(jwt.decode(token)));
                     switch (category) {
-                        case 0: // doctor
-                            this.context.router.history.push("/doctor");
+                        case 0: // specialist
+                            this.context.router.history.push("/specialist");
                             break;
-                        case 1: // pladema
-                            this.context.router.history.push("/pladema");
+                        case 1: // technician
+                            this.context.router.history.push("/technician");
                             break;
                         case 2: // admin
                             this.context.router.history.push("/admin");

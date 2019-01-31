@@ -24,7 +24,7 @@ class TableAdmin extends React.Component {
         for (var i = 0; i < data.length; i++) {
             var item = data[i];
             var row = ( <tr className = "table-secondary" key = { item.email } id = { item.email }>
-                            <td scope="row" name={item.category}>{ (item.category === 0) ? "Doctor" : "Pladema" }</td>
+                            <td scope="row" name={item.category}>{ (item.category === 0) ? "Specialist" : "Technician" }</td>
                             <td>{ item.email }</td>
                             <td><PasswordMask id = { item.email }
                                               name = "password"

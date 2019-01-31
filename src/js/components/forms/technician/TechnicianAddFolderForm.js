@@ -5,9 +5,9 @@ import validator from 'validator'
 import { connect } from 'react-redux';
 import { _nextNode, _getPathAsString, _getFoldersAsObject, _getFilesAsObject } from '../../../utils/tableFunctions'
 import { setTableState, setCurrentLevel } from '../../../actions/tableActions';
-import { plademaAddFolder } from '../../../actions/plademaActions';
+import { technicianAddFolder } from '../../../actions/technicianActions';
 
-class PlademaAddFolderForm extends React.Component {
+class TechnicianAddFolderForm extends React.Component {
     constructor(props){
         super(props);
 
@@ -40,7 +40,7 @@ class PlademaAddFolderForm extends React.Component {
             const { callback } = this.props;
             const _callbackAddFolder = this._callbackAddFolder;
             obj["folder"] = this.state.path +"/"+ this.state.name;
-            plademaAddFolder(obj)
+            technicianAddFolder(obj)
             .then((response)=>{
                 callback();
                 _callbackAddFolder(this.state.name);
@@ -144,7 +144,7 @@ class PlademaAddFolderForm extends React.Component {
     }
 }
 
-PlademaAddFolderForm.propTypes = {
+TechnicianAddFolderForm.propTypes = {
     callback : PropTypes.func.isRequired,
 }
 
@@ -160,4 +160,4 @@ function mapStateToProps(state){
    }
 };
   
-export default  connect(mapStateToProps,mapDispatchToProps)(PlademaAddFolderForm);
+export default  connect(mapStateToProps,mapDispatchToProps)(TechnicianAddFolderForm);

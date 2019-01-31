@@ -3,19 +3,19 @@ import PropTypes from 'prop-types'
 import TextFieldGroup from '../../common/TextFieldGroup'
 import validator from 'validator'
 import { connect } from 'react-redux';
-import { _nextNode, _getPathAsString, _getFoldersAsArray, _getFilesAsObject, _getFoldersAsObject } from '../../../utils/tableFunctions';
-import { doctorRenameFolder } from '../../../actions/doctorActions'
+import { addFlashMessage } from '../../../actions/flashMessagesActions'
+import { specialistRenameFile } from '../../../actions/specialistActions'
+import { _getPathAsString, _nextNode, _getFoldersAsObject } from '../../../utils/tableFunctions'
 import { setCurrentLevel } from '../../../actions/tableActions';
-import { addFlashMessage } from '../../../actions/flashMessagesActions';
 
-class DoctorRenameFolderForm extends React.Component {
+class SpecialistRenameFileForm extends React.Component {
     constructor(props){
         super(props);
 
         this.state = {
             errors: {},
             actualName : "",
-            name: ""
+            name: "",
         }
 
         /* bindings */
@@ -23,69 +23,49 @@ class DoctorRenameFolderForm extends React.Component {
         this._onChange = this._onChange.bind(this);
         this._isValid = this._isValid.bind(this);
         this._cancelForm = this._cancelForm.bind(this);
-        this._updateRenamedFolder = this._updateRenamedFolder.bind(this);
+        this._updateTable = this._updateTable.bind(this);
     }
 
     componentWillMount(){
-        const { folderToRename } = this.props;
-        this.setState({actualName : folderToRename,name : folderToRename});
+        this.setState({actualName:this.props.fileToRename, name:this.props.fileToRename});
     }
 
-    _updateRenamedFolder(newFolderName,oldFolderName){
-        const { username } = this.props.auth.user;
-        var previousFolder = "", toRename="" , newNameFolder = "";
-        var nextNode = null;
-        if (this.props.table.level.position === 0){ //modifico el nombre de un paciente 
-            previousFolder = username;
-            nextNode = _nextNode(previousFolder,this.props.table.content);
-            toRename = username+oldFolderName;
-            newNameFolder = username+newFolderName;
-        } else {
-            previousFolder = username+"/";
-            var split = oldFolderName.split("/");
-            for (var i = 0; i < split.length-1; i++){ // me paro en la carpeta que lo contiene al viejo nombre
-                previousFolder += split[i] + "/";
-            }
-            previousFolder = previousFolder.substring(0,previousFolder.length-1);  // quito el ultimo /
-            nextNode = _nextNode(previousFolder,this.props.table.content);
-            toRename = username+"/"+oldFolderName;
-            newNameFolder = username+"/"+newFolderName;
-        }
+    _updateTable(newFileName,oldFileName){
+        var actualPath = _getPathAsString(this.props.table.level.path);
+        var node = _nextNode(actualPath,this.props.table.content);
         var found = false;
-        var i = 0;
-        while (!found && i < nextNode.SubFolders.length){
-            if (nextNode.SubFolders[i].Folder === toRename){
-                nextNode.SubFolders[i].Folder = newNameFolder;
+        for (var i = 0; i < node.Files.length && !found; i++){
+            if (node.Files[i] === oldFileName){
+                node.Files[i] = newFileName;
                 found = true;
-            } else {
-                i++;
             }
         }
         this.props.dispatch(setCurrentLevel({
-            files : this.props.table.level.files,
-            folders : _getFoldersAsArray(nextNode),
+            files : node.Files,
+            folders : this.props.table.level.folders,
             path: this.props.table.level.path,
             position : this.props.table.level.position
         }));
     }
-
+    
     _submitForm(){
         if (this._isValid()){
             var obj = {}
-            var currentPath = _getPathAsString(this.props.table.level.path,1) +"/";
-            var newName = currentPath + this.state.name;
-            var oldName = currentPath + this.state.actualName;
-            obj["newfolder"] = newName;
-            obj["oldfolder"] = oldName;
-            doctorRenameFolder(obj)
+            const { fileExtension } = this.props;
+            var newName = this.state.name+ "."+ fileExtension;
+            var oldName = this.state.actualName + "."+ fileExtension;
+            obj["filenew"] =  newName;// le agrego la extension al renombrarlos
+            obj["fileold"] = oldName;
+            obj["folder"] = _getPathAsString(this.props.table.level.path,1);
+            specialistRenameFile(obj)
             .then((response)=>{
-                this._updateRenamedFolder(newName,oldName);
+                this._updateTable(newName,oldName);
                 this.props.callback();
             })
             .catch((response)=>{
                 this.props.dispatch(addFlashMessage({
                     type:"error",
-                    text:"network error - DoctorRenameFolderForm - _submitForm"
+                    text:"network error - specialistRenameFileForm - _submitForm"
                 }));
             });
         }
@@ -96,10 +76,10 @@ class DoctorRenameFolderForm extends React.Component {
         var name = this.state.name;
         name = name.trim();
         var _errors = {};
-        var res = name.match(/^[a-z0-9]+$/i); // solo letras y numeros 
+        var res = name.match(/^[a-zA-Z0-9 _]+$/i); // solo letras y numeros 
         if (res === null){
             toReturn = false;
-            _errors["name"] = "only can contains numbers and letters the name of the folder";
+            _errors["name"] = "only can contains numbers and letters the name of the file";
         }
         
         if (toReturn && validator.isEmpty(name)){
@@ -109,19 +89,26 @@ class DoctorRenameFolderForm extends React.Component {
         
         if (toReturn && this.state.actualName === name){
             toReturn = false;
-            _errors["name"] = "the name cannot be the same as the old one"
+            _errors["name"] = "the new name cannot be the same as the old one"
         }
-        var files = _getFilesAsObject(this.props.table.level.files);
-        if (toReturn && files[name] != null){
+        var otherFiles = {};
+        for (var i = 0; i < this.props.table.level.files.length ; i++){
+            var parts = this.props.table.level.files[i].split(".");
+            var otherFileName = "";
+            for (var j = 0; j < parts.length - 1; j++){
+                otherFileName += parts[j];
+            }
+            otherFiles[otherFileName] = i;
+        }
+        if (toReturn && otherFiles[name] != null){
             toReturn = false;
             _errors["name"] = "you already have a file with that name";
         }   
-        var folders = _getFoldersAsObject(this.props.table.level.folders);
-        if (toReturn && folders[name] != null){
+        var otherFolders = _getFoldersAsObject(this.props.table.level.folders);
+        if (toReturn && otherFolders[name] != null){
             toReturn = false;
             _errors["name"] = "you already have a folder with that name";
         }   
-
         this.setState( { errors : _errors });
         return toReturn;
     }
@@ -157,9 +144,10 @@ class DoctorRenameFolderForm extends React.Component {
     }
 }
 
-DoctorRenameFolderForm.propTypes = {
+SpecialistRenameFileForm.propTypes = {
+    fileToRename : PropTypes.string.isRequired,
+    fileExtension : PropTypes.string.isRequired,
     callback : PropTypes.func.isRequired,
-    folderToRename : PropTypes.string.isRequired,
 }
 
 function mapDispatchToProps(dispatch) {
@@ -175,4 +163,4 @@ function mapStateToProps(state){
     }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(DoctorRenameFolderForm);
+export default connect(mapStateToProps,mapDispatchToProps)(SpecialistRenameFileForm);

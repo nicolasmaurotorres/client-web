@@ -9,13 +9,13 @@ function mapStateToProps(state){
     };
 }
 
-export function authenticateDoctor(ComposedComponent){
-    class AuthenticateDoctor extends React.Component {
+export function authenticateSpecialist(ComposedComponent){
+    class AuthenticateSpecialist extends React.Component {
         componentWillMount(){
-            if (!this.props.auth.isAuthenticated || this.props.auth.user.category != 0){ // logued as pladema or admin
+            if (!this.props.auth.isAuthenticated || this.props.auth.user.category != 0){ // logued as technician or admin
                 this.props.addFlashMessage({
                     type : 'error',
-                    text : 'You need to login as doctor to access this page'
+                    text : 'You need to login as specialist to access this page'
                 });
                 this.context.router.history.push("/login");
             }
@@ -34,25 +34,25 @@ export function authenticateDoctor(ComposedComponent){
         }
     }
 
-    AuthenticateDoctor.propTypes = {
+    AuthenticateSpecialist.propTypes = {
         auth : PropTypes.object.isRequired,
         addFlashMessage : PropTypes.func.isRequired
     }
 
-    AuthenticateDoctor.contextTypes = {
+    AuthenticateSpecialist.contextTypes = {
         router : PropTypes.object.isRequired
     }
 
-    return connect(mapStateToProps,{ addFlashMessage })(AuthenticateDoctor);
+    return connect(mapStateToProps,{ addFlashMessage })(AuthenticateSpecialist);
 };
 
-export function authenticatePladema(ComposedComponent){
-    class AuthenticatePladema extends React.Component {
+export function authenticateTechnician(ComposedComponent){
+    class AuthenticateTechnician extends React.Component {
         componentWillMount(){
-            if (!this.props.auth.isAuthenticated || this.props.auth.user.category != 1){ // logued as doctor or admin
+            if (!this.props.auth.isAuthenticated || this.props.auth.user.category != 1){ // logued as specialist or admin
                 this.props.addFlashMessage({
                     type : 'error',
-                    text : 'You need to login as pladema to access this page'
+                    text : 'You need to login as technician to access this page'
                 });
                 this.context.router.history.push("/login");
             }
@@ -71,23 +71,23 @@ export function authenticatePladema(ComposedComponent){
         }
     }
 
-    AuthenticatePladema.propTypes = {
+    AuthenticateTechnician.propTypes = {
         auth : PropTypes.object.isRequired,
         addFlashMessage : PropTypes.func.isRequired
     }
 
-    AuthenticatePladema.contextTypes = {
+    AuthenticateTechnician.contextTypes = {
         router : PropTypes.object.isRequired
     }
 
-    return connect(mapStateToProps,{ addFlashMessage })(AuthenticatePladema);
+    return connect(mapStateToProps,{ addFlashMessage })(AuthenticateTechnician);
 }
 
 export function authenticateAdmin(ComposedComponent){
     class AuthenticateAdmin extends React.Component {
 
         componentWillMount(){
-            if (!this.props.auth.isAuthenticated || this.props.auth.user.category != 2){ // logued as doctor or admin
+            if (!this.props.auth.isAuthenticated || this.props.auth.user.category != 2){ // logued as specialist or admin
                 this.props.addFlashMessage({
                     type : 'error',
                     text : 'You need to login as admin to access this page'
@@ -132,10 +132,10 @@ export function loginControl(LoginComponent){
                 var lobby = "";
                 switch (this.props.auth.user.category){
                     case 0: 
-                        lobby = "/doctor";
+                        lobby = "/specialist";
                         break;
                     case 1:
-                        lobby = "/pladema";
+                        lobby = "/technician";
                         break;
                     case 2:
                         lobby = "/admin";

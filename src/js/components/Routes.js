@@ -5,14 +5,14 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import Home from './common/Home'
 import LoginForm from '../components/forms/LoginForm' 
 import NavBar from './common/NavBar'
-import DoctorLobby from './lobbys/DoctorLobby'
-import PlademaLobby from './lobbys/PlademaLobby'
+import SpecialistLobby from './lobbys/SpecialistLobby'
+import TechnicianLobby from './lobbys/TechnicianLobby'
 import AdminLobby from './lobbys/AdminLobby'
 import FlashMessagesList from './common/FlashMessagesList'
-import { authenticateDoctor, authenticatePladema, authenticateAdmin, loginControl }   from '../utils/authentications'
+import { authenticateSpecialist, authenticateTechnician, authenticateAdmin, loginControl }   from '../utils/authentications'
 import AdminViewUsersForm from '../components/forms/admin/AdminViewUsersForm'
 import AdminAddUserForm from '../components/forms/admin/AdminAddUserForm'
-import DoctorRemoteRenderPage from './pages/DoctorRemoteRenderPage'
+import SpecialistRemoteRenderPage from './pages/SpecialistRemoteRenderPage'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import { ModalContainer }  from './common/Modal';
 import LocalRender from '../renders/LocalRender'
@@ -27,10 +27,10 @@ export default class Routes extends React.Component {
                         <Route path="/" component = { NavBar } />
                         <Route path="/" component = { FlashMessagesList  } />
                         <Route exact path="/login" component = { loginControl(LoginForm) }/>  
-                        <Route exact path="/doctor" component = { authenticateDoctor(DoctorLobby) } />
-                        <Route exact path="/doctor/render" component = { authenticateDoctor(DoctorRemoteRenderPage) } />
+                        <Route exact path="/specialist" component = { authenticateSpecialist(SpecialistLobby) } />
+                        <Route exact path="/specialist/render" component = { authenticateSpecialist(SpecialistRemoteRenderPage) } />
                         <Route exact path="/local" component = { LocalRender } />
-                        <Route exact path="/pladema" component = { authenticatePladema(PlademaLobby) } />
+                        <Route exact path="/technician" component = { authenticateTechnician(TechnicianLobby) } />
                         <Route exact path="/admin" component = { authenticateAdmin(AdminLobby) } />
                         <Route exact path="/admin/view" component = { authenticateAdmin(AdminViewUsersForm) } />
                         <Route exact path="/admin/add" component = { authenticateAdmin(AdminAddUserForm) } />
