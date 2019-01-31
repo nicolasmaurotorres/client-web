@@ -1,11 +1,12 @@
 import React from 'react'
 
-import 'vtk.js/Sources/favicon';
-
 import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
 import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenRenderWindow';
 import vtkMapper from 'vtk.js/Sources/Rendering/Core/Mapper';
 import vtkSTLReader from 'vtk.js/Sources/IO/Geometry/STLReader';
+
+import addFlashMessage from '../actions/flashMessagesActions';
+import setSpinnerState from '../actions/spinnerActions';
 
 class LocalRender extends React.Component {
     constructor(){
@@ -30,14 +31,27 @@ class LocalRender extends React.Component {
         const dataTransfer = event.dataTransfer;
         const files = event.target.files || dataTransfer.files;
         if (files.length === 1) {
-          //myContainer.removeChild(fileContainer);
-          const fileReader = new FileReader();
-          this.setState({file:true});
-          fileReader.onload = function onLoad(e) {
-            _this.reader.parseAsArrayBuffer(fileReader.result);
-            _this._update();
-          };
-          fileReader.readAsArrayBuffer(files[0]);
+            const parts = files[0].split(".");
+            if (parts[1] === "stl"){
+                _this.props.dispatch(setSpinnerState({
+                    state:true
+                }));
+                const fileReader = new FileReader();
+                this.setState({file:true});
+                fileReader.onload = function onLoad(e) {
+                    _this.reader.parseAsArrayBuffer(fileReader.result);
+                    _this._update();
+                    _this.props.dispatch(setSpinnerState({
+                        state:false
+                    }));
+                };
+                fileReader.readAsArrayBuffer(files[0]);
+            } else {
+                this.props.dispatch(addFlashMessage({
+                    type : "error",
+                    text : "the extention of the file is not .stl"
+                }));
+            }
         }
     }
 
