@@ -1,7 +1,6 @@
 const path = require('path'); // We are using node's native package 'path'  https://nodejs.org/api/path.html
 const HtmlWebpackPlugin = require('html-webpack-plugin'); 
 const ExtractTextPlugin = require('extract-text-webpack-plugin'); 
-//const ParaViewWebLoaders = require('./loaders.paraviewweb.webpack-2.js'); // paraviewweb loader
 
 // Constant with our paths
 const paths = {
