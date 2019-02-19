@@ -159,7 +159,7 @@ class SpecialistLobby extends React.Component {
                 fileName += parts[i];
             }
             var dataDir = "/"+this.props.auth.user.username;
-            fileName = "/"+_getPathAsString(this.props.table.level.path,1)+"/"+fileName+"."+parts[parts.length-1]; // agrego la extencion y el path al archivo a renderizar, sin el nombre del del email
+            fileName = _getPathAsString(this.props.table.level.path,1)+"/"+fileName+"."+parts[parts.length-1]; // agrego la extencion y el path al archivo a renderizar, sin el nombre del del email
             this.context.router.history.push({
                 pathname: '/specialist/render',
                 state: { dataFile  : fileName,
