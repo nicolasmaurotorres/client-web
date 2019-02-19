@@ -15,7 +15,7 @@ class VisualizerServerRender extends React.Component {
         var config = renderConfig;
         config['dataDir'] = config['dataDir']+ dataDir;
         console.log('dataDir: '+config['dataDir']);
-        config['dataFile'] = config['dataDir'] + "/"+ dataFile;
+        config['dataFile'] = config['dataDir'] + dataFile;
         console.log('dataFile'+ config['dataFile'] );
         Visualizer.connect(renderConfig);
         Visualizer.autoStopServer(10);
