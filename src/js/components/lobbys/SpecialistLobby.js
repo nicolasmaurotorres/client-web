@@ -9,6 +9,7 @@ import { openModal } from '../../actions/modalActions'
 import { specialistGetPacients, specialistRemoveFile, specialistRemoveFolder } from '../../actions/specialistActions'
 import { addFlashMessage } from '../../actions/flashMessagesActions'
 import { _getPathAsArray, _getPathAsString, _nextNode, _getFoldersAsArray } from '../../utils/tableFunctions';
+import { renderConfig } from '../../config/renderConfig';
 import TableSpecialist from '../common/TableSpecialist'
 import SpecialistRenameFileForm from '../forms/specialist/SpecialistRenameFileForm'
 import SpecialistRenameFolderForm from '../forms/specialist/SpecialistRenameFolderForm'
@@ -158,10 +159,10 @@ class SpecialistLobby extends React.Component {
             for (var i = 1; i < parts.length-1 ; i++){ 
                 fileName += parts[i];
             }
-            var dataDir = "/"+this.props.auth.user.username;
+            var dataDir = "%2F"+this.props.auth.user.username;
             fileName = _getPathAsString(this.props.table.level.path,1)+"/"+fileName+"."+parts[parts.length-1]; // agrego la extencion y el path al archivo a renderizar, sin el nombre del del email
             this.context.router.history.push({
-                pathname: '/specialist/render?dataDir='+dataDir,
+                pathname: '/specialist/render?dataDir='+renderConfig.dataDir+dataDir,
                 state: { dataFile  : fileName,
                         dataDir }
               });
