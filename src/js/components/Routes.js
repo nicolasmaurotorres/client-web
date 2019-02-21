@@ -28,7 +28,7 @@ export default class Routes extends React.Component {
                         <Route path="/" component = { FlashMessagesList  } />
                         <Route exact path="/login" component = { loginControl(LoginForm) }/>  
                         <Route exact path="/specialist" component = { authenticateSpecialist(SpecialistLobby) } />
-                        <Route path="/specialist/render:dataDir" component = { authenticateSpecialist(SpecialistRemoteRenderPage) } />
+                        <Route path="/specialist/render" component = { authenticateSpecialist(SpecialistRemoteRenderPage) } />
                         <Route exact path="/local" component = { LocalRender } />
                         <Route exact path="/technician" component = { authenticateTechnician(TechnicianLobby) } />
                         <Route exact path="/admin" component = { authenticateAdmin(AdminLobby) } />
