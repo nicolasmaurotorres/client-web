@@ -9,7 +9,6 @@ import { openModal } from '../../actions/modalActions'
 import { specialistGetPacients, specialistRemoveFile, specialistRemoveFolder } from '../../actions/specialistActions'
 import { addFlashMessage } from '../../actions/flashMessagesActions'
 import { _getPathAsArray, _getPathAsString, _nextNode, _getFoldersAsArray } from '../../utils/tableFunctions';
-import { renderConfig } from '../../config/renderConfig';
 import TableSpecialist from '../common/TableSpecialist'
 import SpecialistRenameFileForm from '../forms/specialist/SpecialistRenameFileForm'
 import SpecialistRenameFolderForm from '../forms/specialist/SpecialistRenameFolderForm'
@@ -30,6 +29,7 @@ class SpecialistLobby extends React.Component {
         this._onConfirmDeleteFile = this._onConfirmDeleteFile.bind(this);
         this._onClickAddFile = this._onClickAddFile.bind(this);
         this._onClickAddFolder = this._onClickAddFolder.bind(this);
+        this._onClickLocalRender = this._onClickLocalRender.bind(this);
     }
  
     componentWillMount(){
@@ -89,6 +89,12 @@ class SpecialistLobby extends React.Component {
             content: <SpecialistAddFolderForm/>,
         }));
     } 
+
+    _onClickLocalRender(){
+        this.context.router.history.push({
+            pathname: '/local',
+          });
+    }
 
     _onConfirmDeleteFile(fileName){
         var obj = {
@@ -295,6 +301,7 @@ class SpecialistLobby extends React.Component {
         const menu =  (this.props.table.level.position === 0) ? <MenuPacient/> : ( (this.state.isFolder) ? <MenuFolder/> : <MenuFile/> );
         var nameButton = (this.props.table.level.position === 0) ? "Add pacient" : "Add Folder";
         const addPacientButton = <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFolder  }> { nameButton }  </botton> </div>;
+        const localRender = <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFolder  }> Local Render  </botton> </div>;
         const addFileButton = (this.props.table.level.position > 0) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFile }> Add File </botton> </div>  : null;
         const idMenu = this.state.idContextText;
         

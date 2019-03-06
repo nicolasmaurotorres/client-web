@@ -5,8 +5,10 @@ import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenR
 import vtkMapper from 'vtk.js/Sources/Rendering/Core/Mapper';
 import vtkSTLReader from 'vtk.js/Sources/IO/Geometry/STLReader';
 
-import addFlashMessage from '../actions/flashMessagesActions';
-import setSpinnerState from '../actions/spinnerActions';
+import { addFlashMessage } from '../actions/flashMessagesActions';
+import { setSpinnerState } from '../actions/spinnerActions';
+import { connect } from 'react-redux';
+
 
 class LocalRender extends React.Component {
     constructor(){
@@ -31,7 +33,8 @@ class LocalRender extends React.Component {
         const dataTransfer = event.dataTransfer;
         const files = event.target.files || dataTransfer.files;
         if (files.length === 1) {
-            const parts = files[0].split(".");
+            debugger;
+            const parts = files[0].name.split(".");
             if (parts[1] === "stl"){
                 _this.props.dispatch(setSpinnerState({
                     state:true
@@ -70,11 +73,24 @@ class LocalRender extends React.Component {
     render(){
         var fileChooser = <input type="file" onChange={this._handleFile}/>;        
         return (
-            <div id="localRenderId">
+            <div id="localRenderId" className="center-cards"> 
                 { (this.state.file === null ) ? fileChooser : "" }
             </div>
         );
     }
 }  
 
-export default LocalRender;
+function mapStateToProps(state) {
+    return {
+        loading : state.loading
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+      dispatch,
+    }
+};
+
+
+export default connect(mapStateToProps,mapDispatchToProps)(LocalRender);

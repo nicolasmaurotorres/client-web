@@ -23,6 +23,7 @@ class LoginForm extends React.Component {
         this._isValid = this._isValid.bind(this);
         this._onChange = this._onChange.bind(this);
         this._onClickCloseError = this._onClickCloseError.bind(this);
+        this._onClickLocalLogin = this._onClickLocalLogin.bind(this);
     }
 
     _isValid(){
@@ -46,6 +47,10 @@ class LoginForm extends React.Component {
         this.setState({ [e.target.name]: e.target.value });
         this._isValid();
     }
+
+    _onClickLocalLogin(){
+        this.context.router.history.push("/local");
+    } 
 
     _submitForm(e){
         e.preventDefault(); 
@@ -126,6 +131,9 @@ class LoginForm extends React.Component {
                     />
                     <div className="form-group">
                         <button onClick = { this._submitForm } className="btn btn-primary btn-lg"> Login </button>
+                    </div>
+                    <div className="form-group">
+                        <button onClick = { this._onClickLocalLogin } className="btn btn-primary btn-lg"> Local Render </button>
                     </div>
                 </div>
             </div>
