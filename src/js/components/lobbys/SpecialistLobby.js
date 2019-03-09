@@ -309,6 +309,7 @@ class SpecialistLobby extends React.Component {
             <div className="jumbotron fullscreen"> 
                 { addPacientButton }
                 { addFileButton }
+                { localRender }
                 <ContextMenuProvider  id = { idMenu }>
                     <TableSpecialist onMouseEnter = { this._onMouseEnterTableItem }/>
                 </ContextMenuProvider>
