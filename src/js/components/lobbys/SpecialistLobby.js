@@ -234,6 +234,7 @@ class SpecialistLobby extends React.Component {
                 fileName = fileName + parts[i] + "-";
             }
             fileName = fileName.substring(0,fileName.length-1); // quito el ultimo -
+            fileName = fileName + "."+parts[2];
             this.props.dispatch(openModal({
                 id: shortid.generate(),
                 type: 'confirmation',
