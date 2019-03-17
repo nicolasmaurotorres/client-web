@@ -9,6 +9,7 @@ import { openModal } from '../../actions/modalActions'
 import { specialistGetPacients, specialistRemoveFile, specialistRemoveFolder,specialistDownloadFile } from '../../actions/specialistActions'
 import { addFlashMessage } from '../../actions/flashMessagesActions'
 import { _getPathAsArray, _getPathAsString, _nextNode, _getFoldersAsArray } from '../../utils/tableFunctions';
+import { setSpinnerState } from '../../actions/spinnerActions';
 import TableSpecialist from '../common/TableSpecialist'
 import SpecialistRenameFileForm from '../forms/specialist/SpecialistRenameFileForm'
 import SpecialistRenameFolderForm from '../forms/specialist/SpecialistRenameFolderForm'
@@ -269,7 +270,7 @@ class SpecialistLobby extends React.Component {
                 <Item onClick = { onClickRenderFile }><IconFont className = "fa fa-play"/> Render </Item>
                 {/*<Item onClick = { onClickUpgradeFile }><IconFont className = "fa fa-arrow-circle-o-up"/> Upgrade </Item>*/}
                 <Item onClick = { onClickRenameFile }><IconFont className = "fa fa-edit"/> Rename </Item>
-                <Item onClick = { onClickDownloadFile }><IconFont className = "fa-fa-download"/> Download </Item>
+                <Item onClick = { onClickDownloadFile }><IconFont className = "fa fa-download"/> Download </Item>
                 {/*<Item onClick = { onClickPasteFile }><IconFont className = "fa fa-paste"/> Paste </Item>*/}
                 <Item onClick = { onClickDeleteFile }><IconFont className = "fa fa-trash"/> Delete </Item>
             </ContextMenu>
