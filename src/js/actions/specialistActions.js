@@ -39,3 +39,10 @@ export function specialistRemoveFolder (data){
     data["token"] = localStorage.jwtToken;
     return axiosInstance.post("/delete/folder",data);
 }
+
+export function specialistDownloadFile(data){
+    data["token"] = localStorage.jwtToken;
+    return axiosInstance.post("/specialist/download/file",data,{
+        responseType : 'arraybuffer'
+    })
+}

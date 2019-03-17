@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import shortid from 'shortid'
 import { setTableState, setCurrentLevel } from '../../actions/tableActions'
 import { openModal } from '../../actions/modalActions'
-import { specialistGetPacients, specialistRemoveFile, specialistRemoveFolder } from '../../actions/specialistActions'
+import { specialistGetPacients, specialistRemoveFile, specialistRemoveFolder,specialistDownloadFile } from '../../actions/specialistActions'
 import { addFlashMessage } from '../../actions/flashMessagesActions'
 import { _getPathAsArray, _getPathAsString, _nextNode, _getFoldersAsArray } from '../../utils/tableFunctions';
 import TableSpecialist from '../common/TableSpecialist'
@@ -30,6 +30,7 @@ class SpecialistLobby extends React.Component {
         this._onClickAddFile = this._onClickAddFile.bind(this);
         this._onClickAddFolder = this._onClickAddFolder.bind(this);
         this._onClickLocalRender = this._onClickLocalRender.bind(this);
+        this._onConfirmDownloadFile = this._onConfirmDownloadFile.bind(this);
     }
  
     componentWillMount(){
@@ -156,6 +157,44 @@ class SpecialistLobby extends React.Component {
             }));
         });
     }
+
+    _onConfirmDownloadFile(nameFile){
+        var path = _getPathAsString(this.props.table.level.path);
+        var obj = {};
+        obj["file"] = path+"/"+nameFile;
+        console.log(path+"/"+nameFile);
+        this.props.dispatch(setSpinnerState({
+            state : true
+        }));
+        specialistDownloadFile(obj)
+        .then((response)=>{ 
+            var fileName = "";
+            var parts = nameFile.split(".");
+            for (var i = 0; i < parts.length-1; i++){
+                fileName += parts[i] + ".";
+            }
+            fileName = fileName.substring(0,fileName.length-1);//quito el ultimo .
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName+".zip");
+            document.body.appendChild(link);
+            link.click();
+            this.props.dispatch(setSpinnerState({
+                state : false
+            }));
+        })
+        .catch((response)=>{
+            this.props.dispatch(addFlashMessage({
+                type:"error",
+                text:"network error downloading file"
+            }));
+            this.props.dispatch(setSpinnerState({
+                state : false
+            }));
+        });
+    }
+
  
     render(){
         // context menu del archivo adentro de un paciente
@@ -187,9 +226,20 @@ class SpecialistLobby extends React.Component {
                 content: <SpecialistRenameFileForm fileToRename = { fileToRename } fileExtension = { fileExt } />,
             }));
         };
-        const onClickCopyFile = ({event, ref,data,dataFromProvider}) => {
-            // TODO: falta hacer copy file
-            console.log("on click copy file");
+        const onClickDownloadFile = ({event, ref,data,dataFromProvider}) => {
+            var parts = event.target.parentElement.id.split("-");
+            var fileName = ""; 
+            for (var i = 1; i < parts.length-1; i++){ // por si el archivo contenia un "-"
+                fileName = fileName + parts[i] + "-";
+            }
+            fileName = fileName.substring(0,fileName.length-1); // quito el ultimo -
+            this.props.dispatch(openModal({
+                id: shortid.generate(),
+                type: 'confirmation',
+                text: 'Are you sure of download this file?',
+                onClose: null,
+                onConfirm: () => this._onConfirmDownloadFile(fileName),
+              }));
         };
         const onClickPasteFile = ({event, ref,data,dataFromProvider}) => {
             // TODO: falta hacer paste file
@@ -219,8 +269,8 @@ class SpecialistLobby extends React.Component {
                 <Item onClick = { onClickRenderFile }><IconFont className = "fa fa-play"/> Render </Item>
                 {/*<Item onClick = { onClickUpgradeFile }><IconFont className = "fa fa-arrow-circle-o-up"/> Upgrade </Item>*/}
                 <Item onClick = { onClickRenameFile }><IconFont className = "fa fa-edit"/> Rename </Item>
-                {/*<Item onClick = { onClickCopyFile }><IconFont className = "fa fa-copy"/> Copy </Item>
-                <Item onClick = { onClickPasteFile }><IconFont className = "fa fa-paste"/> Paste </Item>*/}
+                <Item onClick = { onClickDownloadFile }><IconFont className = "fa-fa-download"/> Download </Item>
+                {/*<Item onClick = { onClickPasteFile }><IconFont className = "fa fa-paste"/> Paste </Item>*/}
                 <Item onClick = { onClickDeleteFile }><IconFont className = "fa fa-trash"/> Delete </Item>
             </ContextMenu>
         );
