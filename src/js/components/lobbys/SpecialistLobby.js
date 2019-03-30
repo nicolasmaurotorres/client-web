@@ -353,7 +353,7 @@ class SpecialistLobby extends React.Component {
         const menu =  (this.props.table.level.position === 0) ? <MenuPacient/> : ( (this.state.isFolder) ? <MenuFolder/> : <MenuFile/> );
         var nameButton = (this.props.table.level.position === 0) ? "Add pacient" : "Add Folder";
         const addPacientButton = <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFolder  }> { nameButton }  </botton> </div>;
-        const localRender = <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFolder  }> Local Render  </botton> </div>;
+        const localRender = <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickLocalRender  }> Local Render  </botton> </div>;
         const addFileButton = (this.props.table.level.position > 0) ? <div className="form-group"> <botton className="btn btn-primary btn-lg" onClick = { this._onClickAddFile }> Add File </botton> </div>  : null;
         const idMenu = this.state.idContextText;
         
