@@ -58,7 +58,7 @@ class TechnicianAddFolderForm extends React.Component {
         var name = this.state.name;
         name = name.trim();
         var _errors = {};
-        var res = name.match(/^[a-z0-9]+$/i); // solo letras y numeros 
+        var res = name.match(/^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$/i); // solo letras y numeros 
         if (res === null){
             toReturn = false;
             _errors["name"] = "only can contains numbers and letters the name of the pacient";
