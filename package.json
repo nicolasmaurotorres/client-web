@@ -4,7 +4,7 @@
   "description": "this is the client of the thesis",
   "main": "index.js",
   "scripts": {
-    "dev": "./node_modules/.bin/webpack-dev-server --open --port=8000",
+    "dev": "./node_modules/.bin/webpack-dev-server --host 0.0.0.0",
     "build": "fix-autobahn && webpack",
     "build:debug": "fix-autobahn && webpack --display-modules",
     "build:release": "export NODE_ENV=production && fix-autobahn && webpack -p",
