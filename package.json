@@ -55,7 +55,7 @@
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
     "shortid": "^2.2.8",
-    "validator": "^9.4.1",
+    "validator": "^13.7.0",
     "vtk.js": "^7.13.5",
     "wslink": "^0.1.4",
     "zxcvbn": "^4.4.2"
