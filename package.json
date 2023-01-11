@@ -40,7 +40,7 @@
     "axios": "^0.17.1",
     "classnames": "^2.2.5",
     "font-awesome": "^4.7.0",
-    "jsonwebtoken": "^8.2.0",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.5",
     "node-sass": "^4.9.3",
     "normalize.css": "^7.0.0",
